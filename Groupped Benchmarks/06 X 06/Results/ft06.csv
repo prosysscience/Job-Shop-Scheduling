@@ -1,0 +1,72 @@
+clingo-dl version 1.1.1
+Reading from JSPSaadClingoDL_V3.lp ...
+Solving...
+Solving...
+Solving...
+Solving...
+Solving...
+Solving...
+Solving...
+Solving...
+Solving...
+Solving...
+Solving...
+Solving...
+Solving...
+Solving...
+Solving...
+Solving...
+Solving...
+Solving...
+Solving...
+Solving...
+UNSATISFIABLE
+
+Models       : 19
+Calls        : 20
+Time         : 0.031s (Solving: 0.00s 1st Model: 0.00s Unsat: 0.00s)
+CPU Time     : 0.016s
+
+Choices      : 4747    
+Conflicts    : 147      (Analyzed: 146)
+Restarts     : 1        (Average: 146.00 Last: 39)
+Model-Level  : 81.1    
+Problems     : 20       (Average Length: 1.00 Splits: 0)
+Lemmas       : 636      (Deleted: 0)
+  Binary     : 40       (Ratio:   6.29%)
+  Ternary    : 117      (Ratio:  18.40%)
+  Conflict   : 146      (Average Length:    5.3 Ratio:  22.96%) 
+  Loop       : 0        (Average Length:    0.0 Ratio:   0.00%) 
+  Other      : 490      (Average Length:    4.6 Ratio:  77.04%) 
+Backjumps    : 146      (Average:  1.75 Max:  17 Sum:    256)
+  Executed   : 139      (Average:  1.71 Max:  17 Sum:    249 Ratio:  97.27%)
+  Bounded    : 7        (Average:  1.00 Max:   1 Sum:      7 Ratio:   2.73%)
+
+Rules        : 812     
+  Choice     : 126     
+Atoms        : 776     
+Bodies       : 583     
+Equivalences : 1565     (Atom=Atom: 401 Body=Body: 402 Other: 762)
+Tight        : Yes
+Variables    : 145      (Eliminated:    0 Frozen:  126)
+Constraints  : 7        (Binary: 100.0% Ternary:   0.0% Other:   0.0%)
+
+DifferenceLogic
+  Optimization: 55
+  Time init(s): 0.0015506
+  Mutexes    : 0
+  [Thread 0]
+    Propagation(s): 0.0031806
+    Dijkstra(s): 0
+    Undo(s)  : 0.000205
+    True edges: 0
+    False edges: 0
+    False edges (inverse): 0
+    False edges (partial): 0
+    False edges (partial+): 0
+    Edges added: 8936
+    Edges skipped: 5402
+    Edges propagated: 0
+    Cost consistency: 78837
+    Cost forward: 0
+    Cost backward: 0
