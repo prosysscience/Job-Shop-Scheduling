@@ -1,3 +1,6 @@
+#const numOfJobs = 4.
+#const numOfMachines = 3.
+
 assignment(1, 1, 1, 5).
 assignment(1, 2, 2, 10).
 assignment(1, 3, 3, 4).
