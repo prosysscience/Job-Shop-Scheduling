@@ -26,22 +26,9 @@ class Application:
         pass
     
     # get the Time out per Time Window
-    def get_TimeOut(self, JobsNumber, MachinesNumber):
+    def get_TimeOut(self, JobsNumber, MachinesNumber, numOfTimeWindows):
         TimeOutForWindow = 0
-        if JobsNumber == 100:
-            TimeOutForWindow = 5020
-        elif JobsNumber == 50:
-            if MachinesNumber == 20:
-                TimeOutForWindow = 910
-            elif MachinesNumber == 15:
-                TimeOutForWindow = 670
-            elif MachinesNumber == 10:
-                TimeOutForWindow = 509
-        elif JobsNumber == 30:
-            if MachinesNumber == 15:
-                TimeOutForWindow = 935
-            elif MachinesNumber == 20:
-                TimeOutForWindow = 922
+        TimeOutForWindow = 1200/numOfTimeWindows
         return TimeOutForWindow
     # ************************************************
 
@@ -86,13 +73,15 @@ class Application:
             files.append("-")
         for f in files:
             prg.load(f)
-        numOfTimeWindows = 1
+        numOfTimeWindows = 3
         JobsNumber     = prg.get_const("numOfJobs").number
         MachinesNumber = prg.get_const("numOfMachines").number
-        TimeOutForWindow = self.get_TimeOut(JobsNumber, MachinesNumber)
+        TimeOutForWindow = self.get_TimeOut(JobsNumber, MachinesNumber, numOfTimeWindows)
         i, ret = 0, None
         TotalFacts = ''
         Lastbound = 0
+        InterruptedCalls = 0
+        NotInterruptedCalls = 0
         makeSpanTW = []
         while i <= numOfTimeWindows:
             timeUsed = 0
@@ -108,16 +97,19 @@ class Application:
                 Lastbound = bound
                 tic = time.time()
                 if timeUsed >= TimeOutForWindow:
+                    InterruptedCalls += 1
                     break
                 with prg.solve(on_model=self.__on_model, on_statistics=self.__on_statistics, async_=True, yield_=True) as handle:
                     wait = handle.wait(TimeOutForWindow - timeUsed)
                     if not wait:
-                    	break
+                        InterruptedCalls += 1
+                        break
                     for model in handle:
                         a = self.__theory.assignment(model.thread_id)
                         TotalFacts, bound = self.get_TotalFacts(a)
                         break
                     else:
+                        NotInterruptedCalls += 1
                         # sys.stdout.write("Optimum Found\n")
                         break
                 toc = time.time()
@@ -127,7 +119,10 @@ class Application:
                 ret = prg.solve()
             if i != 0:
                 makeSpanTW.append(Lastbound)
-            i = i + 1		# Go to the next Time Window
+            i = i + 1      # Go to the next Time Window
         for x in range(numOfTimeWindows):
             print("Completion Time for Window {} : {} ".format(x+1, makeSpanTW[x]))
+        print("Number of Interrupted Calls : {} ".format(InterruptedCalls))
+        print("Number of UnInterrupted Calls : {} ".format(NotInterruptedCalls-1))
+
 sys.exit(int(clingo.clingo_main(Application("test"), sys.argv[1:])))
