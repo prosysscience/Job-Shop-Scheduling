@@ -35,42 +35,51 @@ sameMach(JobNum1, StepNum1, JobNum2, StepNum2) :- assign(JobNum1, StepNum1, Mach
 
 % *************** To Make the order which operation should be performed first, if I have Operations should be performed on the same machine **********
 {seqM((JobNum1, StepNum1), (JobNum2, StepNum2), ProTime1)} :- sameMach(JobNum1, StepNum1, JobNum2, StepNum2), proTime(JobNum1, StepNum1, ProTime1),
-															  assignToTimeWindow(JobNum1, StepNum1, t),      
+															  assignToTimeWindow(JobNum1, StepNum1, t),
                                                   			  assignToTimeWindow(JobNum2, StepNum2, t).
 
- seqM((JobNum2, StepNum2), (JobNum1, StepNum1), ProTime2)  :- sameMach(JobNum1, StepNum1, JobNum2, StepNum2), proTime(JobNum2, StepNum2, ProTime2), 
+ seqM((JobNum2, StepNum2), (JobNum1, StepNum1), ProTime2)  :- sameMach(JobNum1, StepNum1, JobNum2, StepNum2), proTime(JobNum2, StepNum2, ProTime2),
  															  assignToTimeWindow(JobNum1, StepNum1, t),       proTime(JobNum1, StepNum1, ProTime1),
                                                   			  assignToTimeWindow(JobNum2, StepNum2, t),
  															  not seqM((JobNum1, StepNum1), (JobNum2, StepNum2), ProTime1).
 % ************* To Make the order which operation should be performed first, if I have Operations should be performed on the same machine ************
 
 {seqM((JobNum1, StepNum1), (JobNum2, StepNum2), ProTime1)} :- sameMach(JobNum1, StepNum1, JobNum2, StepNum2), proTime(JobNum1, StepNum1, ProTime1),
-															  overlappedOperation(JobNum1, StepNum1, t),     
+															  overlappedOperation(JobNum1, StepNum1, t),
 															  assignToTimeWindow (JobNum2, StepNum2, t).
 
 {seqM((JobNum1, StepNum1), (JobNum2, StepNum2), ProTime1)} :- sameMach(JobNum1, StepNum1, JobNum2, StepNum2), proTime(JobNum1, StepNum1, ProTime1),
-															  assignToTimeWindow (JobNum1, StepNum1, t),      
+															  assignToTimeWindow (JobNum1, StepNum1, t),
 															  overlappedOperation(JobNum2, StepNum2, t).
 
- seqM((JobNum2, StepNum2), (JobNum1, StepNum1), ProTime2)  :- sameMach(JobNum1, StepNum1, JobNum2, StepNum2), proTime(JobNum2, StepNum2, ProTime2), 
+ seqM((JobNum2, StepNum2), (JobNum1, StepNum1), ProTime2)  :- sameMach(JobNum1, StepNum1, JobNum2, StepNum2), proTime(JobNum2, StepNum2, ProTime2),
  															  overlappedOperation(JobNum1, StepNum1, t),      proTime(JobNum1, StepNum1, ProTime1),
                                                   			  assignToTimeWindow (JobNum2, StepNum2, t),
  															  not seqM((JobNum1, StepNum1), (JobNum2, StepNum2), ProTime1).
  
- seqM((JobNum2, StepNum2), (JobNum1, StepNum1), ProTime2)  :- sameMach(JobNum1, StepNum1, JobNum2, StepNum2), proTime(JobNum2, StepNum2, ProTime2), 
+ seqM((JobNum2, StepNum2), (JobNum1, StepNum1), ProTime2)  :- sameMach(JobNum1, StepNum1, JobNum2, StepNum2), proTime(JobNum2, StepNum2, ProTime2),
  															  assignToTimeWindow (JobNum1, StepNum1, t),      proTime(JobNum1, StepNum1, ProTime1),
                                                   			  overlappedOperation(JobNum2, StepNum2, t),
  															  not seqM((JobNum1, StepNum1), (JobNum2, StepNum2), ProTime1).
 
 % *************************** To Make the order between two operations sharing same machine and in different Time Windows ****************************
- seqM((JobNum1, StepNum1), (JobNum2, StepNum2), ProTime1) :- sameMach(JobNum1, StepNum1, JobNum2, StepNum2), assignToTimeWindow(JobNum1, StepNum1, t-1), 
-															 proTime(JobNum1, StepNum1, ProTime1),           assignToTimeWindow(JobNum2, StepNum2, t  ), 
-															 not overlappedOperation(JobNum1, StepNum1,t).
+seqM((JobNum1, StepNum1), (JobNum2, StepNum2), ProTime1) :- sameMach(JobNum1, StepNum1, JobNum2, StepNum2), assignToTimeWindow(JobNum1, StepNum1, t-1),
+															proTime(JobNum1, StepNum1, ProTime1),           assignToTimeWindow(JobNum2, StepNum2, t  ),
+															not overlappedOperation(JobNum1, StepNum1,t).
 
- seqM((JobNum2, StepNum2), (JobNum1, StepNum1), ProTime2) :- sameMach(JobNum1, StepNum1, JobNum2, StepNum2), assignToTimeWindow(JobNum1, StepNum1, t  ),     
- 															 proTime(JobNum2, StepNum2, ProTime2),			 assignToTimeWindow(JobNum2, StepNum2, t-1),
-                                                  			 not overlappedOperation(JobNum2, StepNum2,t).
+seqM((JobNum2, StepNum2), (JobNum1, StepNum1), ProTime2) :- sameMach(JobNum1, StepNum1, JobNum2, StepNum2), assignToTimeWindow(JobNum1, StepNum1, t  ),
+ 															proTime(JobNum2, StepNum2, ProTime2),			assignToTimeWindow(JobNum2, StepNum2, t-1),
+                                                  			not overlappedOperation(JobNum2, StepNum2,t).
 % *************************** To Make the order between two operations sharing same machine and in different Time Windows ****************************
+
+% ****** This rule to handle the sequence between two operations share same machine and one of them is overlapped on the previous Time Windows ******
+seqM((JobNum2, StepNum2), (JobNum1, StepNum1), ProTime2) :- sameMach(JobNum1, StepNum1, JobNum2, StepNum2), assignToTimeWindow(JobNum1, StepNum1, t),
+ 															proTime (JobNum2, StepNum2, ProTime2),			overlappedOperation(JobNum2, StepNum2, t-1).
+
+seqM((JobNum1, StepNum1), (JobNum2, StepNum2), ProTime1) :- sameMach(JobNum1, StepNum1, JobNum2, StepNum2), overlappedOperation(JobNum1, StepNum1, t-1),
+															proTime (JobNum1, StepNum1, ProTime1),           assignToTimeWindow(JobNum2, StepNum2, t).
+% ****** This rule to handle the sequence between two operations share same machine and one of them is overlapped on the previous Time Windows ******	
+
 
 &diff{ Operation1 - Operation2 }	<= -ProTime1	:- seqL(Operation1, Operation2, ProTime1),
 													   assignToTimeWindow(JobNum, StepNum1, t-1), Operation1 = (JobNum, StepNum1),
@@ -114,11 +123,10 @@ index(JobNum1, StepNum1, N)	:- startTime((JobNum1, StepNum1), StartTime1),
 							   								  (StartTime1, ProTime1, StepNum1, JobNum1) < (StartTime2, ProTime2, StepNum2, JobNum2)}.
 
 overlappedOperation(JobNum, StepNum, t) :- index(JobNum, StepNum, N), numOfOperPerTWin(M),
-										   assignToTimeWindow(JobNum, StepNum, t-1), N < (1 * M / 10).
+										   assignToTimeWindow(JobNum, StepNum, t-1), N < (5 * M / 10).
 
 #program opt(b).
 #external bound(b).
 &diff{  bound		- 		  0} 	<= b :- bound(b).
-
 
 #show maxTime1/1.
