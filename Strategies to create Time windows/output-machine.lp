@@ -5,12 +5,17 @@ todo(JobNum, StepNum, N, I + 1) :- todo(JobNum, StepNum, N, I),
                                    pick(JobNum, StepNuM, M, I), StepNuM < StepNum.
 todo(I)                         :- todo(JobNum, StepNum, N, I).
 
+done(JobNum, StepNum, 0, I) :- todo(I),
+                               startTime((JobNum, StepNum), StartTime).
 done(JobNum, StepNum, N, I) :- todo(I),
                                fill(JobNum, StepNum, N, I - 1).
 done(JobNum, StepNum, N, I) :- todo(I),
                                done(JobNum, StepNum, N, I - 1).
 
-curr(0, 1) :- todo(1).
+curr(0, 1) :- todo(1),
+              not scheduled(_). % THIS RULE CAN BE REMOVED IF scheduled/1 IS ALWAYS INCLUDED
+curr(M, 1) :- todo(1),
+              scheduled(M).
 curr(M, I) :- todo(I),
               pick(JobNum, StepNum, N, I - 1),
               number(JobNum, StepNum, M - 1).
@@ -35,7 +40,10 @@ high(MachNum, MachNum, L, I) :- load(MachNum, 1, L, I),
 high(MachNum, LoadNum, L, I) :- load(MachNum, 1, L1, I),
                                 high(MachNum + 1, LoadNum, L, I), L1 < L.
 
-poss(0, I)     :- todo(I).
+poss(0, I)     :- todo(I),
+                  not scheduled(_). % THIS RULE CAN BE REMOVED IF scheduled/1 IS ALWAYS INCLUDED
+poss(N, I)     :- todo(I),
+                  scheduled(N).
 poss(N + 1, I) :- poss(N, I),
                   done(JobNum, StepNum, N, I).
 poss(N + 1, I) :- keep(JobNum, StepNum, N, I).
