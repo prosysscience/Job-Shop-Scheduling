@@ -26,7 +26,7 @@ We tested our Model on Taillard benchmark instances [Taillard’s instances](htt
     |        └── dlO_Timeout_Whole_Time_Window.py   # Python api with timeout for each Time Window
     │   ├── \Single-shot              
     |        |── JSP.lp                             # Scheduling encoding with Single-shot 
-    │   └── \Strategies to create Time windows      # Directory with different strategies to decompose the problem into Time Windows
+    ├── \Strategies to create Time windows      # Directory with different strategies to decompose the problem into Time Windows
     |
     │
     └── README.md
