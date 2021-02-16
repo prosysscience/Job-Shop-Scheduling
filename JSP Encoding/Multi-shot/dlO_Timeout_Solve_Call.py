@@ -5,6 +5,9 @@ import theory
 import time
 from clingo import Function
 
+NUM_OF_TIME_WINDOWS = 3
+MAX_TIMEOUT = 1000
+
 class Application:
     def __init__(self, name):
         self.program_name = name
@@ -24,36 +27,36 @@ class Application:
     def __on_statistics(self, step, accu):
         self.__theory.on_statistics(step, accu)
         pass
-
+    
     # get the assignment of the operations in a string format to be sent as facts for the next Time Window
-    def get_TotalFacts(self, assignment):
-        TotalFacts = ''
+    def get_total_facts(self, assignment):
+        total_facts = ''
         to_join = []
         for name, value in assignment:
             if str(name) != "bound":
-                FactsFormat = "startTime({}, {}). ".format(name, value)
-                to_join.append(FactsFormat)
+                facts_format = "startTime({}, {}). ".format(name, value)
+                to_join.append(facts_format)
             else:
                 bound = int(value)
-        TotalFacts = ''.join(to_join)
-        return TotalFacts, bound
+        total_facts = ''.join(to_join)
+        return total_facts, bound
     # ****************************************************************************************************
 
     # get the part that should be grounded and solved
-    def step_To_Ground(self, prg, step, TotalFacts):
+    def step_to_ground(self, prg, step, total_facts):
         parts = []
         if step > 0:
             parts.append(("subproblem", [step]))
             if step > 1:
                 parts.append(("solutionTimeWindow", []))
-                prg.add("solutionTimeWindow", [], TotalFacts)
+                prg.add("solutionTimeWindow", [], total_facts)
         else:
             parts.append(("base", []))
         return parts
     # ***********************************************
 
     # add a new constraint to get lower value of bound (Optimization Part)
-    def add_New_Constraint(self, prg, bound):
+    def add_new_constraint(self, prg, bound):
         prg.cleanup()
         prg.ground([("opt", [bound-1])])
         prg.assign_external(Function("bound", [bound-1]), True)
@@ -66,40 +69,44 @@ class Application:
             files.append("-")
         for f in files:
             prg.load(f)
-        numOfTimeWindows = 2
         i, ret = 0, None
-        TotalFacts = ''
-        Lastbound = 0
-        makeSpanTW = []
-        while i <= numOfTimeWindows:
+        total_facts = ''
+        lastbound = 0
+        interrupted_calls = 0
+        non_interrupted_calls = 0
+        makespan_time_window = []
+        while i <= NUM_OF_TIME_WINDOWS:
             prg.configuration.solve.models = 0
-            parts = self.step_To_Ground(prg, i, TotalFacts)
+            parts = self.step_to_ground(prg, i, total_facts)
             prg.cleanup()
             prg.ground(parts)
             self.__theory.prepare(prg)
-            adjust = self.__theory.lookup_symbol(clingo.Number(0))
             bound = 0
             while True:
-                prg.assign_external(Function("bound", [Lastbound-1]), False)
-                Lastbound = bound
+                prg.assign_external(Function("bound", [lastbound-1]), False)
+                lastbound = bound
                 with prg.solve(on_model=self.__on_model, on_statistics=self.__on_statistics, async_=True, yield_=True) as handle:
-                    wait = handle.wait(81)
+                    wait = handle.wait(60)
                     if not wait:
-                    	break
+                        interrupted_calls += 1
+                        break
                     for model in handle:
                         a = self.__theory.assignment(model.thread_id)
-                        TotalFacts, bound = self.get_TotalFacts(a)
+                        total_facts, bound = self.get_total_facts(a)
                         break
                     else:
-                        #sys.stdout.write("Optimum Found\n")
+                        non_interrupted_calls += 1
+                        # sys.stdout.write("Optimum Found\n")
                         break
-                self.add_New_Constraint(prg, bound)
+                self.add_new_constraint(prg, bound)
             else:
                 ret = prg.solve()
             if i != 0:
-                makeSpanTW.append(Lastbound)
-            i = i + 1		# Go to the next Time Window
-        for x in range(numOfTimeWindows):
-            print("Completion Time for Window {} : {} ".format(x+1, makeSpanTW[x]))
-        #print("Total Completion Time / Time Window: {}".format(makeSpanTW[1:]))
+                makespan_time_window.append(lastbound)
+            i = i + 1      # Go to the next Time Window
+        for x in range(NUM_OF_TIME_WINDOWS):
+            print("Completion Time for Window {} : {} ".format(x+1, makespan_time_window[x]))
+        print("Number of Interrupted Calls : {} ".format(interrupted_calls))
+        print("Number of UnInterrupted Calls : {} ".format(non_interrupted_calls-1))
+
 sys.exit(int(clingo.clingo_main(Application("test"), sys.argv[1:])))

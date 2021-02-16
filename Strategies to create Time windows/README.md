@@ -8,9 +8,9 @@ The reorganized logic program files include the following:
 
 The following example calls can be used to try the different splitting strategies:
 
-  * `clingo ../Instances/instance01.lp CreatingTimeWindow\(EST\).lp output-direct.lp`
-  * `clingo ../Instances/instance01.lp CreatingTimeWindow\(EST\).lp output-direct.lp --const numOfTimeWindows=5`
-  * `clingo ../Instances/instance01.lp CreatingTimeWindow\(MTWR\).lp output-direct.lp`
-  * `clingo ../Instances/instance01.lp CreatingTimeWindow\(MTWR\).lp output-direct.lp --const numOfTimeWindows=5`
-  * `clingo ../Instances/instance01.lp CreatingTimeWindow\(EST\).lp output-machine.lp`
-  * `clingo ../Instances/instance01.lp CreatingTimeWindow\(MTWR\).lp output-machine.lp --const numOfTimeWindows=5`
+  * `clingo ../instance01.lp CreatingTimeWindow\(EST\).lp output-direct.lp`
+  * `clingo ../instance01.lp CreatingTimeWindow\(EST\).lp output-direct.lp --const numOfTimeWindows=5`
+  * `clingo ../instance01.lp CreatingTimeWindow\(MTWR\).lp output-direct.lp`
+  * `clingo ../instance01.lp CreatingTimeWindow\(MTWR\).lp output-direct.lp --const numOfTimeWindows=5`
+  * `clingo ../instance01.lp CreatingTimeWindow\(EST\).lp output-machine.lp`
+  * `clingo ../instance01.lp CreatingTimeWindow\(MTWR\).lp output-machine.lp --const numOfTimeWindows=5`

@@ -5,6 +5,9 @@ import theory
 import time
 from clingo import Function
 
+NUM_OF_TIME_WINDOWS = 3
+MAX_TIMEOUT = 1000
+
 class Application:
     def __init__(self, name):
         self.program_name = name
@@ -26,41 +29,39 @@ class Application:
         pass
     
     # get the Time out per Time Window
-    def get_TimeOut(self, JobsNumber, MachinesNumber, numOfTimeWindows):
-        TimeOutForWindow = 0
-        TimeOutForWindow = 1200/numOfTimeWindows
-        return TimeOutForWindow
+    def get_timeout(self):
+        return MAX_TIMEOUT/NUM_OF_TIME_WINDOWS
     # ************************************************
 
     # get the assignment of the operations in a string format to be sent as facts for the next Time Window
-    def get_TotalFacts(self, assignment):
-        TotalFacts = ''
+    def get_total_facts(self, assignment):
+        total_facts = ''
         to_join = []
         for name, value in assignment:
             if str(name) != "bound":
-                FactsFormat = "startTime({}, {}). ".format(name, value)
-                to_join.append(FactsFormat)
+                facts_format = "startTime({}, {}). ".format(name, value)
+                to_join.append(facts_format)
             else:
                 bound = int(value)
-        TotalFacts = ''.join(to_join)
-        return TotalFacts, bound
+        total_facts = ''.join(to_join)
+        return total_facts, bound
     # ****************************************************************************************************
 
     # get the part that should be grounded and solved
-    def step_To_Ground(self, prg, step, TotalFacts):
+    def step_to_ground(self, prg, step, total_facts):
         parts = []
         if step > 0:
             parts.append(("subproblem", [step]))
             if step > 1:
                 parts.append(("solutionTimeWindow", []))
-                prg.add("solutionTimeWindow", [], TotalFacts)
+                prg.add("solutionTimeWindow", [], total_facts)
         else:
             parts.append(("base", []))
         return parts
     # ***********************************************
 
     # add a new constraint to get lower value of bound (Optimization Part)
-    def add_New_Constraint(self, prg, bound):
+    def add_new_constraint(self, prg, bound):
         prg.cleanup()
         prg.ground([("opt", [bound-1])])
         prg.assign_external(Function("bound", [bound-1]), True)
@@ -73,56 +74,52 @@ class Application:
             files.append("-")
         for f in files:
             prg.load(f)
-        numOfTimeWindows = 3
-        JobsNumber     = prg.get_const("numOfJobs").number
-        MachinesNumber = prg.get_const("numOfMachines").number
-        TimeOutForWindow = self.get_TimeOut(JobsNumber, MachinesNumber, numOfTimeWindows)
+        timeout_for_window = self.get_timeout()
         i, ret = 0, None
-        TotalFacts = ''
-        Lastbound = 0
-        InterruptedCalls = 0
-        NotInterruptedCalls = 0
-        makeSpanTW = []
-        while i <= numOfTimeWindows:
-            timeUsed = 0
+        total_facts = ''
+        lastbound = 0
+        interrupted_calls = 0
+        non_interrupted_calls = 0
+        makespan_time_window = []
+        while i <= NUM_OF_TIME_WINDOWS:
+            time_used = 0
             prg.configuration.solve.models = 0
-            parts = self.step_To_Ground(prg, i, TotalFacts)
+            parts = self.step_to_ground(prg, i, total_facts)
             prg.cleanup()
             prg.ground(parts)
             self.__theory.prepare(prg)
-            adjust = self.__theory.lookup_symbol(clingo.Number(0))
             bound = 0
             while True:
-                prg.assign_external(Function("bound", [Lastbound-1]), False)
-                Lastbound = bound
+                prg.assign_external(Function("bound", [lastbound-1]), False)
+                lastbound = bound
                 tic = time.time()
-                if timeUsed >= TimeOutForWindow:
-                    InterruptedCalls += 1
+                if time_used >= timeout_for_window:
+                    interrupted_calls += 1
                     break
                 with prg.solve(on_model=self.__on_model, on_statistics=self.__on_statistics, async_=True, yield_=True) as handle:
-                    wait = handle.wait(TimeOutForWindow - timeUsed)
+                    wait = handle.wait(timeout_for_window - time_used)
                     if not wait:
-                        InterruptedCalls += 1
+                        interrupted_calls += 1
                         break
                     for model in handle:
                         a = self.__theory.assignment(model.thread_id)
-                        TotalFacts, bound = self.get_TotalFacts(a)
+                        total_facts, bound = self.get_total_facts(a)
                         break
                     else:
-                        NotInterruptedCalls += 1
+                        non_interrupted_calls += 1
                         # sys.stdout.write("Optimum Found\n")
                         break
                 toc = time.time()
-                timeUsed += (toc - tic)
-                self.add_New_Constraint(prg, bound)
+                time_used += (toc - tic)
+                self.add_new_constraint(prg, bound)
             else:
                 ret = prg.solve()
             if i != 0:
-                makeSpanTW.append(Lastbound)
+                makespan_time_window.append(lastbound)
             i = i + 1      # Go to the next Time Window
-        for x in range(numOfTimeWindows):
-            print("Completion Time for Window {} : {} ".format(x+1, makeSpanTW[x]))
-        print("Number of Interrupted Calls : {} ".format(InterruptedCalls))
-        print("Number of UnInterrupted Calls : {} ".format(NotInterruptedCalls-1))
+        for x in range(NUM_OF_TIME_WINDOWS):
+            print("Completion Time for Window {} : {} ".format(x+1, makespan_time_window[x]))
+        print("Number of Interrupted Calls : {} ".format(interrupted_calls))
+        print("Number of UnInterrupted Calls : {} ".format(non_interrupted_calls-1))
 
 sys.exit(int(clingo.clingo_main(Application("test"), sys.argv[1:])))
