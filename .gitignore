@@ -1,0 +1,8 @@
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.synctex.gz
+Project_proposal_V1.pdf
