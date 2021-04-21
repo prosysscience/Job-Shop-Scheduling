@@ -25,11 +25,12 @@ Nowadays, the massive progress and development of the internet and online techno
 It can be assumed that knowledge management is a crucial issue in the industry. To extract implicit, unknown, and potentially useful information from data, we use data mining techniques that have been responsible for many of artificial intelligence’s recent successes. 
 Clustering is one of these techniques, which is applied whenever the extracted data is not labeled, i.e., the semantics of this data is with respect to the application is unclear. Therefore, clustering has always been an exploratory but critical task in the knowledge discovery process, with applications ranging from image processing, production systems, and information retrieval \cite{benabdellah2019survey}. Clustering is a technique that aims to partition a dataset (objects) into subsets by identifying similar objects and aggregating them in the same cluster while the dissimilar objects should belong to different clusters.
 
+The data sets could be composed entirely of either numeric features or symbolic features. For the numeric feature, we will use the Euclidean distance metric. However, for symbolic features, the Hamming distance is computed. Since our problem contains only numeric features, we will use Euclidean distance to determine the distance between the objects \cite{aloise2009np, wagstaff2001constrained,macqueen1967some}.
 \comment{The next paragraph jumps to a distance, which is one of the similarity measures in the Euclidean space. One should explain this transition.}
 
 Furthermore, from an optimization perspective, the main objective is to minimize the distance between objects falling in the same cluster and maximize the distance between the others that belong to different clusters. Since clustering does not use a subset of the dataset as labels to learn a classification model, clustering differs from classification \cite{wagstaff2001constrained}. In other words, with the terminology of machine learning, clustering is a form of an unsupervised task, which calculates the similarity between data objects without knowing the proper attribution~\cite{li2018geometric}. Due to these unsupervised characteristics, clustering is known as one of the most challenging machine learning tasks \cite{benabdellah2019survey}.
 
-Clustering has been widely applied in several disciplines; one is production-planning systems, more specifically scheduling. 
+Clustering has been widely applied in several disciplines; one is production-planning systems~\cite{nananukul2013clustering,koskosidis1992clustering}, more specifically scheduling \cite{yashar2013multi,tong2016research}. 
 \comment{Are there any citations for the claim above?}
 Scheduling is one of the most complex problems in the industry. Scheduling of operations involves resource allocation over a period of time to perform a series of tasks, where one of the most critical problems is the Job-shop Scheduling Problem (JSP). The JSP has been known as a complex and combinatorial optimization problem, and it has been proven to be NP-hard \cite{baker1974introduction,lenstra1979computational}. Therefore, it is very difficult to reach an optimal solution in a reasonable time, even for small instances. However, from a practical perspective, the JSP scale is large, where the number of operations can be up to 10,000s in some workshops \cite{zhang2010hybrid}.
 
@@ -45,9 +46,9 @@ In the context of partitioning algorithms, instance-level constraints are helpfu
     \item Cannot link constraints specify that two operations must not be in the same window.
 \end{enumerate}
 
-It can be said that the attributes of the classical JSP are quite a few and not sufficient to define the similarity and dissimilarity between the operations. The lack of these attributes guides me to extract more features that could specify which operations are similar and should be in the same window and which shall not be in the same window. The main contribution of this project is to extract some features that have a significant impact on the decomposition process and accordingly on the makespan. 
+It can be said that the attributes of the classical JSP are quite a few and not sufficient to define the similarity and dissimilarity between the operations. The lack of these attributes guides us to extract more features that could specify which operations are similar and should be in the same window and which shall not be in the same window. The main contribution of this project is to extract some features that have a significant impact on the decomposition process and accordingly on the makespan. 
 \comment{Both I and we are used in the proposal, please select only one.}
-More specifically, I need to extract some features to define which operations are similar to be scheduled in the same window and get a near-optimal solution in a reasonable time. 
+More specifically, we need to extract some features to define which operations are similar to be scheduled in the same window and get a near-optimal solution in a reasonable time. 
 
 \subsection{Feature extraction}
 Some features could be extracted:
@@ -59,7 +60,7 @@ Some features could be extracted:
 \end{enumerate}
 
 \section{Dataset Selection}
-I will use the benchmark instances presented in \cite{taillard1993benchmarks} as a dataset to work on. Many researchers have studied these instances and presented different approaches to solving them. I also developed different decomposition strategies to solve those. Therefore, it will be possible to measure the success/failure of my proposed model by comparing the results of the strategies developed in the past with those obtained from the proposed project. 
+We will use the benchmark instances presented in \cite{taillard1993benchmarks} as a dataset to work on. Many researchers have studied these instances and presented different approaches to solving them. We also developed different decomposition strategies to solve those. Therefore, it will be possible to measure the success/failure of our proposed model by comparing the results of the strategies developed in the past with those obtained from the proposed project. Since the benchmark instances are randomly generated, they do not represent a real-life application. Hence, We will consider some real-world instances to test our proposed model concerning the selected similarity function and clustering algorithms.
 
 \comment{Maybe a good idea would be to consider also some real-world instances just to test the selected similarity function and clustering algorithms.}
 
