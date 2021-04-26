@@ -1,6 +1,8 @@
 #const factor = 3.
 #const divisor = 10.
 
+#const insert = 0. % change to enable inserting operations into gaps at earlier windows
+
 #program base.
 
 job 	 (JobNum) 			:- operation (JobNum, StepNum).
@@ -59,9 +61,13 @@ no_overlapOperation(JobNum, StepNum, t) :- index(JobNum, StepNum, N, t), numOfOp
 current(JobNum, StepNum, t) :- assignToTimeWindow(JobNum, StepNum, t).
 current(JobNum, StepNum, t) :- overlappedOperation(JobNum, StepNum, t).
 
+scheduled(JobNum, StepNum, t) :- no_overlapOperation(JobNum, StepNum, t), insert != 0.
+scheduled(JobNum, StepNum, t) :- scheduled(JobNum, StepNum, t-1).
+
 % ****************************************************** Machine availabilities *******************************************************
 
-free(MachNum, Time, t) :- machine(MachNum),
+free(MachNum, 0,    t) :- machine(MachNum), insert != 0.
+free(MachNum, Time, t) :- machine(MachNum), insert = 0,
                           free(MachNum, Time1, t-1), 
                           Time2 = #max{0;
                                        StartTime + ProTime : startTime((JobNum, StepNum), StartTime, t-1),
@@ -82,6 +88,12 @@ guess(JobNum1, StepNum1, JobNum2, StepNum2, t) :- sameMach(JobNum1, StepNum1, Jo
 guess(JobNum1, StepNum1, JobNum2, StepNum2, t) :- sameMach(JobNum1, StepNum1, JobNum2, StepNum2),
                                         assignToTimeWindow(JobNum1, StepNum1, t),
                                        overlappedOperation(JobNum2, StepNum2, t).
+guess(JobNum1, StepNum1, JobNum2, StepNum2, t) :- sameMach(JobNum1, StepNum1, JobNum2, StepNum2),
+                                                 scheduled(JobNum1, StepNum1, t),
+                                        assignToTimeWindow(JobNum2, StepNum2, t).
+guess(JobNum1, StepNum1, JobNum2, StepNum2, t) :- sameMach(JobNum1, StepNum1, JobNum2, StepNum2),
+                                        assignToTimeWindow(JobNum1, StepNum1, t),
+                                                 scheduled(JobNum2, StepNum2, t).               
 
 {order(JobNum1, StepNum1, JobNum2, StepNum2, t)} :- guess(JobNum1, StepNum1, JobNum2, StepNum2, t).
  order(JobNum2, StepNum2, JobNum1, StepNum1, t)  :- guess(JobNum1, StepNum1, JobNum2, StepNum2, t),
