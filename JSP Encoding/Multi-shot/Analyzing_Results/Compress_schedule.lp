@@ -90,5 +90,5 @@ new_startTime(J,O,S,E,M) :- inspect_endTime(J,O,M,T,E1,I),
 
 % output(J,O,S,E,20) :- fix_startTime(J,O,S,E,20).
 
-#show overlappedOperation/3.
+%#show overlappedOperation/3.
 #show startTime((J,O),S,W) : new_startTime(J,O,S,E,M), compress_window(W).

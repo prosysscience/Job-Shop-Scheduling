@@ -1,6 +1,6 @@
 % ************************************ Constants for configuring the overlap size ***********************
 
-#const factor = 3.
+#const factor = 1.
 #const divisor = 10.
 
 % ************************************ Constants for configuring output of late operations **************
