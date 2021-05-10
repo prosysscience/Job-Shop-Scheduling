@@ -3,6 +3,10 @@
 #const factor = 1.
 #const divisor = 10.
 
+% ************************************ Constant for configuring insertion into earlier windows **********
+
+#const insert = 1.  % Set to 0 for disabling insertion of operations into gaps at earlier windows
+
 % ************************************ Constants for configuring output of late operations **************
 
 #const outE = 1.  % Show operations that could be inserted into earlier window by gap(earlier, X)
@@ -39,7 +43,8 @@ duration(JobNum, StepNum, MachNum, ST, ET, TW) :- assignment(JobNum, StepNum, Ma
 available_machine(MachNum, TW, M) :- machine(MachNum),
                                      timeWindow(TW),
                                      M = #max{0; ET : duration(JobNum, StepNum, MachNum, ST, ET, TW-1),
-                                                      not overlappedOperation(JobNum, StepNum, TW)}.
+                                                      not overlappedOperation(JobNum, StepNum, TW),
+                                                      insert = 0}.
 
 % ************************************ One start time from the assigned window on ***********************
 
