@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+# $ for i in TA76_Info_*.lp; do echo "$i"; ./compress.py ${i} > $i.out; done
+# $ for i in TA76_Info_*.lp; do echo "clingo --const factor=${i:10:1} $i.out TA76.lp Analyze_results.lp"; clingo --const factor=${i:10:1} $i.out TA76.lp Analyze_results.lp; done
+
 # import re
 import sys
 import clingo
