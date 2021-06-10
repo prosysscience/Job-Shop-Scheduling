@@ -1,7 +1,8 @@
 #const factor = 3.
 #const divisor = 10.
 
-#const insert = 0. % change to enable inserting operations into gaps at earlier windows
+#const compress = 0.  % change to disable compression of operations at the current window
+#const insert = 0.    % change to enable inserting operations into gaps at earlier windows
 
 #program base.
 
@@ -75,6 +76,14 @@ free(MachNum, Time, t) :- machine(MachNum), insert = 0,
                                                  no_overlapOperation(JobNum, StepNum,  t)},
                           Time = (Time1 + Time2 + |Time1 - Time2|) / 2.
 
+handle(JobNum, StepNum, t) :- current(JobNum, StepNum, t), assign(JobNum, StepNum, MachNum),
+                              free(MachNum, Time, t), 0 < Time, compress = 0, not numOfTimeWindows(t).
+
+#external cancel(JobNum, StepNum, t) : handle(JobNum, StepNum, t).
+
+cancel(JobNum, StepNum, t-1) :- handle(JobNum, StepNum, t-1), no_overlapOperation(JobNum, StepNum, t).
+cancel(JobNum, StepNum, t-1) :- handle(JobNum, StepNum, t-1), cancel(JobNum, StepNum, t).
+
 % *************** To Make the order for operations of the same job **********
 
 seq(Operation1, (JobNum2, StepNum2), ProTime1, t) :- seqL(Operation1, (JobNum2, StepNum2), ProTime1),
@@ -116,7 +125,8 @@ output(JobNum, StepNum, StartTime) :- startTime((JobNum, StepNum), StartTime, t-
 
 &diff{  0 - (JobNum, StepNum)  } <= -Time :- free(MachNum, Time, t),
                                              assignment(JobNum, StepNum, MachNum, ProTime), 
-                                             current(JobNum, StepNum, t).
+                                             current(JobNum, StepNum, t),
+                                             not cancel(JobNum, StepNum, t).
 
 % &diff{  (JobNum, StepNum) - 0  } <= TotalTime :- maxTime1(TotalTime),
 %                                                  assignToTimeWindow(JobNum, StepNum, t).
