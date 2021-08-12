@@ -80,10 +80,21 @@ We tested our Model on Taillard benchmark instances [Taillard’s instances](htt
     |             |── dynamic-mtwr.lp                       # encoding to assign the operations based on (MTWR)
     |             |── input.lp
     |             |── output-direct.lp                      # encoding to assign the operations withtout considering bottleneck machines
+    |        |── \Dynamic_assignment_compression            
+    |             |── dlO_timeout_window_dynamic_comp.py      # Python api with timeout for each Time Window
+    |             |── Compress_schedule.lp                  # encoding to compress the optimized Time Winodw
+    |             |── dynamic-est.lp                        # encoding to assign the operations based on (EST)
+    |             |── dynamic-mtwr.lp                       # encoding to assign the operations based on (MTWR)
+    |             |── input.lp
+    |             |── output-direct.lp                      # encoding to assign the operations withtout considering bottleneck machines
     |             └── output-machine.lp                     # encoding to assign the operations with bottleneck machines
     |        |── \Static_assignment
     |             |── dlO_Timeout_Whole_Time_Window.py      # Python api with timeout for each Time Window
     |             └── dlO_Timeout_Solve_Call.py             # Python api with timeout for each solve call
+    |        |── \Static_assignment_compression             
+    |             |── dlO_timeout_whole_window_comp.py      # Python api with performing the compression phase#
+    |             |── Compress_schedule.lp                  # encoding to compress the optimized Time Winodw
+    |             └── dlO_solve_sall_comp.py             # Python api with timeout for each solve call
     |        |── \ASP_scheduler
     |            |── JSP.lp                             # Scheduling encoding
     │            └── JSP_TW_Overlapping.lp              # Scheduling encoding with Overlapping between Time Windows
