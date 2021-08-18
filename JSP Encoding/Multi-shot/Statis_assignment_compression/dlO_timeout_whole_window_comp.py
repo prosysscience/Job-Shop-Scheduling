@@ -5,7 +5,7 @@ import theory
 import time
 from clingo import Function
 
-NUM_OF_TIME_WINDOWS = 2
+NUM_OF_TIME_WINDOWS = 4
 MAX_TIMEOUT = 600
 
 class Application:
