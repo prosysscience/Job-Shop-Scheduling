@@ -297,39 +297,36 @@ We use the benchmark instances presented in \cite{taillard1993benchmarks} as a d
 \end{enumerate}
 We neglected the rank of an operation and the time length of a job because they had negative impact results from the preliminary experiments. The following Table~\ref{tab4} shows the selected features and the performance of each combination for solving benchmark instances of 50 jobs and 15 machines \cite{taillard1993benchmarks}. The following table shows the results of our experiments. The first column represents the instances we tested, and the next four columns show the makespan values obtained by FIFO, MTWR, and (EST with single and multi-shot) heuristics. From the sixth column, we show the makespan values obtained by combining the features mentioned above. Our experiments found that the first five combinations do not provide good solutions compared to the other heuristics. However, features (\textbf{F6}, \textbf{F8}, \textbf{F11}, \textbf{F12}, and \textbf{F15}) have a good impact in the cost function in the most cases. Especially, combinations \textbf{F6} and \textbf{F15} provided good results. It means that the most important features extracted from the problem itself and have a positive impact on the performance are \textit{Remaining Processing Time, Machine Load and Earliest Starting Time}. Also, The information obtained from the solutions of the other heuristics like (\textit{Starting Time} and \textit{Waiting Time}) led us to get better decomposition for the problem at hand. More specifically, combining \textit{Remaining Processing Time} with \textit{Machine Load} provides a good decomposition with/without \textit{Waiting Time} attributes obtained by the other heuristics. In a few instances, our proposed method did not outperform other heuristics, and the average makespan of \textbf{F6} was better than the average makespan obtained by the other heuristics and close to the FIFO makespan. The following section illustrates the difference between our proposed algorithm and the methods implemented by other researchers.
 
-%\begin{table}
-\begin{sidewaystable}
-\setlength{\tabcolsep}{5.5pt}
+\begin{table}
   \begin{center}
     \caption{The performance of selected features.}
     \label{tab4}
-%\rotatebox{90}{
- \begin{adjustwidth}{-3.5cm}{}
-    \begin{tabular}{c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c | c}
 
-
-\hline
-      \textbf{Instances} & \textbf{FIFO} & \textbf{MTWR} & \textbf{Single-shot} & \textbf{EST} & \textbf{F1} & \textbf{F2} & \textbf{F3} & \textbf{F4} & \textbf{F5} & \textbf{F6} & \textbf{F7} & \textbf{F8} & \textbf{F9} & \textbf{F10} & \textbf{F11} & \textbf{F12} & \textbf{F13} & \textbf{F14} & \textbf{F15}\\
-      \hline
-      TA51 &3549  &3364  &3632  &3506  &3506  &3362  &3324  &3360  &3346  &\textbf{3294}  &3328  &3588  &3588  &3568  &3514  &3682  &3624  &3554  &3509 \\
-      TA52 &3339  &3304  &3615  &3773  &3277  &3318  &3330  &3286  &3243  &3275  &3226  &3397  &3373  &3533  &3256  &3494  &3505  &3373  &\textbf{3184} \\
-      TA53 &3160  &3168  &3481  &3478  &3382  &3585  &3347  &3543  &3517  &3250  &3338  &3251  &3522  &3373  &3585  &\textbf{3143}  &3427  &3524  &3380 \\
-      TA54 &3218  &3494  &3462  &3497  &3414  &3425  &3425  &3503  &3397  &3265  &3353  &3563  &3443  &3386  &3352  &3270  &3236  &3232  &3289 \\
-      TA55 &3291  &3237  &3552  &3482  &3308  &3441  &3424  &3319  &3355  &3386  &3301  &3498  &3385  &3530  &3365  &3309  &3370  &3385  &\textbf{3218} \\
-      TA56 &3325  &3287  &3610  &3605  &3353  &3380  &3548  &3270  &3383  &3366  &3564  &\textbf{3229}  &3306  &3362  &3344  &3332  &3338  &3483  &3389 \\
-      TA57 &3654  &3633  &3778  &3753  &3605  &3573  &3601  &3583  &3650  &\textbf{3480}  &3592  &3621  &3543  &3608  &3670  &3632  &3749  &3573  &\textbf{3480} \\
-      TA58 &3299  &3591  &3718  &3731  &3352  &3412  &3370  &3509  &3707  &3324  &3496  &3517 &3716 &3644  &3611  &3471  &3437  &3365   &3481 \\
-      TA59 &3344  &3394  &3613  &3398  &3453  &3416  &3301  &3339  &3508  &3430  &3352  &3258 &3381  &3402  &\textbf{3145}  &3250  &3253  &3284  &3290 \\
-      TA60 &3129  &3257  &3550  &3247  &3483  &3315  &3617  &3563  &3591  &3327  &3399  &3374  &3526  &3637  &3425  &3676  &3659  &3767  &3569 \\
-\hline
- Average  &3331  &3373  &3601  &3547  &3413  &3423  &3429  &3428  &3470  &3340  &3395  &3430  &3475  &3504  &3427  &3426  &3460  &3454  &3379 \\
-\hline
-    \end{tabular}
-%}
-\end{adjustwidth}
+    \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|l|} \hline
+      & \multicolumn{11}{|c|}{\textbf{Instances}} \\ \cline{2-12}
+      \textbf{Approach}   & TA51                           & TA52                           & TA53                           & TA54 & TA55                           & TA56                           & TA57                           & TA58 & TA59                           & TA60 & AVG  \\ \hline
+      \textbf{FIFO}        & 3549                           & 3339                           & 3160                           & 3218 & 3291                           & 3325                           & 3654                           & 3299 & 3344                           & 3129 & 3331 \\
+      \textbf{MTWR}        & 3364                           & 3304                           & 3168                           & 3494 & 3237                           & 3287                           & 3633                           & 3591 & 3394                           & 3257 & 3373 \\
+      \textbf{Single-shot} & 3632                           & 3615                           & 3481                           & 3462 & 3552                           & 3610                           & 3778                           & 3718 & 3613                           & 3550 & 3601 \\
+      \textbf{EST}         & 3506                           & 3773                           & 3478                           & 3497 & 3482                           & 3605                           & 3753                           & 3731 & 3398                           & 3247 & 3547 \\ \hline
+      \textbf{F1}          & 3506                           & 3277                           & 3382                           & 3414 & 3308                           & 3353                           & 3605                           & 3352 & 3453                           & 3483 & 3413 \\
+      \textbf{F2}          & 3362                           & 3318                           & 3585                           & 3425 & 3441                           & 3380                           & 3573                           & 3412 & 3416                           & 3315 & 3423 \\
+      \textbf{F3}          & 3324                           & 3330                           & 3347                           & 3425 & 3424                           & 3548                           & 3601                           & 3370 & 3301                           & 3617 & 3429 \\
+      \textbf{F4}          & 3360                           & 3286                           & 3543                           & 3503 & 3319                           & 3270                           & 3583                           & 3509 & 3339                           & 3563 & 3428 \\
+      \textbf{F5}          & 3346                           & 3243                           & 3517                           & 3397 & 3355                           & 3383                           & 3650                           & 3707 & 3508                           & 3591 & 3470 \\
+      \textbf{F6}          & \textbf{3294} & 3275                           & 3250                           & 3265 & 3386                           & 3366                           & \textbf{3480} & 3324 & 3430                           & 3327 & 3340 \\
+      \textbf{F7}          & 3328                           & 3226                           & 3338                           & 3353 & 3301                           & 3564                           & 3592                           & 3496 & 3352                           & 3399 & 3395 \\
+      \textbf{F8}          & 3588                           & 3397                           & 3251                           & 3563 & 3498                           & \textbf{3229} & 3621                           & 3517 & 3258                           & 3374 & 3430 \\
+      \textbf{F9}          & 3588                           & 3373                           & 3522                           & 3443 & 3385                           & 3306                           & 3543                           & 3716 & 3381                           & 3526 & 3475 \\
+      \textbf{F10}         & 3568                           & 3533                           & 3373                           & 3386 & 3530                           & 3362                           & 3608                           & 3644 & 3402                           & 3637 & 3504 \\
+      \textbf{F11}         & 3514                           & 3256                           & 3585                           & 3352 & 3365                           & 3344                           & 3670                           & 3611 & \textbf{3145} & 3425 & 3427 \\
+      \textbf{F12}         & 3682                           & 3494                           & \textbf{3143} & 3270 & 3309                           & 3332                           & 3632                           & 3471 & 3250                           & 3676 & 3426 \\
+      \textbf{F13}         & 3624                           & 3505                           & 3427                           & 3236 & 3370                           & 3338                           & 3749                           & 3437 & 3253                           & 3659 & 3460 \\
+      \textbf{F14}         & 3554                           & 3373                           & 3524                           & 3232 & 3385                           & 3483                           & 3573                           & 3365 & 3284                           & 3767 & 3454 \\
+      \textbf{F15}         & 3509                           & \textbf{3184} & 3380                           & 3289 & \textbf{3218} & 3389                           & \textbf{3480} & 3481 & 3290                           & 3569 & 3379 \\ \hline
+      \end{tabular}
   \end{center}
-\end{sidewaystable}
-%\end{table}
+\end{table}
 
 
 
