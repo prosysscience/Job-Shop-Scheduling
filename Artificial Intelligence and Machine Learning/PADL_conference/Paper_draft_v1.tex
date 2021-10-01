@@ -47,7 +47,10 @@ Technische Universität Graz, Graz, Austria\\
 \maketitle              % typeset the header of the contribution
 %
 \begin{abstract}
-Scheduling decision in production planning plays a significant role in the manufacturing industry. A good schedule may lead to solve production problems and improve productivity. Job-shop Scheduling Problem (JSP) is one of the most crucial problems in production systems. JSP deals with allocating tasks on resources and determining the sequence of the operations on each machine while completing all tasks as early as possible. One of the most effective approaches studied by many researchers for solving the JSP is decomposition. This work investigates applying the decomposition strategy to split the problem into a series of sub-problems using data mining methodologies. This study proposes a constrained clustering algorithm to group the data objects (operations) into clusters, where each cluster is a Time Window (TW). The decomposition process depends on two main phases; the first phase is to extract features to predict the sequence of the operations on each machine. These features are extracted either from the problem itself or from solutions obtained by other heuristics. The second phase is to develop a constrained clustering algorithm to assign each data object (an operation) into a cluster. We solved the problem using the Answer Set Programming model, and tested our proposed algorithm on a set of benchmark instances, and the results showed that our proposed outperformed other heuristics in most cases. The results also showed that some features like \textit{Remaining Processing Time}, \textit{Machine Load} and \textit{Earliest Starting Time} have a significant impact on the solution quality.
+Scheduling is a crucial problem appearing in various domains, such as manufacturing, transportation, or healthcare. In most problem definitions, the goal is to schedule a given set of operations on available resources to complete the operations as early as possible. Unfortunately, most scheduling problems cannot be solved efficiently. Therefore, the research of suitable approximation methods is of primary importance.
+
+This work suggests a novel approximation approach based on problem decomposition with data mining methodologies. This study proposes a constrained clustering algorithm to group the operations into clusters corresponding to time windows in which these operations must be scheduled. 
+The decomposition process depends on two main phases. The first phase is to extract features to predict the sequence of the operations on each resource. These features are extracted either from the problem itself or from solutions obtained by other heuristics. The second phase is to develop a constrained clustering algorithm to assign each operation into a time window. We solved the problem using the Answer Set Programming. Evaluation results show that our proposed outperformed other heuristic schedulers in most cases, where features, like \textit{Remaining Processing Time}, \textit{Machine Load}, and \textit{Earliest Starting Time}, contributed significantly to the solution quality.
 
 \keywords{Job-shop Scheduling  Problem \and Constrained Clustering \and Time Windows \and Answer Set Programming.}
 \end{abstract}
@@ -168,7 +171,7 @@ We present the features that we considered:
 \textit{Processing Time (PT)}  and \textit{Remain Processing Time (RPT)} are attributes dependent on the problem domain. The \textit{PT} represents the execution time of a particular operation in a machine. However, \textit{RPT} is the aggregate processing time for all subsequent operations of that job.
 
 \subsection{\textit{Operation}}
-The \textit{Operation} attribute is an ordinal value to represent the rank of each operation in its job.
+The \textit{operation} attribute is an ordinal value to represent the rank of each operation in its job.
 
 \subsection{\textit{Time Length of a Job} (TLJ)}
 \textit{TLJ} is an attribute that describes the total processing time needed to complete a particular job. It is the summation of processing time for all operations of that job.
