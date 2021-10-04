@@ -60,12 +60,16 @@ The decomposition process depends on two main phases. The first phase is to extr
 %
 %
 \section{Introduction}
-Scheduling is one of the most crucial problems in various industrial, transportation, or healthcare applications. 
-\todo{add 1-2 citations for each application} 
+Scheduling is one of the most crucial problems in various industrial, transportation, or healthcare applications
+%\todo{add 1-2 citations for each application}
+ \cite{pezzella2008genetic,chaudhry2016research,nouiri2018effective,demirbilek2019dynamically,schoenfelder2020nurse,wang2019routing,janakbhai2021blockchain}. 
+
 These applications resulted in different definitions of scheduling problems, with Job-shop Scheduling Problem (JSP) being among the most popular ones.
 In JSP, operations of given jobs must be scheduled on available machines in an optimal way wrt.\ some pre-defined criteria. The latter include, for instance, minimization of makespan, i.e., the completion time of the last job, or tardiness, i.e., the sum of delays for all jobs completed after their deadlines. 
 
-However, JSP is a NP-complete combinatorial optimization problem \cite{DBLP:journals/mor/GareyJS76,SOTSKOV1995237} for which no efficient algorithms are known. Therefore, searching for an optimal solution with modern approaches like Answer Set Programming (ASP), Mixed Integer Programming, or Constraint Programming \todo{cite at least 1 paper solving JSP with these methods} often takes too much computation time, even for small instances. Practical applications require solving JSP instances of vast scale with thousands of operations \cite{zhang2010hybrid}.
+However, JSP is a NP-complete combinatorial optimization problem \cite{DBLP:journals/mor/GareyJS76,SOTSKOV1995237} for which no efficient algorithms are known. Therefore, searching for an optimal solution with modern approaches like Answer Set Programming (ASP), Mixed Integer Programming, or Constraint Programming \cite{meng2020mixed,el2020job,al2017job}
+%\todo{cite at least 1 paper solving JSP with these methods} 
+often takes too much computation time, even for small instances. Practical applications require solving JSP instances of vast scale with thousands of operations \cite{zhang2010hybrid}.
 As a result, many researchers focused on the development of efficient algorithms for finding high-quality approximations of the optimal schedule, including dispatching rules and other heuristic approaches~\cite{blackstone1982state}, or stochastic optimization techniques \cite{DBLP:journals/informs/VaessensAL96,DBLP:journals/jim/CalisB15}.  
 The main issue of these approaches is that they require manual parametrization for a particular scheduling problem, which is tedious and error-prone. For instance, heuristic approaches might require the development of new heuristics or their combinations. Similarly, default parameters of stochastic methods might result in a finding of mediocre schedules.    
 As a result, much focus of the recent research lies on the automation of the parametrization using machine learning techniques~\cite{bengio2020machine}.
@@ -117,7 +121,7 @@ The paper is organized as follows: the following section provides the definition
 The Job-shop Scheduling Problem (JSP) is one of the well-known hardest combinatorial optimization problems \cite{baker1974introduction,lenstra1979computational,garey1976complexity}. The JSP is given a set $J = \{ J_1, J_2,...,J_n \}$  of jobs and a set $M = \{ M_1, M_2,...,M_m \}$ of Machines. Each job $J_i$ has a series $  O_{i,1}, O_{i,2},...,O_{i,m} $ of operations that must be processed in a predefined order. Each machine $M_i$ executes an operation of each job with a known and fixed processing time. The main objective of the JSP is to minimize the total completion time for all jobs (makespan). \\ The JSP assumptions are listed as follows:
 
 \begin{enumerate}
-	\item Once an operation is started, it must be completed without interruption.
+	\item Once an operation starts, it must be completed without interruption.
 	\item Each job visits a machine once.
 	\item A machine cannot perform more than one operation at a time.
 	\item A machine is not broken.
