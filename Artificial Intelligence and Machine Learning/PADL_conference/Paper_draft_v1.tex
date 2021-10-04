@@ -99,7 +99,7 @@ Therefore, our clustering method implements a novel type of constraints that
 \end{enumerate*}
 Further contributions of this paper can be summarized as follows:
 \begin{itemize}
-  \item A typical JSP instance describing jobs, their operations, and available machines, does not provide enough information for a clustering algorithm to find a good decomposition. Therefore, we suggest various heuristic feature extractors, such as First-In-First-Out or machine load.
+  \item Since a typical JSP instance describing jobs, their operations, and available machines, does not provide enough information for a clustering algorithm to find a good decomposition, we suggest various heuristic feature extractors, such as First-In-First-Out or machine load.
   \item We implement the suggested constrained clustering method and combine it with the forward selection of features. The latter is an automatic procedure aiming to find a subset of features allowing the clustering algorithm to compute a decomposition resulting in the best quality schedule.
   \item Evaluation of our method on the Taillard benchmark instances \cite{taillard1993benchmarks} showed that it significantly outperforms baseline heuristic methods and pure ASP optimization algorithms wrt.\ the makespan optimization criteria within the timeout of 600 seconds.
 \end{itemize}
@@ -117,28 +117,26 @@ Further contributions of this paper can be summarized as follows:
 The paper is organized as follows: the following section provides the definition of JSP and gives an illustrative example of input data. Section \ref{sec:features} discusses heuristic feature extractors, followed by Section \ref{sec:method}, which presents the proposed constrained clustering algorithm. Section \ref{sec:eval} presents an extensive computational study on benchmark instances, comparing our results with the baseline solvers. A literature review is given in Section \ref{sec:literature}, followed by the conclusions and future work.
 
 
-\section{Problem Formulation}
-The Job-shop Scheduling Problem (JSP) is one of the well-known hardest combinatorial optimization problems \cite{baker1974introduction,lenstra1979computational,garey1976complexity}. The JSP is given a set $J = \{ J_1, J_2,...,J_n \}$  of jobs and a set $M = \{ M_1, M_2,...,M_m \}$ of Machines. Each job $J_i$ has a series $  O_{i,1}, O_{i,2},...,O_{i,m} $ of operations that must be processed in a predefined order. Each machine $M_i$ executes an operation of each job with a known and fixed processing time. The main objective of the JSP is to minimize the total completion time for all jobs (makespan). \\ The JSP assumptions are listed as follows:
-
-\begin{enumerate}
-	\item Once an operation starts, it must be completed without interruption.
-	\item Each job visits a machine once.
+\section{Problem Definition}
+The Job-shop Scheduling Problem (JSP) is one of the well-known scheduling problems \cite{baker1974introduction,lenstra1979computational}. An instance of a JSP comprises a set $J = \{ J_1, J_2, \dots ,J_n \}$  of jobs and a set $M = \{ M_1, M_2, \dots ,M_m \}$ of Machines. Each job $J_i$ has a sequence $(O_{i,1}, O_{i,2}, \dots ,O_{i,m})$ of operations that must be processed in a predefined order. Each machine $M_i$ executes an operation of each job with a known and fixed processing time. The main objective of a JSP solver is to find a schedule that minimizes some criteria like makespan, i.e., the total completion time for all jobs.
+In addition, JSP makes the following assumptions:
+\begin{itemize}
+	\item Once an operation starts, it must be completed without interruptions.
+	\item Each job has no duplicated operations, i.e., visits a machine only once.
 	\item A machine cannot perform more than one operation at a time.
-	\item A machine is not broken.
-	\item All jobs and machines are available at time 0.
-\end{enumerate}
-It is hard to reach a solution close to the optimal in a reasonable time, even if the number of operations to be scheduled is low. In real-life applications, the number of operations that are to be scheduled is up to $10,000$ \cite{zhang2010hybrid}, which makes the problem more complicated. The JSP has attracted the interest of many researchers in the last decades to find effective methods to solve this problem. One of these methods is decomposition. The decomposition idea is to split the problem into sub-problems, solve them separately, and then integrate those solutions to solve the whole problem. Many decomposition strategies have been proposed for solving the JSP  \cite{zhai2014decomposition,singer2001decomposition,ovacik2012decomposition,uzsoy2000performance}. However, there is no guarantee of which method is the best because the performance varies according to the problem. \\
+	\item All machines are available at all times.
+	\item Processing the the jobs starts at time 0.
+\end{itemize}
 
-A problem data can be organized in a table, where rows correspond to operations and columns refer to the name of the operation, the machine assigned to an operation, and the processing time of a particular operation. Table~\ref{tab1} shows the information of a simple Job-shop Scheduling Problem which consists of $3$ jobs and $3$ machines. For instance, in the third row of the table, $O_{1,3}$ is the third operation of the first job that will be executed by machine $1$ with processing time $5$. 
+Let us illustrate the problem on a small example presented in Table~\ref{tab1}, which shows the information of a simple JSP comprising $3$ jobs and $3$ machines. In this table, rows correspond to operations, whereas columns refer to the name of the operation, the machine assigned to an operation, and the processing time of a particular operation. For instance, in the third row of the table, $O_{1,3}$ is the third operation of the first job that will be executed by machine $1$ with processing time $5$. 
 
-
-
-\begin{table}[h!]
+\begin{table}
+\begin{minipage}{.6\textwidth}
 %\fontsize{12}{9}
-\setlength{\tabcolsep}{10.0pt}
+\setlength{\tabcolsep}{5.0pt}
 \centering
-  \begin{center}
-    \caption{An example of a Job-shop Scheduling Problem.}
+ % \begin{center}
+    \caption{A sample JSP instance.}
     \label{tab1}
  %\begin{adjustwidth}{0.0cm}{}
     \begin{tabular}{c c c}
@@ -157,19 +155,14 @@ A problem data can be organized in a table, where rows correspond to operations 
       $O_{3,2}$  & 3  & 3  	\\
       $O_{3,3}$  & 2  & 5  	\\
     \end{tabular}
-
 %\end{adjustwidth}
-  \end{center}
- 
-\end{table}
-In our example in Table~\ref{tab1}, there are $9$ operations and $3$ machines. We aim to split them efficiently into two parts and schedule them separately without violating the precedence constraint. More specifically, we should not assign an operation in the first TW, and its predecessor is assigned to the following TW(s). Table~\ref{tab2} shows how the output of the proposed method should look. As shown in the Table~\ref{tab2}, operations $\{ O_{1,1}, O_{1,2}, O_{2,1}, O_{2,2}, O_{3,1} \}$ are assigned to the first TW and the rest to the second TW. It means that the first TW will be optimized and then the upcoming TW(s). In this study, we investigate applying a constrained clustering algorithm to decompose the JSP, where we extract some features from the problem itself and the solutions of other heuristics. These features have been used for the splitting process, and we present them in detail in the following section.
-
-\begin{table}[h!]
-\fontsize{12}{9}
-\setlength{\tabcolsep}{10.0pt}
-\centering
-  \begin{center}
-    \caption{Time Window Assignment.}
+%  \end{center}
+\end{minipage}
+\begin{minipage}{.4\textwidth}
+  \setlength{\tabcolsep}{5.0pt}
+  \centering
+ % \begin{center}
+    \caption{Possible decomposition.}
     \label{tab2}
  %\begin{adjustwidth}{0.0cm}{}
     \begin{tabular}{c  c }
@@ -186,36 +179,42 @@ In our example in Table~\ref{tab1}, there are $9$ operations and $3$ machines. W
       $O_{2,3}$  & 2		\\
       $O_{3,2}$  & 2    	\\
       $O_{3,3}$  & 2    	\\
+      \\
     \end{tabular}
 %\end{adjustwidth}
-  \end{center}
- 
+  %\end{center}
+\end{minipage}
 \end{table}
 
+Since no efficient algorithm is known for JSP \cite{garey1976complexity}, 
+modern optimization algorithms often cannot reach a solution close to the optimal one in a reasonable time, even if the number of operations to be scheduled is low. In real-life applications, the number of operations in an instance might be up to tens of thousands \cite{zhang2010hybrid}. The JSP has attracted the interest of many researchers in the last decades to find effective methods to solve this problem. One of these methods is decomposition. The decomposition idea is to split the problem into sub-problems, solve them separately, and then integrate those solutions to solve the whole problem. Many decomposition strategies have been proposed for solving the JSP  \cite{zhai2014decomposition,singer2001decomposition,ovacik2012decomposition,uzsoy2000performance}. However, there is no guarantee of which method is the best because the performance varies according to the problem.
+
+In our example in Table~\ref{tab1}, there are $9$ operations and $3$ machines. We aim to split the operations efficiently into two partitions and schedule them separately without violating the precedence constraint. More specifically, we should not assign an operation in the Time Window (TW) which precedes TW(s) of at least one of its predecessors. Table~\ref{tab2} shows one of the possible decompositions that we would like our method to return. Namely, operations $\{ O_{1,1}, O_{1,2}, O_{2,1}, O_{2,2}, O_{3,1} \}$ are assigned to the first TW and the rest to the second TW. Given this decomposition, a multi-shot optimization method, like ASP, will first find an optimal schedule of the operations in the first TW and provide it as a set of facts to the search of the optimal solution for the second TW. In this study, we investigate applying a constrained clustering algorithm to decompose the JSP, where we extract some features from the problem itself and the solutions of other heuristics. These features have been used for the splitting process, and we present them in detail in the following section.
 
 \section{Features extraction}
 \label{sec:features}
 In this section, we show which features have been extracted and how did we extract them. Based on the previous work, \cite{koonce2000using, harrath2002genetic, shahzad2010discovering, ismail2012production, adibi2014clustering, nasiri2019data}, the following features have been identified: priority, processing time, remaining processing time, machine load, and route position. Most of the researchers converted the attributes into qualitative data. As mentioned in these studies, the main reason for this conversion is to make the decision rules more generic, which can be applied to several scheduling problems. However, in our case, we will not convert the data into classes because we will use these features to measure the similarities/dissimilarities between the operations in the clustering process, which requires having numerical values.
 We present the features that we considered:
-\subsection{\textit{Process}}
-\textit{Processing Time (PT)}  and \textit{Remain Processing Time (RPT)} are attributes dependent on the problem domain. The \textit{PT} represents the execution time of a particular operation in a machine. However, \textit{RPT} is the aggregate processing time for all subsequent operations of that job.
+\paragraph{Process.}
+The two attributes \textit{Processing Time (PT)}  and \textit{Remain Processing Time (RPT)} are dependent on the problem domain. The \textit{PT} represents the execution time of a particular operation in a machine. However, \textit{RPT} is the aggregate processing time for all subsequent operations of that job. \todo[inline]{we need to provide rationale behind the features, why do we think they are useful for the clusering algorithm. Example of values extracted for the sample instance in Table 1 would also improve the readability of the paper.}
+\todo[inline]{Why in all other paragraphs we are talking only about one feature at a time and here about two. Can we split them? Like \\paragraph\{Processing Time (PT)\} and \\paragraph\{Remain Processing time (RPT)\}}
 
-\subsection{\textit{Operation}}
+\paragraph{Operation.}
 The \textit{operation} attribute is an ordinal value to represent the rank of each operation in its job.
 
-\subsection{\textit{Time Length of a Job} (TLJ)}
+\paragraph{Time Length of a Job (TLJ).}
 \textit{TLJ} is an attribute that describes the total processing time needed to complete a particular job. It is the summation of processing time for all operations of that job.
 
-\subsection{\textit{Earliest Starting Time} (EST)}
+\paragraph{Earliest Starting Time (EST).}
 The \textit{EST} attribute represents the earliest possible time for a particular operation to be executed. It is calculated by accumulating the processing time of the predecessor(s) of that operation, and it is $Zero$, if the operation has no predecessor.
 
-\subsection{\textit{Machine Load} (ML)}
+\paragraph{{Machine Load} (ML)}
 \textit{ML} is a property of a machine that shows how much time a particular machine has to execute all the operations assigned to it. In the initial state, the \textit{ML} is the aggregate of processing time of all operations assigned to that machine. For each step, the load of a machine is decreased by the processing time of an operation assigned to the machine and has the smallest \textit{EST}.
 
-\subsection{\textit{Starting Time} (ST)}
+\paragraph{{Starting Time} (ST)}
 \textit{ST} attribute represents the starting execution time of each operation by solving the problem using heuristics FIFO, MTWR and EST developed by \cite{tassel2021reinforcement,el2020job}.
 
-\subsection{\textit{Waiting Time} (WT)}
+\paragraph{{Waiting Time} (WT)}
 Since we used three different heuristics to mine information from the obtained solution, we will have three waiting times. \textit{WT} attribute is the difference between the starting time of a particular operation and the maximum value between the end time of its predecessor and when the machine became free. \\
 
 
@@ -361,7 +360,7 @@ We neglected the rank of an operation and the time length of a job because they 
 
 
 
-\section{Literature Review}
+\section{Related Work}
 \label{sec:literature}
 In this section, we will review some of the most related works about data mining approaches employed to solve scheduling problems. Over the last decades, solving the scheduling problem has attracted the interest of many researchers, and a wide range of approaches has been developed for solving the scheduling problem. One of the approaches that have been widely used to solve the problem is data mining. The main idea of data mining is to explore the patterns from the obtained solutions by some heuristics and then develop some decision rules that approximate the order of the operations in each machine \cite{ismail2012production}. More precisely, it aims to get an order of the operations according to some characteristics.\\
 
