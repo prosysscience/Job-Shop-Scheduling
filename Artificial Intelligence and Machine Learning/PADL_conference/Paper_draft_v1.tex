@@ -125,7 +125,7 @@ In addition, JSP makes the following assumptions:
 	\item Each job has no duplicated operations, i.e., visits a machine only once.
 	\item A machine cannot perform more than one operation at a time.
 	\item All machines are available at all times.
-	\item Processing the the jobs starts at time 0.
+	\item Processing the jobs starts at time 0.
 \end{itemize}
 
 Let us illustrate the problem on a small example presented in Table~\ref{tab1}, which shows the information of a simple JSP comprising $3$ jobs and $3$ machines. In this table, rows correspond to operations, whereas columns refer to the name of the operation, the machine assigned to an operation, and the processing time of a particular operation. For instance, in the third row of the table, $O_{1,3}$ is the third operation of the first job that will be executed by machine $1$ with processing time $5$. 
@@ -193,28 +193,35 @@ In our example in Table~\ref{tab1}, there are $9$ operations and $3$ machines. W
 
 \section{Features extraction}
 \label{sec:features}
-In this section, we show which features have been extracted and how did we extract them. Based on the previous work, \cite{koonce2000using, harrath2002genetic, shahzad2010discovering, ismail2012production, adibi2014clustering, nasiri2019data}, the following features have been identified: priority, processing time, remaining processing time, machine load, and route position. Most of the researchers converted the attributes into qualitative data. As mentioned in these studies, the main reason for this conversion is to make the decision rules more generic, which can be applied to several scheduling problems. However, in our case, we will not convert the data into classes because we will use these features to measure the similarities/dissimilarities between the operations in the clustering process, which requires having numerical values.
-We present the features that we considered:
-\paragraph{Process.}
-The two attributes \textit{Processing Time (PT)}  and \textit{Remain Processing Time (RPT)} are dependent on the problem domain. The \textit{PT} represents the execution time of a particular operation in a machine. However, \textit{RPT} is the aggregate processing time for all subsequent operations of that job. \todo[inline]{we need to provide rationale behind the features, why do we think they are useful for the clusering algorithm. Example of values extracted for the sample instance in Table 1 would also improve the readability of the paper.}
-\todo[inline]{Why in all other paragraphs we are talking only about one feature at a time and here about two. Can we split them? Like \\paragraph\{Processing Time (PT)\} and \\paragraph\{Remain Processing time (RPT)\}}
+Data mining merges with machine learning and statistical techniques to gain information and new knowledge from the databases\cite{ismail2012production,nasiri2019data}. Examples of data mining tasks are classification, clustering, and sequential pattern mining. In this work, we aim to use clustering to study the operations' pattern to find a good sequencing of the operations on each machine that leads us to obtain a near-optimal solution of the JSP. In order to use the clustering approach, we should have some features which describe the characteristics of the problem. These features would aid us in the decision-making process, hence, reaching a near-optimal solution. \\
 
-\paragraph{Operation.}
+Some of the previous work \cite{koonce2000using, harrath2002genetic, shahzad2010discovering, ismail2012production, adibi2014clustering, nasiri2019data} have extracted the following features: priority, processing time, remaining processing time, machine load, and route position. Most of the researchers converted the attributes into qualitative data. As mentioned in these studies, the main reason for this conversion is to make the decision rules more generic, which can be applied to several scheduling problems. However, in our case, we will not convert the data into classes because we will use these features to measure the similarities/dissimilarities between the operations in the clustering process, which requires having numerical values.
+We present the features that we considered:
+%\paragraph{Process.}
+%The two attributes \textit{Processing Time (PT)}  and \textit{Remain Processing Time (RPT)} are dependent on the problem domain. The \textit{PT} represents the execution time of a particular operation in a machine. However, \textit{RPT} is the aggregate processing time for all subsequent operations of that job. \todo[inline]{we need to provide rationale behind the features, why do we think they are useful for the clusering algorithm. Example of values extracted for the sample instance in Table 1 would also improve the readability of the paper.}
+%\todo[inline]{Why in all other paragraphs we are talking only about one feature at a time and here about two. Can we split them? Like \\paragraph\{Processing Time (PT)\} and \\paragraph\{Remain Processing time (RPT)\}}
+\paragraph{Processing Time (PT):}
+The \textit{PT} represents the execution time of a particular operation in a machine.
+
+\paragraph{Remain Processing Time (RPT):}
+\textit{RPT} attribute is the aggregate processing time for all subsequent operations of that job.
+
+\paragraph{Operation:}
 The \textit{operation} attribute is an ordinal value to represent the rank of each operation in its job.
 
-\paragraph{Time Length of a Job (TLJ).}
+\paragraph{Time Length of a Job (TLJ):}
 \textit{TLJ} is an attribute that describes the total processing time needed to complete a particular job. It is the summation of processing time for all operations of that job.
 
-\paragraph{Earliest Starting Time (EST).}
+\paragraph{Earliest Starting Time (EST):}
 The \textit{EST} attribute represents the earliest possible time for a particular operation to be executed. It is calculated by accumulating the processing time of the predecessor(s) of that operation, and it is $Zero$, if the operation has no predecessor.
 
-\paragraph{{Machine Load} (ML)}
+\paragraph{{Machine Load} (ML):}
 \textit{ML} is a property of a machine that shows how much time a particular machine has to execute all the operations assigned to it. In the initial state, the \textit{ML} is the aggregate of processing time of all operations assigned to that machine. For each step, the load of a machine is decreased by the processing time of an operation assigned to the machine and has the smallest \textit{EST}.
 
-\paragraph{{Starting Time} (ST)}
+\paragraph{{Starting Time} (ST):}
 \textit{ST} attribute represents the starting execution time of each operation by solving the problem using heuristics FIFO, MTWR and EST developed by \cite{tassel2021reinforcement,el2020job}.
 
-\paragraph{{Waiting Time} (WT)}
+\paragraph{{Waiting Time} (WT):}
 Since we used three different heuristics to mine information from the obtained solution, we will have three waiting times. \textit{WT} attribute is the difference between the starting time of a particular operation and the maximum value between the end time of its predecessor and when the machine became free. \\
 
 
@@ -261,10 +268,29 @@ The proposed model aims to apply clustering methods where each cluster will repr
 \item The number of operations assigned to each cluster should be close to each other.
 \end{enumerate}
 
-Algorithm.~\ref{alg} shows the pseudocode of the proposed algorithm. As shown in the pseudocode, the number of clusters is given. We calculate the cluster capacity by dividing the total number of operations by the number of clusters. In the next step, the clustering process starts by generating the centroids, where the number of centroids is the number of clusters. In general, the centroids are generated randomly as well as in our model. However, we selected some operations as centroids. Although the operations are selected randomly, we followed a rule to select the centroids. For example, let us assume that a job consists of 15 operations, and the number of clusters is $3$. The first centroid will be an operation of rank 1 - 5, the second centroid will be 6 - 10, and the third will be from the last five operations. We followed this strategy to make them far from each other because the operations grouped in the first clusters should be at the beginning of their jobs. After generating the centroids, we check for exceeding the number of clusters and the cluster capacity, respectively. After that, we calculate the distance between each operation and the centroid of the current cluster using Euclidean distance and assign the nearest operation to that cluster. In order to satisfy the precedence constraint, we check if the predecessor is not assigned to a cluster, it will be assigned to the current cluster, and the centroid is updated. If the maximum number of operations is reached, we will go to the next cluster. After assigning all operations into clusters, the algorithm terminates.
+Our main procedure starts with selecting a subset of the extracted features, which will be used for the clustering process to get the Time window assignment. As shown in algorithm~\ref{alg1}, the extracted features are given, and a set of combinations of the features are initialized. At each iteration, a subset of features is selected and run with the clustering process discussed later, then the Time Window assignment. This process is repeated until the termination condition is met.
 
 \begin{algorithm}
-\caption{Proposed Clustering Algorithm}\label{alg}
+\caption{Feature Selection Algorithm}\label{alg1}
+\begin{algorithmic}
+\Require $extracted\_features$
+\State $count\_feature \gets 0$
+\State $comb\_features$ \Comment{Define a set of combined features}
+\State $num\_subsets \gets \textbf{count}(comb\_features)$
+\While{$count\_feature < num\_subsets$}
+	\State $selected\_subset \gets comb\_features[count\_feature]$
+	\State Proposed Clustering Algorithm ($selected\_subset$) \Comment{\textbf{(Algorithm.~\ref{alg2})}} %\textbf{(Algorithm.~\ref{alg2})}
+	\State Store the Time Windows Assignment
+	\State $count\_feature \gets count\_feature + 1$
+\EndWhile
+
+\end{algorithmic}
+\end{algorithm}
+
+Algorithm.~\ref{alg2} shows the pseudocode of the proposed algorithm. As shown in the pseudocode, the number of clusters is given. We calculate the cluster capacity by dividing the total number of operations by the number of clusters. In the next step, the clustering process starts by generating the centroids, where the number of centroids is the number of clusters. In general, the centroids are generated randomly as well as in our model. However, we selected some operations as centroids. Although the operations are selected randomly, we followed a rule to select the centroids. For example, let us assume that a job consists of 15 operations, and the number of clusters is $3$. The first centroid will be an operation of rank 1 - 5, the second centroid will be 6 - 10, and the third will be from the last five operations. We followed this strategy to make them far from each other because the operations grouped in the first clusters should be at the beginning of their jobs. After generating the centroids, we check for exceeding the number of clusters and the cluster capacity, respectively. After that, we calculate the distance between each operation and the centroid of the current cluster using Euclidean distance and assign the nearest operation to that cluster. In order to satisfy the precedence constraint, we check if the predecessor is not assigned to a cluster, it will be assigned to the current cluster, and the centroid is updated. If the maximum number of operations is reached, we will go to the next cluster. After assigning all operations into clusters, the algorithm terminates.
+
+\begin{algorithm}
+\caption{Proposed Clustering Algorithm}\label{alg2}
 \begin{algorithmic}
 \Require $num\_clus$
 %\Require $n \geq 0$
