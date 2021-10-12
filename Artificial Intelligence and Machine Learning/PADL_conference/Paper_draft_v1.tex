@@ -42,27 +42,38 @@
 %
 \author{Mohammed M. S. El-Kholany\inst{1}\orcidID{0000-0002-1088-2081} \and
 Konstantin Schekotihin\inst{1}\orcidID{0000-0002-0286-0958} \and
-Martin Gebser\inst{1,2}\orcidID{0000--0000-0000-0000}}
+Martin Gebser\inst{1,2}\orcidID{0000-0002-8010-4752}}
 %
 \authorrunning{M. El-Kholany et al.}
 % First names are abbreviated in the running head.
 % If there are more than two authors, 'et al.' is used.
 %
-\institute{Alpen-Adria-Universität Klagenfurt, Klagenfurt, Austria 
-\email{\{mohammed.el-kholany, konstantin.schekotihin and martin.gebser\}@aau.at}\\
-%\url{http://www.springer.com/gp/computer-science/lncs} \and
-Technische Universität Graz, Graz, Austria\\
-\email{mgebser@ist.tugraz.at}}
+\institute{Alpen-Adria-Universität Klagenfurt, % Klagenfurt, 
+Austria\\% 
+% \email{\{mohammed.el-kholany, konstantin.schekotihin and martin.gebser\}@aau.at}%\\
+%\url{http://www.springer.com/gp/computer-science/lncs}
+\and
+Technische Universität Graz, % Graz, 
+Austria\\%
+% \email{mgebser@ist.tugraz.at}
+\email{firstname.lastname@aau.at}}
 %
 \maketitle              % typeset the header of the contribution
 %
 \begin{abstract}
-Scheduling is a crucial problem appearing in various domains, such as manufacturing, transportation, or healthcare. In most problem definitions, the goal is to schedule a given set of operations on available resources to complete the operations as early as possible. Unfortunately, most scheduling problems cannot be solved efficiently. Therefore, the research of suitable approximation methods is of primary importance.
+Scheduling is a crucial problem appearing in various domains, such as manufacturing, transportation, or healthcare, where % . In most problem definitions, 
+the goal is to schedule % a given set of 
+given operations on available resources such that the operations are completed as soon as possible. Unfortunately, most scheduling problems cannot be solved efficiently, % Therefore, the 
+so that research on suitable approximation methods is of primary importance.
+%
+This work introduces a novel approximation approach based on problem decomposition with data mining methodologies. We propose a constrained clustering algorithm to group operations into clusters, corresponding to time windows in which the operations must be scheduled. 
+The decomposition process consists of two main phases. 
+First, features are extracted, either from the problem itself or from solutions obtained by heuristic methods, to predict the execution sequence of operations on each resource.
+% The first phase is to extract features to predict the sequence of operations on each resource. These features are extracted either from the problem itself or from solutions obtained by other heuristics.
+The second phase % is to develop
+deploys our constrained clustering algorithm to assign each operation into a time window. We then schedule the operations by time windows using Answer Set Programming. Evaluation results show that our proposed approach outperforms other heuristic schedulers in most cases, where incorporating features like \textit{Remaining Processing Time}, \textit{Machine Load}, and \textit{Earliest Starting Time} significantly improves the solution quality.
 
-This work suggests a novel approximation approach based on problem decomposition with data mining methodologies. This study proposes a constrained clustering algorithm to group the operations into clusters corresponding to time windows in which these operations must be scheduled. 
-The decomposition process depends on two main phases. The first phase is to extract features to predict the sequence of the operations on each resource. These features are extracted either from the problem itself or from solutions obtained by other heuristics. The second phase is to develop a constrained clustering algorithm to assign each operation into a time window. We solved the problem using the Answer Set Programming. Evaluation results show that our proposed outperformed other heuristic schedulers in most cases, where features, like \textit{Remaining Processing Time}, \textit{Machine Load}, and \textit{Earliest Starting Time}, contributed significantly to the solution quality.
-
-\keywords{Job-shop Scheduling  Problem \and Constrained Clustering \and Time Windows \and Answer Set Programming.}
+\keywords{Job-shop Scheduling  Problem \and Constrained Clustering \and Time Windows \and Answer Set Programming}
 \end{abstract}
 %
 %
@@ -71,16 +82,17 @@ The decomposition process depends on two main phases. The first phase is to extr
 Scheduling is one of the most crucial problems in various industrial, transportation, or healthcare applications
 %\todo{add 1-2 citations for each application}
  \cite{pezzella2008genetic,chaudhry2016research,nouiri2018effective,demirbilek2019dynamically,schoenfelder2020nurse,wang2019routing,janakbhai2021blockchain}. 
+%
+Such applications result in different scheduling problem definitions, with the Job-shop Scheduling Problem (JSP) \cite{taillard1993benchmarks} being one if not the most well-known variant.
+In JSP, operations of given jobs must be scheduled on available machines in an optimal way wrt.\ some pre-defined criteria. The latter include, for instance, minimization of makespan, i.e., the latest completion time of any job, or tardiness, i.e., the sum of delays over all jobs completed after their deadlines. 
 
-These applications resulted in different definitions of scheduling problems, with Job-shop Scheduling Problem (JSP) being among the most popular ones.
-In JSP, operations of given jobs must be scheduled on available machines in an optimal way wrt.\ some pre-defined criteria. The latter include, for instance, minimization of makespan, i.e., the completion time of the last job, or tardiness, i.e., the sum of delays for all jobs completed after their deadlines. 
-
-However, JSP is a NP-complete combinatorial optimization problem \cite{DBLP:journals/mor/GareyJS76,SOTSKOV1995237} for which no efficient algorithms are known. Therefore, searching for an optimal solution with modern approaches like Answer Set Programming (ASP), Mixed Integer Programming, or Constraint Programming \cite{meng2020mixed,el2020job,al2017job}
+However, JSP is an NP-complete combinatorial optimization problem \cite{DBLP:journals/mor/GareyJS76,SOTSKOV1995237} for which no efficient algorithms are known. Therefore, searching for an optimal solution with state-of-the-art solvers for Answer Set Programming (ASP), Mixed Integer Programming, or Constraint Programming \cite{meng2020mixed,coltep19a,el2020job,al2017job}
 %\todo{cite at least 1 paper solving JSP with these methods} 
-often takes too much computation time, even for small instances. Practical applications require solving JSP instances of vast scale with thousands of operations \cite{zhang2010hybrid}.
-As a result, many researchers focused on the development of efficient algorithms for finding high-quality approximations of the optimal schedule, including dispatching rules and other heuristic approaches~\cite{blackstone1982state}, or stochastic optimization techniques \cite{DBLP:journals/informs/VaessensAL96,DBLP:journals/jim/CalisB15}.  
-The main issue of these approaches is that they require manual parametrization for a particular scheduling problem, which is tedious and error-prone. For instance, heuristic approaches might require the development of new heuristics or their combinations. Similarly, default parameters of stochastic methods might result in a finding of mediocre schedules.    
-As a result, much focus of the recent research lies on the automation of the parametrization using machine learning techniques~\cite{bengio2020machine}.
+often takes too much computation time, even for seemingly small instances. Practical applications instead necessitate solving JSP instances of large scale with thousands of operations~\cite{zhang2010hybrid}.
+As a result, much research work focuses on % the development of 
+efficient methods for finding high-quality approximations of optimal schedules, including dispatching rules and other heuristic approaches~\cite{blackstone1982state} as well as stochastic optimization techniques \cite{DBLP:journals/informs/VaessensAL96,DBLP:journals/jim/CalisB15}.  
+The main issue of these approaches is that they require manual parametrization for a particular scheduling problem, which is tedious and error-prone. For instance, adapting heuristic methods might involve the development of new dispatching rules or specific combinations of existing ones. Similarly, merely utilizing default parameters for stochastic techniques might lead to mediocre schedules.    
+In view of these challenges, recent research interest lies on the automatic parametrization of approximation methods using machine learning methodologies~\cite{bengio2020machine}.
 
 
 %Nowadays, the massive progress and development of the internet and online technologies, data generated by machines and devices, product development, quality and inventory management systems, or production planning systems has become huge and is expected to increase in the coming years. Hence, to capture long-term revenues and sustainable competitive advantages, companies must manage the knowledge and have the valuable information to make the right decision at the right time \cite{benabdellah2019survey}. \\
@@ -96,20 +108,19 @@ As a result, much focus of the recent research lies on the automation of the par
 %Clustering has been widely applied in several disciplines; one is production-planning systems~\cite{nananukul2013clustering,koskosidis1992clustering}, more specifically scheduling \cite{yashar2013multi,tong2016research}. 
 %\comment{Are there any citations for the claim above?}
 
-In this work, we suggest a clustering-based method that automatically decomposes a JSP instance into sub-instances which can be tackled by 
-optimization algorithms of an ASP solver. 
-General clustering algorithms are unsupervised learning methods that partition a given set of objects into disjoint clusters, where each cluster comprises closest objects wrt.\ some distance function. 
-In scheduling settings, however, clusters must satisfy additional constraints, which define precedence relations between operations of a job. Standard constrained clustering algorithms are not applicable in scheduling scenarios since they usually allow for the definition of disjointness constraints, which specify objects that cannot appear in one cluster \cite{zhang2019framework,wagstaff2001constrained,ding2020unified}. 
+In this work, we introduce a method based on clustering to automatically decomposes a JSP instance into several time windows that are small enough for optimization by an ASP solver.
+General clustering algorithms are unsupervised learning methods that partition a given set of objects into disjoint clusters, where each cluster comprises close objects wrt.\ some distance measure. 
+In scheduling settings, however, clusters must satisfy additional constraints implied by the precedence relation between operations of a job. Standard constrained clustering algorithms are not readily applicable to scheduling scenarios either, as they are limited to disjointness constraints specifying objects that must not appear together in a cluster \cite{zhang2019framework,wagstaff2001constrained,ding2020unified}. 
 Therefore, our clustering method implements a novel type of constraints that
 \begin{enumerate*}[label=\emph{(\roman*)}]
-  \item prevent the assignment of an operation to a cluster if its preceding operation is not yet assigned to the same or previous cluster, and
-  \item ensure balancing between the clusters according to the number of operations per cluster.
+  \item prevent the assignment of an operation to a cluster if its preceding operation is not yet assigned to the same or a previous cluster and
+  \item ensure balancing between clusters according to the target number of operations per cluster.
 \end{enumerate*}
-Further contributions of this paper can be summarized as follows:
+Further contributions of our work can be summarized as follows:
 \begin{itemize}
-  \item Since a typical JSP instance describing jobs, their operations, and available machines, does not provide enough information for a clustering algorithm to find a good decomposition, we suggest various heuristic feature extractors, such as First-In-First-Out or machine load.
-  \item We implement the suggested constrained clustering method and combine it with the forward selection of features. The latter is an automatic procedure aiming to find a subset of features allowing the clustering algorithm to compute a decomposition resulting in the best quality schedule.
-  \item Evaluation of our method on the Taillard benchmark instances \cite{taillard1993benchmarks} showed that it significantly outperforms baseline heuristic methods and pure ASP optimization algorithms wrt.\ the makespan optimization criteria within the timeout of 600 seconds.
+  \item Since a typical JSP instance describing jobs, their operations, and available machines does not provide sufficient information by itself for finding some promising decomposition by a clustering algorithm, we incorporate heuristic approaches like \textit{First-In-First-Out} and \textit{Machine Load} to extract features from their solutions.
+  \item We implement the proposed constrained clustering algorithm and combine it with the forward selection of features, which is an automatic method for identifying a subset of features allowing the clustering method to compute decompositions resulting in best-quality schedules.
+  \item The evaluation of our approach on Taillard's benchmark instances \cite{taillard1993benchmarks} shows that it significantly outperforms baseline heuristic methods and pure ASP optimization wrt.\ the makespan optimization criterion within a timeout limit of 600 seconds.
 \end{itemize}
 %It can be said that the attributes of the classical JSP are quite a few and not sufficient to define the similarity and dissimilarity between the operations. The lack of these attributes guides us to extract more features that could specify which operations are similar and should be in the same window and which shall not be in the same window. The main contribution of this work is to extract some features that have a significant impact on the decomposition process and accordingly on the makespan. 
 %More specifically, we need to extract some features to define which operations are similar to be scheduled in the same window and get a near-optimal solution in a reasonable time. \\
@@ -122,11 +133,11 @@ Further contributions of this paper can be summarized as follows:
 %    \item The second phase aims to develop, implement and test a proposed clustering algorithm that will split the problem into sub-problems where each operation is a data object, and each cluster will represent a Time Window (TW). It will consider the precedence constraints between the operations and balancing between the clusters according to the number of operations per cluster.
 %\end{enumerate}
 
-The paper is organized as follows: the following section provides the definition of JSP and gives an illustrative example of input data. Section \ref{sec:features} discusses heuristic feature extractors, followed by Section \ref{sec:method}, which presents the proposed constrained clustering algorithm. Section \ref{sec:eval} presents an extensive computational study on benchmark instances, comparing our results with the baseline solvers. A literature review is given in Section \ref{sec:literature}, followed by the conclusions and future work.
+The rest of this paper is organized as follows. Section~\ref{sec:problem} introduces JSP along with a running example. In Section \ref{sec:features}, we describe the feature extraction, including heuristic methods to obtain corresponding reference solutions. Section~\ref{sec:method} presents our proposed constrained clustering algorithm. In Section~\ref{sec:eval}, we empirically evaluate our approach and compare it to baseline heuristic methods as well as pure ASP optimization. Section~\ref{sec:literature} then surveys related work, followed by conclusions and future work in Section~\ref{sec:conclusions}.
 
 
-\section{Problem Definition}
-The Job-shop Scheduling Problem (JSP) is one of the well-known scheduling problems \cite{baker1974introduction,lenstra1979computational}. An instance of a JSP comprises a set $J = \{ J_1, J_2, \dots ,J_n \}$  of jobs and a set $M = \{ M_1, M_2, \dots ,M_m \}$ of Machines. Each job $J_i$ has a sequence $(O_{i,1}, O_{i,2}, \dots ,O_{i,m})$ of operations that must be processed in a predefined order. Each machine $M_i$ executes an operation of each job with a known and fixed processing time. The main objective of a JSP solver is to find a schedule that minimizes some criteria like makespan, i.e., the total completion time for all jobs.
+\section{Problem Definition}\label{sec:problem}
+The Job-shop Scheduling Problem (JSP) is one of the well-known scheduling problems \cite{baker1974introduction,lenstra1979computational,taillard1993benchmarks}. An instance of a JSP comprises a set $J = \{ J_1, J_2, \dots ,J_n \}$  of jobs and a set $M = \{ M_1, M_2, \dots ,M_m \}$ of Machines. Each job $J_i$ has a sequence $(O_{i,1}, O_{i,2}, \dots ,O_{i,m})$ of operations that must be processed in a predefined order. Each machine $M_i$ executes an operation of each job with a known and fixed processing time. The main objective of a JSP solver is to find a schedule that minimizes some criteria like makespan, i.e., the total completion time for all jobs.
 In addition, JSP makes the following assumptions:
 \begin{itemize}
 	\item Once an operation starts, it must be completed without interruptions.
