@@ -61,12 +61,19 @@ Austria\\%
 \maketitle              % typeset the header of the contribution
 %
 \begin{abstract}
-Scheduling is a crucial problem appearing in various domains, such as manufacturing, transportation, or healthcare. In most problem definitions, the goal is to schedule a given set of operations on available resources to complete the operations as early as possible. Unfortunately, most scheduling problems cannot be solved efficiently. Therefore, the research of suitable approximation methods is of primary importance.
+Scheduling is a crucial problem appearing in various domains, such as manufacturing, transportation, or healthcare, where % . In most problem definitions, 
+the goal is to schedule % a given set of 
+given operations on available resources such that the operations are completed as soon as possible. Unfortunately, most scheduling problems cannot be solved efficiently, % Therefore, the 
+so that research on suitable approximation methods is of primary importance.
+%
+This work introduces a novel approximation approach based on problem decomposition with data mining methodologies. We propose a constrained clustering algorithm to group operations into clusters, corresponding to time windows in which the operations must be scheduled. 
+The decomposition process consists of two main phases. 
+First, features are extracted, either from the problem itself or from solutions obtained by heuristic methods, to predict the execution sequence of operations on each resource.
+% The first phase is to extract features to predict the sequence of operations on each resource. These features are extracted either from the problem itself or from solutions obtained by other heuristics.
+The second phase % is to develop
+deploys our constrained clustering algorithm to assign each operation into a time window. We then schedule the operations by time windows using Answer Set Programming. Evaluation results show that our proposed approach outperforms other heuristic schedulers in most cases, where incorporating features like \textit{Remaining Processing Time}, \textit{Machine Load}, and \textit{Earliest Starting Time} significantly improves the solution quality.
 
-This work suggests a novel approximation approach based on problem decomposition with data mining methodologies. This study proposes a constrained clustering algorithm to group the operations into clusters corresponding to time windows in which these operations must be scheduled. 
-The decomposition process depends on two main phases. The first phase is to extract features to predict the sequence of the operations on each resource. These features are extracted either from the problem itself or from solutions obtained by other heuristics. The second phase is to develop a constrained clustering algorithm to assign each operation into a time window. We solved the problem using the Answer Set Programming. Evaluation results show that our proposed outperformed other heuristic schedulers in most cases, where features, like \textit{Remaining Processing Time}, \textit{Machine Load}, and \textit{Earliest Starting Time}, contributed significantly to the solution quality.
-
-\keywords{Job-shop Scheduling  Problem \and Constrained Clustering \and Time Windows \and Answer Set Programming.}
+\keywords{Job-shop Scheduling  Problem \and Constrained Clustering \and Time Windows \and Answer Set Programming}
 \end{abstract}
 %
 %
