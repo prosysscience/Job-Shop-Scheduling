@@ -86,7 +86,7 @@ Scheduling is one of the most crucial problems in various industrial, transporta
 Such applications result in different scheduling problem definitions, with the Job-shop Scheduling Problem (JSP) \cite{taillard1993benchmarks} being one if not the most well-known variant.
 In JSP, operations of given jobs must be scheduled on available machines in an optimal way wrt.\ some predefined criteria. The latter include, for instance, minimization of makespan, i.e., the latest completion time of any job, or tardiness, i.e., the sum of delays over all jobs completed after their deadlines. 
 
-However, JSP is an NP-complete combinatorial optimization problem \cite{DBLP:journals/mor/GareyJS76,SOTSKOV1995237} for which no efficient algorithms are known. Therefore, searching for an optimal solution with state-of-the-art solvers for Answer Set Programming (ASP), Mixed Integer Programming, or Constraint Programming \cite{meng2020mixed,coltep19a,el2020job,al2017job}
+However, JSP is an NP-hard combinatorial optimization problem \cite{garey1976complexity,SOTSKOV1995237} for which no efficient algorithms are known. Therefore, searching for an optimal solution with state-of-the-art solvers for Answer Set Programming (ASP), Mixed Integer Programming, or Constraint Programming \cite{meng2020mixed,coltep19a,el2020job,al2017job}
 %\todo{cite at least 1 paper solving JSP with these methods} 
 often takes too much computation time, even for seemingly small instances. Practical applications instead necessitate solving JSP instances of large scale with thousands of operations~\cite{zhang2010hybrid}.
 As a result, much research work focuses on % the development of 
@@ -237,12 +237,42 @@ yet it does not stretch the resulting makespan beyond time~$20$.
 \end{minipage}
 \end{table}
 
-Since no efficient algorithm is known for JSP \cite{garey1976complexity}, 
-modern optimization algorithms often cannot reach a solution close to the optimal one in a reasonable time, even if the number of operations to be scheduled is low. In real-life applications, the number of operations in an instance might be up to tens of thousands \cite{zhang2010hybrid}. The JSP has attracted the interest of many researchers in the last decades to find effective methods to solve this problem. One of these methods is decomposition. The decomposition idea is to split the problem into sub-problems, solve them separately, and then integrate those solutions to solve the whole problem. Many decomposition strategies have been proposed for solving the JSP  \cite{zhai2014decomposition,singer2001decomposition,ovacik2012decomposition,uzsoy2000performance}. However, there is no guarantee of which method is the best because the performance varies according to the problem.
+Since JSP is NP-hard \cite{garey1976complexity,SOTSKOV1995237}
+and
+no efficient solving algorithms are known, 
+even state-of-the-art optimization methods can often not find (near-)optimal solutions in reasonable time, already for instances with a seemingly small number of operations.
+As the number of operations in real-life applications
+can easily reach tens of thousands~\cite{zhang2010hybrid},
+approximation methods have attracted particular research interest.
+One such approach is decomposition into easier to optimize parts,
+% . The decomposition idea is to split the problem into sub-problems,
+which can be solved separately and whose partial solutions are
+eventually combined into a joint schedule for the entire problem instance.
+While various decomposition strategies have been proposed in the literature \cite{zhai2014decomposition,singer2001decomposition,ovacik2012decomposition,uzsoy2000performance},
+none of them can provide solution quality guarantees
+or strictly dominates over heterogeneous JSP instances. 
+% there is no guarantee of which method is the best because the performance varies according to the problem.
 
-In our example in Table~\ref{tab1}, there are $9$ operations and $3$ machines. We aim to split the operations efficiently into two partitions and schedule them separately without violating the precedence constraint. More specifically, we should not assign an operation in the Time Window (TW) which precedes TW(s) of at least one of its predecessors. Table~\ref{tab2} shows one of the possible decompositions that we would like our method to return. Namely, operations $\{ O_{1,1}, O_{1,2}, O_{2,1}, O_{2,2}, O_{3,1} \}$ are assigned to the first TW and the rest to the second TW. Given this decomposition, a multi-shot optimization method, like ASP, will first find an optimal schedule of the operations in the first TW and provide it as a set of facts to the search of the optimal solution for the second TW. In this study, we investigate applying a constrained clustering algorithm to decompose the JSP, where we extract some features from the problem itself and the solutions of other heuristics. These features have been used for the splitting process, and we present them in detail in the following section.
+For our example in Table~\ref{tab1}, there are $9$ operations and $3$ machines.
+Assume that we aim to split the operations into two parts to be scheduled separately such that the precedence between operations belonging to the same job is preserved.
+That is, we should not assign a successor operation to an earlier Time Window (TW)
+than its predecessor. % operation.
+Table~\ref{tab2} shows one feasible decomposition that we may like to generate.
+The operations $\{ O_{1,1}, O_{1,2}, O_{2,1}, O_{2,2}, O_{3,1} \}$ are here assigned to TW~$1$, and the remaining operations to TW~$2$.
+Given this decomposition, a multi-shot optimization approach,
+as offered by ASP~\cite{gekakasc17a},
+can first optimize a schedule (wrt.\ to the makespan)
+for the operations in TW~$1$, and then extend the first part by
+additionally scheduling the operations in TW~$2$ in an optimal way.
+However, considering that the operation $O_{3,2}$ belongs to TW~$2$
+and should be executed later than $O_{1,2}$ of TW~$1$,
+the decomposition is incompatible with the execution order
+$(O_{2,1}, O_{3,2}, O_{1,2})$ for machine~$3$ and thus discards optimal schedules.
+% provide it as a set of facts to the search of the optimal solution for the second TW.
 
-\section{Feature extraction}
+In this work, we introduce and deploy a constrained clustering algorithm to decompose  JSP instances into time windows, where we extract some features from the problem itself and others from solutions obtained by heuristic methods. The features we consider for the decomposition process are explained in detail in the next section.
+
+\section{Feature Extraction}
 \label{sec:features}
 Application of machine learning methods to scheduling problems requires careful selection of data describing the hidden dependencies between operations of different jobs \cite{ismail2012production,nasiri2019data}. Clustering methods, which we aim to apply in our approach, are not an exception. Thus, a clustering method requires an informative set of features describing jobs, their operations, and machines of an instance to find patterns resulting in a beneficial decomposition of all operations in time windows. 
 
