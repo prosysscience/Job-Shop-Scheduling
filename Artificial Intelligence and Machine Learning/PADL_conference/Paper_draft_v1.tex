@@ -84,7 +84,7 @@ Scheduling is one of the most crucial problems in various industrial, transporta
  \cite{pezzella2008genetic,chaudhry2016research,nouiri2018effective,demirbilek2019dynamically,schoenfelder2020nurse,wang2019routing,janakbhai2021blockchain}. 
 %
 Such applications result in different scheduling problem definitions, with the Job-shop Scheduling Problem (JSP) \cite{taillard1993benchmarks} being one if not the most well-known variant.
-In JSP, operations of given jobs must be scheduled on available machines in an optimal way wrt.\ some pre-defined criteria. The latter include, for instance, minimization of makespan, i.e., the latest completion time of any job, or tardiness, i.e., the sum of delays over all jobs completed after their deadlines. 
+In JSP, operations of given jobs must be scheduled on available machines in an optimal way wrt.\ some predefined criteria. The latter include, for instance, minimization of makespan, i.e., the latest completion time of any job, or tardiness, i.e., the sum of delays over all jobs completed after their deadlines. 
 
 However, JSP is an NP-complete combinatorial optimization problem \cite{DBLP:journals/mor/GareyJS76,SOTSKOV1995237} for which no efficient algorithms are known. Therefore, searching for an optimal solution with state-of-the-art solvers for Answer Set Programming (ASP), Mixed Integer Programming, or Constraint Programming \cite{meng2020mixed,coltep19a,el2020job,al2017job}
 %\todo{cite at least 1 paper solving JSP with these methods} 
@@ -137,20 +137,25 @@ The rest of this paper is organized as follows. Section~\ref{sec:problem} introd
 
 
 \section{Problem Definition}\label{sec:problem}
-The Job-shop Scheduling Problem (JSP) is one of the well-known scheduling problems \cite{baker1974introduction,lenstra1979computational,taillard1993benchmarks}. An instance of a JSP comprises a set $J = \{ J_1, J_2, \dots ,J_n \}$  of jobs and a set $M = \{ M_1, M_2, \dots ,M_m \}$ of Machines. Each job $J_i$ has a sequence $(O_{i,1}, O_{i,2}, \dots ,O_{i,m})$ of operations that must be processed in a predefined order. Each machine $M_i$ executes an operation of each job with a known and fixed processing time. The main objective of a JSP solver is to find a schedule that minimizes some criteria like makespan, i.e., the total completion time for all jobs.
-In addition, JSP makes the following assumptions:
-\begin{itemize}
-	\item Once an operation starts, it must be completed without interruptions.
-	\item Each job has no duplicated operations, i.e., visits a machine only once.
-	\item A machine cannot perform more than one operation at a time.
-	\item All machines are available at all times.
-	\item Processing the jobs starts at time 0.
-\end{itemize}
+The Job-shop Scheduling Problem (JSP) is one of the most well-known scheduling problems \cite{baker1974introduction,lenstra1979computational,taillard1993benchmarks}. A JSP instance comprises a set $J = \{ J_1, J_2, \dots ,J_n \}$  of jobs and a set $M = \{ M_1, M_2, \dots ,M_m \}$ of machines. Each job $J_i$ consists of a sequence $(O_{i,1},\linebreak[1] O_{i,2},\linebreak[1] \dots ,O_{i,m})$ of operations that must be processed in the given order. Each machine $M_i$ executes one operation per job with a predefined, fixed processing time.
+Once the execution of an operation is started, it cannot be interrupted,
+and each machine can perform at most one operation at a time.
+The main objective of JSP solving algorithms is to find a schedule that minimizes optimization criteria,
+where we focus on the makespan, i.e., the latest completion time of any job.
+% In addition, JSP solutions are subject to the following conditions:
+% \begin{itemize}
+% 	\item Once an operation starts, it must be completed without interruptions.
+%	\item Each job has no duplicated operations, i.e., visits a machine only once.
+% 	\item A machine cannot perform more than one operation at a time.
+% 	\item All machines are available at all times.
+% 	\item Processing the jobs starts at time 0.
+% \end{itemize}
 
-Let us illustrate the problem on a small example presented in Table~\ref{tab1}, which shows the information of a simple JSP comprising $3$ jobs and $3$ machines. In this table, rows correspond to operations, whereas columns refer to the name of the operation, the machine assigned to an operation, and the processing time of a particular operation. For instance, in the third row of the table, $O_{1,3}$ is the third operation of the first job that will be executed by machine $1$ with processing time $5$. 
+Let us illustrate the problem on the small JSP instance specified in Table~\ref{tab1}, which provides parameters for $3$ jobs and $3$ machines. In this table, rows correspond to operations, whereas columns refer to the name of the operation, the machine assigned to an operation, and the processing time of a particular operation. For instance, in the third row of the table, $O_{1,3}$ is the third operation of the first job that will be executed by machine $1$ with processing time $5$. 
 
-\begin{table}
-\begin{minipage}{.6\textwidth}
+\begin{table}[t]
+%  \centering
+\begin{minipage}{.56\textwidth}
 %\fontsize{12}{9}
 \setlength{\tabcolsep}{5.0pt}
 \centering
@@ -159,7 +164,7 @@ Let us illustrate the problem on a small example presented in Table~\ref{tab1}, 
     \label{tab1}
  %\begin{adjustwidth}{0.0cm}{}
     \begin{tabular}{c c c}
-      \textbf{Operation} & \textbf{Machine} & \textbf{Procesing Time} \\
+      \textbf{Operation} & \textbf{Machine} & \textbf{Processing Time} \\
       \hline
 								\\
       $O_{1,1}$  & 2  &  9  	\\
