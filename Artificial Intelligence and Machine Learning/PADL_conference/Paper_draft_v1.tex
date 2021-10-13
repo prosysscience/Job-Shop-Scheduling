@@ -136,7 +136,7 @@ Further contributions of our work can be summarized as follows:
 The rest of this paper is organized as follows. Section~\ref{sec:problem} introduces JSP along with a running example. In Section \ref{sec:features}, we describe the feature extraction, including heuristic methods to obtain corresponding reference solutions. Section~\ref{sec:method} presents our proposed constrained clustering algorithm. In Section~\ref{sec:eval}, we empirically evaluate our approach and compare it to baseline heuristic methods as well as pure ASP optimization. Section~\ref{sec:literature} then surveys related work, followed by conclusions and future work in Section~\ref{sec:conclusions}.
 
 
-\section{Problem Definition}\label{sec:problem}
+\section{Job-shop Scheduling Problem}\label{sec:problem}
 The Job-shop Scheduling Problem (JSP) is one of the most well-known scheduling problems \cite{baker1974introduction,lenstra1979computational,taillard1993benchmarks}. A JSP instance comprises a set $J = \{ J_1, J_2, \dots ,J_n \}$  of jobs and a set $M = \{ M_1, M_2, \dots ,M_m \}$ of machines. Each job $J_i$ consists of a sequence $(O_{i,1},\linebreak[1] O_{i,2},\linebreak[1] \dots ,O_{i,m})$ of operations that must be processed in the given order. Each machine $M_i$ executes one operation per job with a predefined, fixed processing time.
 Once the execution of an operation is started, it cannot be interrupted,
 and each machine can perform at most one operation at a time.
@@ -151,8 +151,35 @@ where we focus on the makespan, i.e., the latest completion time of any job.
 % 	\item Processing the jobs starts at time 0.
 % \end{itemize}
 
-Let us illustrate the problem on the small JSP instance specified in Table~\ref{tab1}, which provides parameters for $3$ jobs and $3$ machines. In this table, rows correspond to operations, whereas columns refer to the name of the operation, the machine assigned to an operation, and the processing time of a particular operation. For instance, in the third row of the table, $O_{1,3}$ is the third operation of the first job that will be executed by machine $1$ with processing time $5$. 
-
+Let us illustrate the problem on the small JSP instance specified in Table~\ref{tab1}, which provides parameters for $3$ jobs and $3$ machines. 
+The rows list operations along with their respective machines and processing times; e.g., the third operation of the first job, $O_{1,3}$, takes $5$ time units for execution by machine~$1$.
+The minimum makespan happens to be $20$, which matches the sum $9+6+5$ of processing times for the operations $O_{1,1}$, $O_{2,2}$, and $O_{3,3}$ executed by machine~$2$.
+While there are plenty, i.e., $234$, optimal schedules with makespan $20$,
+they agree on the execution orders $(O_{3,1}, O_{1,3}, O_{2,3})$ and $(O_{1,1}, O_{2,2}, O_{3,3})$
+of operations processed by machine~$1$ or~$2$, respectively.
+The two feasible execution orders for machine $3$ are
+$(O_{2,1}, O_{3,2}, O_{1,2})$ and
+$(O_{2,1}, O_{1,2}, O_{3,2})$.
+In both cases, the earliest eligible starting times for the operations
+$O_{1,1}$, $O_{1,2}$, and $O_{1,3}$ of job $J_1$ are
+$0$, $9$, and $12$,
+as well as
+$0$, $9$, and $17$ for $O_{2,1}$, $O_{2,2}$, and $O_{2,3}$
+belonging to the job~$J_2$.
+Regarding the operations of~$J_3$,
+the earliest starting time for $O_{3,1}$ is~$0$,
+$O_{3,3}$ can only be started at time~$15$ because its machine~$1$
+is occupied before,
+while either $4$ or $12$ is the earliest eligible starting time for $O_{3,2}$,
+depending on whether it is processed directly after completing $O_{3,1}$
+(and $O_{2,1}$ on its machine~$3$) or waits for the completion of $O_{1,2}$
+on machine~$3$.
+The latter option lets machine~$3$ idle unnecessarily 
+and may seem less attractive,
+yet it does not stretch the resulting makespan beyond time~$20$. 
+%
+% In this table, rows correspond to operations, whereas columns refer to the name of the operation, the machine assigned to an operation, and the processing time of a particular operation. For instance, in the third row of the table, $O_{1,3}$ is the third operation of the first job that will be executed by machine $1$ with processing time $5$. 
+%
 \begin{table}[t]
 %  \centering
 \begin{minipage}{.56\textwidth}
@@ -167,17 +194,17 @@ Let us illustrate the problem on the small JSP instance specified in Table~\ref{
       \textbf{Operation} & \textbf{Machine} & \textbf{Processing Time} \\
       \hline
 								\\
-      $O_{1,1}$  & 2  &  9  	\\
-      $O_{1,2}$  & 3  &  3  	\\
-      $O_{1,3}$  & 1  &  5  	\\
+      $O_{1,1}$  & $2$  &  $9$  	\\
+      $O_{1,2}$  & $3$  &  $3$  	\\
+      $O_{1,3}$  & $1$  &  $5$ 	\\
 								\\
-      $O_{2,1}$  & 3  & 4  	\\
-      $O_{2,2}$  & 2  & 6  	\\
-      $O_{2,3}$  & 1  & 2  	\\
+      $O_{2,1}$  & $3$  & $4$  	\\
+      $O_{2,2}$  & $2$  & $6$  	\\
+      $O_{2,3}$  & $1$  & $2$  	\\
 								\\
-      $O_{3,1}$  & 1  & 4  	\\
-      $O_{3,2}$  & 3  & 3  	\\
-      $O_{3,3}$  & 2  & 5  	\\
+      $O_{3,1}$  & $1$  & $4$  	\\
+      $O_{3,2}$  & $3$  & $3$  	\\
+      $O_{3,3}$  & $2$  & $5$  	\\
     \end{tabular}
 %\end{adjustwidth}
 %  \end{center}
@@ -193,16 +220,16 @@ Let us illustrate the problem on the small JSP instance specified in Table~\ref{
       \textbf{Operation} & \textbf{Time Window}  \\
       \hline
 							\\
-      $O_{1,1}$  & 1    	\\
-      $O_{1,2}$  & 1    	\\
-      $O_{2,1}$  & 1    	\\
-      $O_{2,2}$  & 1   	\\
-      $O_{3,1}$  & 1		\\
+      $O_{1,1}$  & $1$    	\\
+      $O_{1,2}$  & $1$    	\\
+      $O_{2,1}$  & $1$    	\\
+      $O_{2,2}$  & $1$   	\\
+      $O_{3,1}$  & $1$		\\
 					    		\\
-      $O_{1,3}$  & 2  	\\
-      $O_{2,3}$  & 2		\\
-      $O_{3,2}$  & 2    	\\
-      $O_{3,3}$  & 2    	\\
+      $O_{1,3}$  & $2$  	\\
+      $O_{2,3}$  & $2$		\\
+      $O_{3,2}$  & $2$    	\\
+      $O_{3,3}$  & $2$    	\\
       \\
     \end{tabular}
 %\end{adjustwidth}
