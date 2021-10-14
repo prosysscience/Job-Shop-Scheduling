@@ -355,29 +355,37 @@ Therefore, we propose a constrained clustering algorithm that preserves sequence
 Since our approach solves each sub-problem separately, the generation of large clusters might reduce its performance significantly. In the extreme case, finding a solution for a sub-problem might require the same time as the solution of the whole problem.
 Therefore, in addition to the similarity optimization criteria, our algorithm also aims to generate clusters with an equal number of operations assigned to each cluster.  
 
-Our main procedure starts with selecting a subset of the extracted features, which will be used for the clustering process to get the Time window assignment. As shown in Algorithm~\ref{alg1}, the extracted features are given, and a set of combinations of the features are initialized. At each iteration, a subset of features is selected and run with the clustering process discussed later, then the Time Window assignment. This process is repeated until the termination condition is met.
+Our main procedure starts with the selection of a subset of the extracted features, which allows the clustering algorithm to compute the best possible time window assignments. 
+The procedure follows the forward feature selection principle: start with a small set of features and in every iteration extends it with one feature.
+Run the clustering algorithm on the new set of features and solve the obtained sequence of time windows. The subset of features resulting in the best possible solution quality is preserved and provided for extension in the next loop of the feature selection algorithm. The latter continues until either 
+\begin{enumerate*}[label=\emph{(\roman*)}]
+  \item all features are included in the target set, or 
+  \item any extension of the provided subset of features results in solutions of worse quality than the solution of the given set.
+\end{enumerate*}
+ 
+%\begin{algorithm}
+%\caption{Feature Selection Algorithm}\label{alg1}
+%\begin{algorithmic}
+%\Require $extracted\_features$
+%\State $count\_feature \gets 0$
+%\State $comb\_features \get \emptyset$ \Comment{Define a set of combined %features}
+%\State $num\_subsets \gets \textbf{count}(comb\_features)$
+%\While{$count\_feature < num\_subsets$}
+%	\State $selected\_subset \gets comb\_features[count\_feature]$
+%	\State Clustering Algorithm ($selected\_subset$) \Comment{\textbf{(Algorithm.%~\ref{alg2})}} %\textbf{(Algorithm.~\ref{alg2})}
+%	\State Store the Time Windows Assignment
+%	\State $count\_feature \gets count\_feature + 1$
+%\EndWhile
+%
+%\end{algorithmic}
+%\end{algorithm}
+
+Algorithm~\ref{alg2} shows the pseudocode of the proposed clustering algorithm. Similar to K-Means, we assume that the algorithm gets the number of clusters as input. We calculate the cluster capacity by dividing the total number of operations by the number of clusters. In the next step, the clustering process starts by generating the centroids, where the number of centroids corresponds to the number of clusters. Each centroid in our case corresponds to some randomly selected operation from a set of operations allowing for preserving of sequencing constraints. For example, let us assume that a job consists of 15 operations, and the number of clusters is $3$. The first centroid will be an operation of order $\{1, dots, 5\}$ in the sequence, the second centroid will be selected from operations with the order $\{6, dots, 10\}$, and so forth. After generating the centroids, we check for exceeding the number of clusters and the cluster capacity, respectively. 
+%
+Next, the algorithm calculates the distance between each operation and the centroid of the current cluster using Euclidean distance and assigns the nearest operation to that cluster. In order to satisfy the precedence constraint, we check the assignments of predecessors. If the constraint is satisfied, the algorithm assigns the operation to the cluster, and the centroid is updated. Whenever the maximum number of operations is reached, the algorithm continues with the next cluster. These iterations continue until all operations are assigned to some cluster. 
 
 \begin{algorithm}
-\caption{Feature Selection Algorithm}\label{alg1}
-\begin{algorithmic}
-\Require $extracted\_features$
-\State $count\_feature \gets 0$
-\State $comb\_features$ \Comment{Define a set of combined features}
-\State $num\_subsets \gets \textbf{count}(comb\_features)$
-\While{$count\_feature < num\_subsets$}
-	\State $selected\_subset \gets comb\_features[count\_feature]$
-	\State Proposed Clustering Algorithm ($selected\_subset$) \Comment{\textbf{(Algorithm.~\ref{alg2})}} %\textbf{(Algorithm.~\ref{alg2})}
-	\State Store the Time Windows Assignment
-	\State $count\_feature \gets count\_feature + 1$
-\EndWhile
-
-\end{algorithmic}
-\end{algorithm}
-
-Algorithm.~\ref{alg2} shows the pseudocode of the proposed algorithm. As shown in the pseudocode, the number of clusters is given. We calculate the cluster capacity by dividing the total number of operations by the number of clusters. In the next step, the clustering process starts by generating the centroids, where the number of centroids is the number of clusters. In general, the centroids are generated randomly as well as in our model. However, we selected some operations as centroids. Although the operations are selected randomly, we followed a rule to select the centroids. For example, let us assume that a job consists of 15 operations, and the number of clusters is $3$. The first centroid will be an operation of rank 1 - 5, the second centroid will be 6 - 10, and the third will be from the last five operations. We followed this strategy to make them far from each other because the operations grouped in the first clusters should be at the beginning of their jobs. After generating the centroids, we check for exceeding the number of clusters and the cluster capacity, respectively. After that, we calculate the distance between each operation and the centroid of the current cluster using Euclidean distance and assign the nearest operation to that cluster. In order to satisfy the precedence constraint, we check if the predecessor is not assigned to a cluster, it will be assigned to the current cluster, and the centroid is updated. If the maximum number of operations is reached, we will go to the next cluster. After assigning all operations into clusters, the algorithm terminates.
-
-\begin{algorithm}
-\caption{Proposed Clustering Algorithm}\label{alg2}
+\caption{Clustering Algorithm}\label{alg2}
 \begin{algorithmic}
 \Require $num\_clus$
 %\Require $n \geq 0$
