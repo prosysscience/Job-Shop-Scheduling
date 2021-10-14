@@ -295,17 +295,17 @@ In this work, we propose a method that can be applied to feature values directly
         \textbf{Operation} & \textbf{RPT} & \textbf{EST} & \textbf{ML} & \textbf{\stfifo} & \textbf{\wtfifo}\\
         \hline
                       \\
-        $O_{1,1}$  & 17 & 0   & 20	&  0  & 0\\
-        $O_{1,2}$  & 8  & 9   & 3		&  9  & 0\\
-        $O_{1,3}$  & 5  & 12  & 5	  &  12 & 0\\
+        $O_{1,1}$  & $17$ & $0$   & $20$	&  $0$  & $0$\\
+        $O_{1,2}$  & $8$  & $9$   & $3$		&  $9$  & $0$\\
+        $O_{1,3}$  & $5$  & $12$  & $5$	  &  $12$ & $0$\\
                       \\
-        $O_{2,1}$  & 12 & 0   & 10	&  0  & 0\\
-        $O_{2,2}$  & 8  & 4   & 11	&  9  & 5\\
-        $O_{2,3}$  & 2  & 10  & 7	  &  17 & 2\\
+        $O_{2,1}$  & $12$ & $0$   & $10$	&  $0$  & $0$\\
+        $O_{2,2}$  & $8$  & $4$   & $11$	&  $9$  & $5$\\
+        $O_{2,3}$  & $2$  & $10$  & $7$	  &  $17$ & $2$\\
                           \\
-        $O_{3,1}$  & 12 & 0  & 11	  &  0  & 0\\
-        $O_{3,2}$  & 8  & 4  & 6		&  4  & 0\\
-        $O_{3,3}$  & 5  & 7  & 5		&  15 & 8\\
+        $O_{3,1}$  & $12$ & $0$  & $11$	  &  $0$  & $0$\\
+        $O_{3,2}$  & $8$  & $4$  & $6$		&  $4$  & $0$\\
+        $O_{3,3}$  & $5$  & $7$  & $5$		&  $15$ & $8$\\
       \end{tabular}
   %\end{adjustwidth}
     \end{center} 
@@ -314,27 +314,60 @@ In this work, we propose a method that can be applied to feature values directly
 % In our approach we evaluated the following features:
 In detail, we consider the following features of jobs, operations, and machines:
 \begin{description}
-  \item[Processing Time (PT)] that represents the execution time of a particular operation in a machine. This feature is provided in every JSP instance, like in the sample instance presented in Table \ref{tab1}.
-  
-  \item[Operation (OP)] feature is an ordinal value representing the rank of each operation in its job.
+  \item[Operation (OP)] is the ordinal value for the position of an operation in its job.
 
-  \item[Remaining Processing Time (RPT)] attribute corresponds to the total processing time for all subsequent operations of a job. For example, Table~\ref{tab3} shows a set of \textit{RPT} values computed for the sample instance. Since the first job $J_1$ consists of $3$ operations with a total processing time of $17$, \textit{RPT} of $O_{1,1}$ is $17$ because it has no preceding operations. After finishing the first operation of $J_1$, the \textit{RPT} becomes $8$ because the processing time of the completed operation $O_{1,1}$ is subtracted. Similarly, when the second operation of $J_1$ is completed, the \textit{RPT} of the last operation is $5$. 
+  \item[Processing Time (PT)] is the time for executing an operation on its machine. This feature is part of a JSP instance, such as the sample instance specified in Table~\ref{tab1}.
   
-  \item[Time Length of a Job (TLJ)] is an attribute describing the total processing time needed to execute all operations of a job. Since all operations of a job have the same feature value, this feature can only be used to differentiate between jobs.
+  \item[Remaining Processing Time (RPT)] provides the total processing time for pending operations until the completion of a job. For example, Table~\ref{tab3} lists \textit{RPT} values for operations of the sample instance in Table~\ref{tab1}. The job $J_1$ consists of $3$ operations with a total processing time of $17$, which matches \textit{RPT} for the first operation $O_{1,1}$. % is $17$ because it has no preceding operations.
+  The \textit{RPT} for $O_{1,2}$ is obtained by subtracting the processing time of $O_{1,1}$, i.e., $17-9=8$, and it corresponds to the processing time $5$ for the last job $O_{1,3}$.
+  % After finishing the first operation of $J_1$, the \textit{RPT} becomes $8$ because the processing time of the completed operation $O_{1,1}$ is subtracted. Similarly, when the second operation of $J_1$ is completed, the \textit{RPT} of the last operation is $5$. 
+  
+  \item[Time Length of a Job (TLJ)] is the total processing time for operations of a job, which coincides with the \textit{RPT} value of the job's first operation and is more coarse-grained than the operation-specific \textit{RPT} feature.
+  % is an attribute describing the total processing time needed to execute all operations of a job. Since all operations of a job have the same feature value, this feature can only be used to differentiate between jobs.
   %It is the summation of processing time for all operations of that job.
   
-  \item[Earliest Starting Time (EST)] attribute represents the earliest possible execution time for an operation. It is calculated by accumulating the processing time of all preceding operations. This feature has zero value if the operation has no predecessors.
+  \item[Earliest Starting Time (EST)] represents the earliest possible time for executing an operation, given by the total processing time for the predecessor operations in its job. % It is calculated by accumulating the processing time of all preceding operations. This feature has zero value if the operation has no predecessors.
+  For the first operation of each job, the \textit{EST} value defaults to~$0$.
   
-  \item[Machine Load (ML)] is a property of a machine that shows how much time this machine requires to execute all the operations assigned to it. In the initial state, \textit{ML} corresponds to the total processing time of all operations assigned to that machine. In each time step, the load of a machine is decreased by the processing time of an operation with the smallest \textit{EST} assigned to the machine. For example, machine $3$ has to process operations $\{ O_{1,2}, O_{2,1}, O_{3,2} \}$. A load of machine $3$ at time $0$ is 10. The machine would start processing the operation $O_{2,1}$ that has the smallest \textit{EST}. After completing $O_{2,1}$, the load of the machine is decreased by the processing time of the completed operation $O_{2,1}$ and the machine will start the next of remaining operations, which has the smallest \textit{EST} value. The algorithm continues until a machine processes all operations assigned to it in the instance.
+  \item[Machine Load (ML)] is a property describing how much time it takes to execute the operations assigned to a machine. Initially, \textit{ML} corresponds to the total processing time for all operations to be executed by a machine.
+  Then the assumption is that the operations are processed in increasing order of their \textit{EST} values, and \textit{ML} is thus reduced by the processing times of preceeding operations.
+  For example, the \textit{EST} for the operations $O_{2,1}$, $O_{3,2}$, and $O_{1,2}$ assigned to machine~$3$ is $0$, $4$, or $9$, respectively.
+  Proceeding in this execution order, \textit{ML} is the total processing time $10$ for $O_{2,1}$, reduced by the processing time of $O_{2,1}$ to $10-4 = 6$ for $O_{3,2}$, and then we obtain the execution time $3$ for the last operation $O_{1,2}$.
+  % In each time step, the load of a machine is decreased by the processing time of an operation with the smallest \textit{EST} assigned to the machine. For example, machine $3$ has to process operations $\{ O_{1,2}, O_{2,1}, O_{3,2} \}$. A load of machine $3$ at time $0$ is 10. The machine would start processing the operation $O_{2,1}$ that has the smallest \textit{EST}. After completing $O_{2,1}$, the load of the machine is decreased by the processing time of the completed operation $O_{2,1}$ and the machine will start the next of remaining operations, which has the smallest \textit{EST} value. The algorithm continues until a machine processes all operations assigned to it in the instance.
   
-  \item[Starting Time (ST)] is a set of features representing the starting execution time of each operation by solving the problem using a heuristic greedy search. In our work, we consider EST (\stest), First-In-First-Out (\stfifo), and Most Total Work Remaining (\stmtwr) heuristics, see \cite{jones1998survey} for an overview.
-  To compute the starting time, we use a simple greedy algorithm \cite{el2020job} that at each step selects a not scheduled operation according to the heuristic and schedules it to a machine. In the case of \stfifo, the algorithm selects an operation that appeared first in the queue for scheduling. For example, operations $O_{2,2}$ and $O_{3,3}$ appear in the processing queue at time points $6$ and $7$ respectively, see Table \ref{tab1}. Machine 2 required by both operations becomes available only at time point $9$ when the processing of the task $O_{1,1}$ is finished. According to FIFO heuristic, the algorithm selects $O_{2,2}$ to process at time $9$ in machine $2$ and schedules $O_{3,3}$ at time $15$. Similarly, using MTWR, the algorithm selects the operation that belongs to the job with the longest processing time from the queue, i.e., $O_{2,2}$ in our example.
+  \item[Starting Time (ST)] is a family of features providing the starting times of operations obtained by scheduling them with heuristic greedy search methods. In our work, we consider Earliest Starting Time (\stest), First-In-First-Out (\stfifo), and Most Total Work Remaining (\stmtwr) as heuristics for the greedy operation allocation; see \cite{jones1998survey} for an overview of such techniques.
+  At each step, a simple greedy algorithm~\cite{el2020job} selects some pending operation whose machine is available according to the heuristic and schedules it. In the case of \stfifo, the algorithm selects an operation waiting longest for its machine to become available.
+  For example, the first operations $O_{1,1}$, $O_{2,1}$, and $O_{3,1}$ are all scheduled at time~$0$ (on different machines),
+  then $O_{2,2}$ waits from time~$4$ for its machine~$2$ to get available,
+  while $O_{3,2}$ is started on machine~$3$ at time~$4$, so that
+  $O_{3,3}$ also waits for machine~$2$ from time~$7$.
+  When the machine~$2$ is at time~$9$ ready to start another operation,
+  the \stfifo heuristic thus selects the operation $O_{2,2}$, which waits
+  for longer, to be executed next.
+  With the \stest and \stmtwr heuristics,
+  the selection of the next operation is based on smaller \textit{EST} or
+  greater \textit{RPT} values, respectively, which in view of the attributes in Table~\ref{tab3} also leads to the result that $O_{2,2}$
+  is processed before $O_{3,3}$. % on machine~$2$.
+  % operations $O_{2,2}$ and $O_{3,3}$ appear in the processing queue at time points $6$ and $7$ respectively, see Table \ref{tab1}. Machine 2 required by both operations becomes available only at time point $9$ when the processing of the task $O_{1,1}$ is finished. According to FIFO heuristic, the algorithm selects $O_{2,2}$ to process at time $9$ in machine $2$ and schedules $O_{3,3}$ at time $15$. Similarly, using MTWR, the algorithm selects the operation that belongs to the job with the longest processing time from the queue, i.e., $O_{2,2}$ in our example.
 
-  \item[Waiting Time (WT)] is also a set of features, like ST, for which computation we used the same greedy algorithm as above with three different heuristics EST (\wtest), FIFO (\wtfifo), and MTWR (\wtmtwr). Each feature in \textit{WT} set is the difference between the scheduled starting time of a particular operation and the ending time of its predecessor.
-  As shown in Table~\ref{tab3}, the waiting time of $O_{2,2}$ is $5$ since the processing of its predecessor $O_{2,1}$ finishes at time $4$ and FIFO heuristic selects $O_{2,2}$ for scheduling to machine $2$ at time $9$, just as in the \stfifo case.
+  \item[Waiting Time (WT)] is also a family of features, where variants denoted by \wtest, \wtfifo, and \wtmtwr rely on schedules obtained with the corresponding ST heuristic, i.e., \stest, \stfifo, or \stmtwr.
+  Given a schedule computed by the greedy algorithm,
+  the waiting time of an operation is determined by the difference
+  between its starting time and the time of completing the predecessor
+  operation, or simply the starting time for the first operation of each job.
+  For instance, the starting times with \stfifo listed in Table~\ref{tab3}
+  yield the waiting times given in the \wtfifo column.
+  In fact, $O_{2,2}$ waits for $5$ time units for its machine~$2$ to get available,
+  its processing time is included in the waiting time~$8$ of $O_{3,3}$, and
+  $O_{2,3}$ also needs to wait $2$ time units for the completion of $O_{1,3}$
+  before its execution by machine~$1$.
+  %
+  % for which computation we used the same greedy algorithm as above with three different heuristics EST (\wtest), FIFO (\wtfifo), and MTWR (\wtmtwr). Each feature in \textit{WT} set is the difference between the scheduled starting time of a particular operation and the ending time of its predecessor.
+  % As shown in Table~\ref{tab3}, the waiting time of $O_{2,2}$ is $5$ since the processing of its predecessor $O_{2,1}$ finishes at time $4$ and FIFO heuristic selects $O_{2,2}$ for scheduling to machine $2$ at time $9$, just as in the \stfifo case.
 \end{description}
 %
-All features extracted from a given JSP instance are provided to our decomposition method presented in the next section. 
+We extract all of the features described above from a given JSP instance
+and can thus use them as inputs to our decomposition method presented in the next section. 
 
 
 \section{Constrained Clustering Algorithm}
