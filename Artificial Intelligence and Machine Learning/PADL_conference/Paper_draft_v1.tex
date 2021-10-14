@@ -15,6 +15,7 @@
 \usepackage{caption}
 \usepackage{todonotes}
 \usepackage[inline]{enumitem}
+\usepackage{xspace}
 \captionsetup[table]{skip=10pt}
 \DeclarePairedDelimiter\ceil{\lceil}{\rceil}
 % Used for displaying a sample figure. If possible, figure files should
@@ -24,13 +25,13 @@
 % to display URLs in blue roman font according to Springer's eBook style:
 % \renewcommand\UrlFont{\color{blue}\rmfamily}
 
-\newcommand{\stest}{\textit{ST\_EST}}
-\newcommand{\stmtwr}{\textit{ST\_MTWR}}
-\newcommand{\stfifo}{\textit{ST\_FIFO}}
+\newcommand{\stest}{\textit{ST\_EST}\xspace}
+\newcommand{\stmtwr}{\textit{ST\_MTWR}\xspace}
+\newcommand{\stfifo}{\textit{ST\_FIFO}\xspace}
 
-\newcommand{\wtest}{\textit{WT\_EST}}
-\newcommand{\wtmtwr}{\textit{WT\_MTWR}}
-\newcommand{\wtfifo}{\textit{WT\_FIFO}}
+\newcommand{\wtest}{\textit{WT\_EST}\xspace}
+\newcommand{\wtmtwr}{\textit{WT\_MTWR}\xspace}
+\newcommand{\wtfifo}{\textit{WT\_FIFO}\xspace}
 
 \begin{document}
 %
@@ -276,14 +277,38 @@ In this work, we introduce and deploy a constrained clustering algorithm to deco
 \label{sec:features}
 The application of machine learning methods to scheduling problems requires a careful selection of data describing the hidden dependencies between operations of different jobs \cite{ismail2012production,nasiri2019data}. Clustering methods, which we intend to apply in our approach, are not an exception to this. That is, a clustering method requires an informative set of features characterizing the jobs, their operations, and machines of a problem instance to identify patterns resulting in a beneficial decomposition of the operations into time windows. 
 
-Methods suggested in the literature \cite{koonce2000using, harrath2002genetic, shahzad2010discovering, ismail2012production, adibi2014clustering, nasiri2019data} characterize instances of scheduling problems based on the following features: priority, processing time, remaining processing time, machine load, and sequence position. 
-Most of these approaches convert the quantitative feature values % of the attributes
-into qualitative attributes in order to obtain generic dispatching rules
-that remain applicable to instances of different size.
-% As mentioned in these studies, the main reason for this conversion was to make the heuristic dispatching rules more generic and allow their application to several scheduling problems. 
-In this work, we propose a method that can be applied to feature values directly and does not require any problem-specific transformations. However, our clustering method for JSP instance decomposition requires all features to have numerical values, which permit the calculation of distance measures for estimating (dis)similarities between operations.
+Methods suggested in the previous work \cite{koonce2000using, harrath2002genetic, shahzad2010discovering, ismail2012production, adibi2014clustering, nasiri2019data} used characterizations of scheduling instances based on the following features: priority, processing time, remaining processing time, machine load, and route position. 
+Most of the approaches converted the quantitative values of the attributes into qualitative data. As mentioned in these studies, the main reason for this conversion was to make the heuristic dispatching rules more generic and allow their application to several scheduling problems. 
+In this work, we suggest a method that can work directly on the sets of features and does not require any problem-specific transformations. However, our clustering method for JSP instance decomposition requires all features to have numerical values allowing distance measures to estimate similarities/dissimilarities between operations of jobs.
 
-In detail, we consider the following features of jobs, operations, and machines:
+\begin{table}[tb]
+  \setlength{\tabcolsep}{10.0pt}
+  \centering
+    \begin{center}
+    \caption{Features extracted for the sample problem instance.}
+    \label{tab3}
+   %\begin{adjustwidth}{0.0cm}{}
+      \begin{tabular}{c  c  c  c  c  c}
+        \textbf{Operation} & \textbf{RPT} & \textbf{EST} & \textbf{ML} & \textbf{\stfifo} & \textbf{\wtfifo}\\
+        \hline
+                      \\
+        $O_{1,1}$  & 17 & 0   & 20	&  0  & 0\\
+        $O_{1,2}$  & 8  & 9   & 3		&  9  & 0\\
+        $O_{1,3}$  & 5  & 12  & 5	  &  12 & 0\\
+                      \\
+        $O_{2,1}$  & 12 & 0   & 10	&  0  & 0\\
+        $O_{2,2}$  & 8  & 4   & 11	&  9  & 5\\
+        $O_{2,3}$  & 2  & 10  & 7	  &  17 & 2\\
+                          \\
+        $O_{3,1}$  & 12 & 0  & 11	  &  0  & 0\\
+        $O_{3,2}$  & 8  & 4  & 6		&  4  & 0\\
+        $O_{3,3}$  & 5  & 7  & 5		&  15 & 8\\
+      \end{tabular}
+  %\end{adjustwidth}
+    \end{center} 
+  \end{table}
+
+In our approach we evaluated the following features:
 \begin{description}
   \item[Processing Time (PT)] that represents the execution time of a particular operation in a machine. This feature is provided in every JSP instance, like in the sample instance presented in Table \ref{tab1}.
   
@@ -294,60 +319,43 @@ In detail, we consider the following features of jobs, operations, and machines:
   \item[Time Length of a Job (TLJ)] is an attribute describing the total processing time needed to execute all operations of a job. Since all operations of a job have the same feature value, this feature can only be used to differentiate between jobs.
   %It is the summation of processing time for all operations of that job.
   
-  \item[Earliest Starting Time (EST)] attribute represents the earliest possible execution time for an operation. It is calculated by accumulating the processing time of all preceding operations. This feature has a specific value $0$ if the operation has no predecessors.%\todo{This value does not appear in the table, why?}
+  \item[Earliest Starting Time (EST)] attribute represents the earliest possible execution time for an operation. It is calculated by accumulating the processing time of all preceding operations. This feature has zero value if the operation has no predecessors.
   
-  \item[Machine Load (ML)] is a property of a machine that shows how much time this machine requires to execute all the operations assigned to it. In the initial state, \textit{ML} corresponds to the total processing time of all operations assigned to that machine. In each time step, the load of a machine is decreased by the processing time of an operation assigned to the machine and has the smallest \textit{EST}. For example, machine $3$ has to process operations $\{ O_{1,2}, O_{2,1}, O_{3,2} \}$. The load of machine $3$ at time $0$ is 10. We assumed that the machine would start processing the operation $O_{2,1}$ that has the smallest \textit{EST}. After completing the operation $O_{2,1}$, the machine will target the next operation, which has the smallest value of \textit{EST} and the load of the machine is decreased by the processing time of the completed operation $O_{2,1}$, and so on till completing all the operations assigned to a particular machine.
+  \item[Machine Load (ML)] is a property of a machine that shows how much time this machine requires to execute all the operations assigned to it. In the initial state, \textit{ML} corresponds to the total processing time of all operations assigned to that machine. In each time step, the load of a machine is decreased by the processing time of an operation with the smallest \textit{EST} assigned to the machine. For example, machine $3$ has to process operations $\{ O_{1,2}, O_{2,1}, O_{3,2} \}$. A load of machine $3$ at time $0$ is 10. The machine would start processing the operation $O_{2,1}$ that has the smallest \textit{EST}. After completing $O_{2,1}$, the load of the machine is decreased by the processing time of the completed operation $O_{2,1}$ and the machine will start the next of remaining operations, which has the smallest \textit{EST} value. The algorithm continues until a machine processes all operations assigned to it in the instance.
   
-  \item[Starting Time (ST)] is a set of features representing the starting execution time of each operation by solving the problem using a heuristic. In our work, we consider EST (\stest), First-In-First-Out (\stfifo), and Most Total Work Remaining (\stmtwr), see \cite{jones1998survey} for an overview.
-  To compute the starting time, we use a simple greedy algorithm \cite{el2020job} that at each step selects a not scheduled operation according to the heuristics and schedules it to a machine. In the case of FIFO, the algorithm selects an operation that appeared first in the queue. For example, $O_{2,2}$ and $O_{3,3}$ are in the queue at time $9$ on machine $2$. Since $O_{2,2}$ and $O_{3,3}$ were ready to be processed at time $4$ and $7$, respectively. The algorithm selects $O_{2,2}$ to process at time $9$ before $O_{3,3}$ which starts at time $15$. Similarly, for MTWR, the algorithm selects the operation that belongs to the job with the longest processing time from the queue.
+  \item[Starting Time (ST)] is a set of features representing the starting execution time of each operation by solving the problem using a heuristic greedy search. In our work, we consider EST (\stest), First-In-First-Out (\stfifo), and Most Total Work Remaining (\stmtwr) heuristics, see \cite{jones1998survey} for an overview.
+  To compute the starting time, we use a simple greedy algorithm \cite{el2020job} that at each step selects a not scheduled operation according to the heuristic and schedules it to a machine. In the case of \stfifo, the algorithm selects an operation that appeared first in the queue for scheduling. For example, operations $O_{2,2}$ and $O_{3,3}$ appear in the processing queue at time points $6$ and $7$ respectively, see Table \ref{tab1}. Machine 2 required by both operations becomes available only at time point $9$ when the processing of the task $O_{1,1}$ is finished. According to FIFO heuristic, the algorithm selects $O_{2,2}$ to process at time $9$ in machine $2$ and schedules $O_{3,3}$ at time $15$. Similarly, using MTWR, the algorithm selects the operation that belongs to the job with the longest processing time from the queue, i.e., $O_{2,2}$ in our example.
 
-  \item[Waiting Time (WT)] is also a set of features, like ST, for which computation we used the same greedy algorithm as above with three different heuristics EST (\wtest), FIFO (\wtfifo), and MTWR (\wtmtwr). Each feature in \textit{WT} set is the difference between the scheduled starting time of a particular operation and ending time of its predecessor. %The latter is the maximum out of the end processing time of the operation's predecessor and the earliest time at which the required machine became available. 
-  As shown in Table~\ref{tab3}, the predecessor of $O_{2,2}$ which is $O_{2,1}$ is finished at time $4$. However machine $2$ that executes $O_{2,2}$ was not free at that time, so $O_{2,2}$ had to wait $5$ time units to start the processing.
-
-  %\todo{It would be nice to add examples of other features to the table. If this is complicated, then only of \wtest and \stest.}
+  \item[Waiting Time (WT)] is also a set of features, like ST, for which computation we used the same greedy algorithm as above with three different heuristics EST (\wtest), FIFO (\wtfifo), and MTWR (\wtmtwr). Each feature in \textit{WT} set is the difference between the scheduled starting time of a particular operation and the ending time of its predecessor.
+  As shown in Table~\ref{tab3}, the waiting time of $O_{2,2}$ is $5$ since the processing of its predecessor $O_{2,1}$ finishes at time $4$ and FIFO heuristic selects $O_{2,2}$ for scheduling to machine $2$ at time $9$, just as in the \stfifo case.
 \end{description}
+%
+All features extracted from a given JSP instance are provided to our decomposition method presented in the following section. 
 
 
-
-\begin{table}[t]
-\setlength{\tabcolsep}{10.0pt}
-\centering
-  \begin{center}
-  \caption{Features extracted for the sample problem instance from Table~\ref{tab1}.}
-  \label{tab3}
- %\begin{adjustwidth}{0.0cm}{}
-    \begin{tabular}{c  c  c  c  c  c}
-      \textbf{Operation} & \textbf{RPT} & \textbf{EST} & \textbf{ML} & \textbf{\stfifo} & \textbf{\wtfifo}\\
-      \hline
-										\\
-      $O_{1,1}$  & 17 & 0   & 20	&  0  & 0\\
-      $O_{1,2}$  & 8  & 9   & 3		&  9  & 0\\
-      $O_{1,3}$  & 5  & 12  & 5	  &  12 & 0\\
-										\\
-      $O_{2,1}$  & 12 & 0   & 10	&  0  & 0\\
-      $O_{2,2}$  & 8  & 4   & 11	&  9  & 5\\
-      $O_{2,3}$  & 2  & 10  & 7	  &  17 & 2\\
-					    					\\
-      $O_{3,1}$  & 12 & 0  & 11	  &  0  & 0\\
-      $O_{3,2}$  & 8  & 4  & 6		&  4  & 0\\
-      $O_{3,3}$  & 5  & 7  & 5		&  15 & 8\\
-    \end{tabular}
-%\end{adjustwidth}
-
-  \end{center} 
-\end{table}
-
-\section{Constrained Clustering Algorithm}
+\section{Method}
 \label{sec:method}
-In this section, we will show the implementation of our proposed model and how it works. The main idea of the proposed model is to split the problem into sub-problems, solve them sequentially and integrate the solutions to have the solution of the main problem. We aim to decompose the problem into TWs because this technique proved its effectiveness for solving the scheduling problems \cite{zhang2010hybrid,zhai2014decomposition}. Several ways have been presented during the last decades to decompose the problem \cite{zhai2014decomposition,singer2001decomposition,ovacik2012decomposition,uzsoy2000performance}.\\ 
+%In this section, we will show the implementation of our proposed model and how it works. 
+The proposed method comprises two main steps: 
+\begin{enumerate*}[label=\emph{(\roman*)}]
+  \item first, it decomposes a problem into a sequence of sub-problems, called \emph{time windows}; 
+  \item second, the sub-problems are solved one after another such that each subsequent sub-problem gets solutions of the previous sub-problems as input.
+\end{enumerate*}
+As a result, the solution of the last sub-problem provides a complete schedule for the given JSP instance.
+The computational efficiency of the approach and the quality of obtained schedules depend highly on the quality of decomposition obtained in the first step \cite{zhang2010hybrid,zhai2014decomposition}. 
+%To address this problem, several decomposition approaches have been presented during the last decades \cite{zhai2014decomposition,singer2001decomposition,ovacik2012decomposition,uzsoy2000performance}.
+Our approach uses a novel constraint clustering method to find a favorable decomposition of JSP instances using features of operations provided in them. Each cluster represents a time window, i.e., a subset of all operations that a scheduling algorithm must consider for the assignment.
 
-The proposed model aims to apply clustering methods where each cluster will represent a TW, and each operation is a data object. The clustering algorithms are used to group a set of data objects into one cluster. It depends on measuring the similarity/dissimilarity between the data objects according to the features of these data objects. The similar objects will be in one cluster, and the dissimilar are in different clusters. The difference between the basic clustering and our proposed is the ordering of the clusters. In general, the cluster number does not have meaning; it just means that the data objects grouped in a particular cluster are similar. However, in our case, the cluster number is meaningful because the data objects grouped in a particular cluster $i$ should be scheduled before other data objects in the successor cluster(s). More specifically, it is not allowed to insert a data object (\textit{an operation}) in a particular cluster, and the predecessor of that operation is not assigned yet to the same cluster or the preceding cluster(s). Since we will solve each window separately, we should consider balancing the clusters concerning the number of operations assigned to each cluster. So that, we will have two types of constraints:
-\begin{enumerate}
-\item The predecessor(s) of an operation must be inserted into the same or previous cluster(s).
-\item The number of operations assigned to each cluster should be close to each other.
-\end{enumerate}
+The clustering algorithms are unsupervised learning methods which goal is to partition a set of objects into (disjoint) subsets, called clusters, such that each cluster contains the most similar objects. 
+The similarity of objects is determined by some measure, like Euclidian distance, using features of each object, such as features of operations extracted in the previous section. 
+However, direct application of clustering algorithms, like K-Means \cite{Forgy1965ClusterAO}, in scheduling is limited since the partitioning cannot preserve the sequences of operations in a job. As a result, a clustering algorithm might place $O_{1,1}$ and $O_{1,3}$ in one cluster and $O_{1,2}$ in another. As a result, the sequence of sub-problems becomes inconsistent and no schedule can be found. 
 
-Our main procedure starts with selecting a subset of the extracted features, which will be used for the clustering process to get the Time window assignment. As shown in algorithm~\ref{alg1}, the extracted features are given, and a set of combinations of the features are initialized. At each iteration, a subset of features is selected and run with the clustering process discussed later, then the Time Window assignment. This process is repeated until the termination condition is met.
+Therefore, we propose a constrained clustering algorithm that preserves sequences of operations by considering the number of a cluster in which an operation is assigned. In particular, all predecessors of an operation placed in a cluster $i$ must be assigned to clusters $\{1, \dots, i\}$. 
+%More specifically, it is not allowed to insert a data object (\textit{an operation}) in a particular cluster, and the predecessor of that operation is not assigned yet to the same cluster or the preceding cluster(s). 
+Since our approach solves each sub-problem separately, the generation of large clusters might reduce its performance significantly. In the extreme case, finding a solution for a sub-problem might require the same time as the solution of the whole problem.
+Therefore, in addition to the similarity optimization criteria, our algorithm also aims to generate clusters with an equal number of operations assigned to each cluster.  
+
+Our main procedure starts with selecting a subset of the extracted features, which will be used for the clustering process to get the Time window assignment. As shown in Algorithm~\ref{alg1}, the extracted features are given, and a set of combinations of the features are initialized. At each iteration, a subset of features is selected and run with the clustering process discussed later, then the Time Window assignment. This process is repeated until the termination condition is met.
 
 \begin{algorithm}
 \caption{Feature Selection Algorithm}\label{alg1}
@@ -430,9 +438,8 @@ We use the benchmark instances presented in \cite{taillard1993benchmarks} as a d
 \item \textbf{F14} \textrightarrow \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, EST, ML \}}
 \item \textbf{F15} \textrightarrow \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, RPT, EST, ML \}}
 \end{enumerate}
-We neglected the rank of an operation and the time length of a job because they had negative impact results from the preliminary experiments. The following Table~\ref{tab4} shows the selected features, and the performance of each combination for solving benchmark instances of 50 jobs and 15 machines \cite{taillard1993benchmarks}. The following table shows the results of our experiments. The first column shows the approaches used for solving the problem in the literature in addition to the combinations of features we presented previously. The next columns represent the instances of our benchmark set except for the last column, which shows the average of each approach through the whole benchmark set. The first $4$ rows in the table show the values of each makespan obtained by heuristics; FIFO, MTWR, and (EST with a single and multi-shot). We can say that FIFO and MTWR provided the best results compared to the other two heuristics. However for the features combinations, the combinations (\textbf{F6}, \textbf{F8}, \textbf{F11}, \textbf{F12}and \textbf{F15}) provided good results according to the cost function in the most cases especially with combinations (\textbf{F6} and \textbf{F15}). It means that the most important features extracted from the problem itself and have a positive impact on the performance are \textit{Remaining Processing Time, Machine Load and Earliest Starting Time}. Also, The information obtained from the solutions of the other heuristics like (\textit{Starting Time} and \textit{Waiting Time}) led us to get better decomposition for the problem at hand. More specifically, combining \textit{Remaining Processing Time} with \textit{Machine Load} provides a good decomposition with/without \textit{Waiting Time} attributes obtained by the other heuristics. In a few instances, our proposed method did not outperform other heuristics, however, in the last column, the best average makespan of the other approaches was $3331$ by FIFO, and the average makespan of our feature selection algorithm was $3256$. We can conclude that the feature selection algorithm outperformed other heuristics in the literature. The following section illustrates the difference between our proposed algorithm and the methods implemented by other researchers.
 
-\begin{table}
+\begin{table}[bt]
   \begin{center}
     \caption{The performance of selected features.}
     \label{tab4}
@@ -466,22 +473,26 @@ We neglected the rank of an operation and the time length of a job because they 
 \end{table}
 
 
+We neglected the rank of an operation and the time length of a job because they had negative impact results from the preliminary experiments. The following Table~\ref{tab4} shows the selected features, and the performance of each combination for solving benchmark instances of 50 jobs and 15 machines \cite{taillard1993benchmarks}. The following table shows the results of our experiments. The first column shows the approaches used for solving the problem in the literature in addition to the combinations of features we presented previously. The next columns represent the instances of our benchmark set except for the last column, which shows the average of each approach through the whole benchmark set. The first $4$ rows in the table show the values of each makespan obtained by heuristics; FIFO, MTWR, and (EST with a single and multi-shot). We can say that FIFO and MTWR provided the best results compared to the other two heuristics. However for the features combinations, the combinations (\textbf{F6}, \textbf{F8}, \textbf{F11}, \textbf{F12}and \textbf{F15}) provided good results according to the cost function in the most cases especially with combinations (\textbf{F6} and \textbf{F15}). It means that the most important features extracted from the problem itself and have a positive impact on the performance are \textit{Remaining Processing Time, Machine Load and Earliest Starting Time}. Also, The information obtained from the solutions of the other heuristics like (\textit{Starting Time} and \textit{Waiting Time}) led us to get better decomposition for the problem at hand. More specifically, combining \textit{Remaining Processing Time} with \textit{Machine Load} provides a good decomposition with/without \textit{Waiting Time} attributes obtained by the other heuristics. In a few instances, our proposed method did not outperform other heuristics, however, in the last column, the best average makespan of the other approaches was $3331$ by FIFO, and the average makespan of our feature selection algorithm was $3256$. We can conclude that the feature selection algorithm outperformed other heuristics in the literature. The following section illustrates the difference between our proposed algorithm and the methods implemented by other researchers.
+
+
+
 
 \section{Related Work}
 \label{sec:literature}
-In this section, we will review some of the most related works about data mining approaches employed to solve scheduling problems. Over the last decades, solving the scheduling problem has attracted the interest of many researchers, and a wide range of approaches has been developed for solving the scheduling problem. One of the approaches that have been widely used to solve the problem is data mining. The main idea of data mining is to explore the patterns from the obtained solutions by some heuristics and then develop some decision rules that approximate the order of the operations in each machine \cite{ismail2012production}. More precisely, it aims to get an order of the operations according to some characteristics.\\
+In this section, we will review some of the most related works about data mining approaches employed to solve scheduling problems. Over the last decades, solving the scheduling problem has attracted the interest of many researchers, and a wide range of approaches has been developed for solving the scheduling problem. One of the approaches that have been widely used to solve the problem is data mining. The main idea of data mining is to explore the patterns from the obtained solutions by some heuristics and then develop some decision rules that approximate the order of the operations in each machine \cite{ismail2012production}. More precisely, it aims to get an order of the operations according to some characteristics.
 
-Data mining methodologies are applied to explore the patterns in data generated by Genetic Algorithm (GA) \cite{koonce2000using}. This work aimed to generate rules to determine the priority for each job with weight. They solved the scheduling problem using GA to create some rules. Some characteristics (rank of operations, processing time, machine load, and remaining processing time) have been considered. In order to evaluate their heuristic, they tested the generated rules on some other instances that were randomly generated. The results showed that the generated rules were able to outperform the shortest processing time heuristic. One of the drawbacks is that the problem instances considered contain only 36 operations.\\
+Data mining methodologies are applied to explore the patterns in data generated by Genetic Algorithm (GA) \cite{koonce2000using}. This work aimed to generate rules to determine the priority for each job with weight. They solved the scheduling problem using GA to create some rules. Some characteristics (rank of operations, processing time, machine load, and remaining processing time) have been considered. In order to evaluate their heuristic, they tested the generated rules on some other instances that were randomly generated. The results showed that the generated rules were able to outperform the shortest processing time heuristic. One of the drawbacks is that the problem instances considered contain only 36 operations.
 
-Other researchers also implemented GA to get some information of the solution but considered other features to generate decision rules \cite{harrath2002genetic}. They considered processing time, job length, remaining processing time, the rank of the operation, and machine load. To build a generic model for scheduling problems, they discretized the data by converting the quantitative data into qualitative. They sorted the operations share the same machine according to processing time. If two or more operations have the same processing time, they look at the time length of the job. If the job length is the same, sort them out based on the remaining processing time.\\
+Other researchers also implemented GA to get some information of the solution but considered other features to generate decision rules \cite{harrath2002genetic}. They considered processing time, job length, remaining processing time, the rank of the operation, and machine load. To build a generic model for scheduling problems, they discretized the data by converting the quantitative data into qualitative. They sorted the operations share the same machine according to processing time. If two or more operations have the same processing time, they look at the time length of the job. If the job length is the same, sort them out based on the remaining processing time.
 
-The work mentioned above had considered static JSP. However, dynamic JSP became one of the most crucial problems in real-life applications. New dispatching rules for JSP are presented using a data mining approach to obtain an efficient schedule in a dynamic Job-shop Scheduling environment \cite{shahzad2010discovering}. This study aimed to minimize makespan by creating new dispatching rules. Firstly, they solved the scheduling problems using Tabu Search and used the obtained solution as a training set to get a rule-set capable of approximating efficient solutions. They considered some other features like (Earliest possible Starting Time EST, the difference in remaining processing time for a job, and the difference in the processing time of two operations) to create a rule-set for dispatching the operations. The experiments showed that the results of mined rule-set are superior or comparable to the heuristics in the literature.\\
+The work mentioned above had considered static JSP. However, dynamic JSP became one of the most crucial problems in real-life applications. New dispatching rules for JSP are presented using a data mining approach to obtain an efficient schedule in a dynamic job-shop scheduling environment \cite{shahzad2010discovering}. This study aimed to minimize makespan by creating new dispatching rules. Firstly, they solved the scheduling problems using Tabu Search and used the obtained solution as a training set to get a rule-set capable of approximating efficient solutions. They considered some other features like (Earliest possible Starting Time EST, the difference in remaining processing time for a job, and the difference in the processing time of two operations) to create a rule-set for dispatching the operations. The experiments showed that the results of mined rule-set are superior or comparable to the heuristics in the literature.
 
-The variable neighborhood search (VNS) is combined with the k-means algorithm to address Dynamic JSP \cite{adibi2014clustering}. The proposed algorithm depends on extracting information from the problem's input data when an event like (machine breakdown or adding new job(s)) occurred. At any rescheduling point, cluster analysis is performed to replace jobs according to their distances. In other words, a job that belongs to a farther cluster has a greater probability to be selected in making a new adjacent than the other belonging to a closer cluster. The proposed method was compared to VNS and some common heuristics using a simulated job shop. the results indicated that the performance of the proposed model is better than the others, including some heuristics (FIFO, LIFO, and SPT).\\
+The variable neighborhood search (VNS) is combined with the k-means algorithm to address Dynamic JSP \cite{adibi2014clustering}. The proposed algorithm depends on extracting information from the problem's input data when an event like (machine breakdown or adding new job(s)) occurred. At any rescheduling point, cluster analysis is performed to replace jobs according to their distances. In other words, a job that belongs to a farther cluster has a greater probability to be selected in making a new adjacent than the other belonging to a closer cluster. The proposed method was compared to VNS and some common heuristics using a simulated job shop. the results indicated that the performance of the proposed model is better than the others, including some heuristics (FIFO, LIFO, and SPT).
 
-Another study has presented a data mining approach to generate an initial population for population-based heuristics/metaheuristics to solve JSP \cite{nasiri2019data}. They extracted information from optimal or near-optimal solutions obtained by a heuristic procedure called "Assignment Procedure" to build decision rules to determine the priority of the operations. Once the rules are extracted, the initial solution is generated using these rules. To evaluate the performance of the proposed method, they performed a series of computational experiments on several test instances. The results showed that the proposed method with data mining generated initial population outperforms the methods with randomly generated initial population.\\
+Another study has presented a data mining approach to generate an initial population for population-based heuristics/metaheuristics to solve JSP \cite{nasiri2019data}. They extracted information from optimal or near-optimal solutions obtained by a heuristic procedure called "Assignment Procedure" to build decision rules to determine the priority of the operations. Once the rules are extracted, the initial solution is generated using these rules. To evaluate the performance of the proposed method, they performed a series of computational experiments on several test instances. The results showed that the proposed method with data mining generated initial population outperforms the methods with randomly generated initial population.
 
-From the literature, we have found that most of the studies which used data mining techniques aimed to extract some features either from the problem instances or solutions obtained by some heuristics to build a decision-rules to order the operations assigned to a machine.\\
+From the literature, we have found that most of the studies which used data mining techniques aimed to extract some features either from the problem instances or solutions obtained by some heuristics to build a decision-rules to order the operations assigned to a machine.
 
 
 \section{Conclusions}
