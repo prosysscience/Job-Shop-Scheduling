@@ -275,17 +275,20 @@ In this work, we introduce and deploy a constrained clustering algorithm to deco
 
 \section{Feature Extraction}
 \label{sec:features}
-Application of machine learning methods to scheduling problems requires careful selection of data describing the hidden dependencies between operations of different jobs \cite{ismail2012production,nasiri2019data}. Clustering methods, which we aim to apply in our approach, are not an exception. Thus, a clustering method requires an informative set of features describing jobs, their operations, and machines of an instance to find patterns resulting in a beneficial decomposition of all operations in time windows. 
+The application of machine learning methods to scheduling problems requires a careful selection of data describing the hidden dependencies between operations of different jobs \cite{ismail2012production,nasiri2019data}. Clustering methods, which we intend to apply in our approach, are not an exception to this. That is, a clustering method requires an informative set of features characterizing the jobs, their operations, and machines of a problem instance to identify patterns resulting in a beneficial decomposition of the operations into time windows. 
 
-Methods suggested in the previous work \cite{koonce2000using, harrath2002genetic, shahzad2010discovering, ismail2012production, adibi2014clustering, nasiri2019data} used characterizations of scheduling instances based on the following features: priority, processing time, remaining processing time, machine load, and route position. 
-Most of the approaches converted the quantitative values of the attributes into qualitative data. As mentioned in these studies, the main reason for this conversion was to make the heuristic dispatching rules more generic and allow their application to several scheduling problems. 
-In this work, we suggest a method that can work directly on the sets of features and does not require any problem-specific transformations. However, our clustering method for JSP instance decomposition requires all features to have numerical values allowing distance measures to estimate similarities/dissimilarities between operations of jobs.
+Methods suggested in the literature \cite{koonce2000using, harrath2002genetic, shahzad2010discovering, ismail2012production, adibi2014clustering, nasiri2019data} characterize instances of scheduling problems based on the following features: priority, processing time, remaining processing time, machine load, and sequence position. 
+Most of these approaches convert the quantitative feature values % of the attributes
+into qualitative attributes in order to obtain generic dispatching rules
+that remain applicable to instances of different size.
+% As mentioned in these studies, the main reason for this conversion was to make the heuristic dispatching rules more generic and allow their application to several scheduling problems. 
+In this work, we propose a method that can be applied to feature values directly and does not require any problem-specific transformations. However, our clustering method for JSP instance decomposition requires all features to have numerical values, which permit the calculation of distance measures for estimating (dis)similarities between operations.
 
 \begin{table}[tb]
   \setlength{\tabcolsep}{10.0pt}
   \centering
     \begin{center}
-    \caption{Features extracted for the sample problem instance.}
+    \caption{Features extracted from the sample problem instance in Table~\ref{tab1}.}
     \label{tab3}
    %\begin{adjustwidth}{0.0cm}{}
       \begin{tabular}{c  c  c  c  c  c}
@@ -307,8 +310,9 @@ In this work, we suggest a method that can work directly on the sets of features
   %\end{adjustwidth}
     \end{center} 
   \end{table}
-
-In our approach we evaluated the following features:
+%
+% In our approach we evaluated the following features:
+In detail, we consider the following features of jobs, operations, and machines:
 \begin{description}
   \item[Processing Time (PT)] that represents the execution time of a particular operation in a machine. This feature is provided in every JSP instance, like in the sample instance presented in Table \ref{tab1}.
   
@@ -330,10 +334,10 @@ In our approach we evaluated the following features:
   As shown in Table~\ref{tab3}, the waiting time of $O_{2,2}$ is $5$ since the processing of its predecessor $O_{2,1}$ finishes at time $4$ and FIFO heuristic selects $O_{2,2}$ for scheduling to machine $2$ at time $9$, just as in the \stfifo case.
 \end{description}
 %
-All features extracted from a given JSP instance are provided to our decomposition method presented in the following section. 
+All features extracted from a given JSP instance are provided to our decomposition method presented in the next section. 
 
 
-\section{Method}
+\section{Constrained Clustering Algorithm}
 \label{sec:method}
 %In this section, we will show the implementation of our proposed model and how it works. 
 The proposed method comprises two main steps: 
