@@ -373,15 +373,16 @@ and can thus use them as inputs to our decomposition method presented in the nex
 \section{Constrained Clustering Algorithm}
 \label{sec:method}
 %In this section, we will show the implementation of our proposed model and how it works. 
-The proposed method comprises two main steps: 
+Our approximation approach comprises two main steps: 
 \begin{enumerate*}[label=\emph{(\roman*)}]
-  \item first, it decomposes a problem into a sequence of sub-problems, called \emph{time windows}; 
-  \item second, the sub-problems are solved one after another such that each subsequent sub-problem gets solutions of the previous sub-problems as input.
+  \item first, we decompose a problem instance into a sequence of sub-problems, called \emph{time windows}, and
+  \item second, the time windows are solved one after another,
+        where optimized solutions for preceding time windows are taken as input for solving the next.
 \end{enumerate*}
-As a result, the solution of the last sub-problem provides a complete schedule for the given JSP instance.
-The computational efficiency of the approach and the quality of obtained schedules depend highly on the quality of decomposition obtained in the first step \cite{zhang2010hybrid,zhai2014decomposition}. 
+As a result, the solution obtained for the last time window provides a complete schedule for the given JSP instance.
+The computational efficiency of this approach and the quality of obtained schedules rely on the decomposition performed in the first step \cite{zhang2010hybrid,zhai2014decomposition}. 
 %To address this problem, several decomposition approaches have been presented during the last decades \cite{zhai2014decomposition,singer2001decomposition,ovacik2012decomposition,uzsoy2000performance}.
-Our approach uses a novel constraint clustering method to find a favorable decomposition of JSP instances using features of operations provided in them. Each cluster represents a time window, i.e., a subset of all operations that a scheduling algorithm must consider for the assignment.
+Our approach incorporates a novel constrained clustering method for the favorable decomposition of JSP instances based on features of their comprised operations. Each cluster represents a time window, i.e., a subset of operations to be scheduled together by an iterative solving algorithm.
 
 Clustering algorithms are unsupervised learning methods whose goal is to partition a set of objects into (disjoint) subsets, called clusters, such that each cluster contains the most similar objects. 
 The similarity of objects is determined by some measure, like Euclidian distance, using features of each object, such as features of operations extracted in the previous section. 
