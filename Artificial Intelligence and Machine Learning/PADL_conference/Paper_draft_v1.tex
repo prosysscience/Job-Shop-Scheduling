@@ -25,6 +25,9 @@
 % to display URLs in blue roman font according to Springer's eBook style:
 % \renewcommand\UrlFont{\color{blue}\rmfamily}
 
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\algnewcommand{\To}{{\normalfont\bfseries to }}
+
 \newcommand{\stest}{\textit{ST\_EST}\xspace}
 \newcommand{\stmtwr}{\textit{ST\_MTWR}\xspace}
 \newcommand{\stfifo}{\textit{ST\_FIFO}\xspace}
@@ -37,7 +40,7 @@
 %
 \title{Decomposition-based Job-shop Scheduling with Constrained Clustering}%\thanks{Supported by organization x.}}
 %
-\titlerunning{Decomposition-based JSP with Constrained Clustering}
+% \titlerunning{Decomposition-based JSP with Constrained Clustering}
 % If the paper title is too long for the running head, you can set
 % an abbreviated paper title here
 %
@@ -382,25 +385,19 @@ Our approximation approach comprises two main steps:
 As a result, the solution obtained for the last time window provides a complete schedule for the given JSP instance.
 The computational efficiency of this approach and the quality of obtained schedules rely on the decomposition performed in the first step \cite{zhang2010hybrid,zhai2014decomposition}. 
 %To address this problem, several decomposition approaches have been presented during the last decades \cite{zhai2014decomposition,singer2001decomposition,ovacik2012decomposition,uzsoy2000performance}.
-Our approach incorporates a novel constrained clustering method for the favorable decomposition of JSP instances based on features of their comprised operations. Each cluster represents a time window, i.e., a subset of operations to be scheduled together by an iterative solving algorithm.
+Our approach incorporates a novel constrained clustering method for the favorable decomposition of JSP instances based on features of their comprised operations. Each cluster represents a time window, i.e., a subset of operations to be scheduled in one go of an iterative solving algorithm.
 
-Clustering algorithms are unsupervised learning methods whose goal is to partition a set of objects into (disjoint) clusters, such that each cluster gathers objects of high similarity. 
+Clustering algorithms are unsupervised learning methods whose goal is to partition a set of data objects into (disjoint) clusters such that each cluster gathers objects of high similarity. 
 Such similarity is determined by some measure, e.g., Euclidean distance, based on features of each object, like the features of operations described in the previous section. 
 However, the direct application of common clustering algorithms, such as K-Means~\cite{Forgy1965ClusterAO}, to scheduling problems is impractical since the partitioning does not take the sequence of operations in a job into account. For instance, a clustering algorithm may put $O_{1,1}$ and $O_{1,3}$ into the same and $O_{1,2}$ into another cluster. As a result, the sequence of time windows becomes inconsistent, and no compatible schedule exists.
 
-Therefore, we propose a constrained clustering algorithm that preserves sequences of operations by considering the number of a cluster in which an operation is assigned. In particular, all predecessors of an operation placed in a cluster $i$ must be assigned to clusters $\{1, \dots, i\}$. 
+We thus propose a constrained clustering algorithm that preserves sequences of operations by considering their order in the assignment to clusters. That is, the predecessors of an operation to be put into the $n$th cluster must be assigned to clusters $1,\dots,n$. 
 %More specifically, it is not allowed to insert a data object (\textit{an operation}) in a particular cluster, and the predecessor of that operation is not assigned yet to the same cluster or the preceding cluster(s). 
-Since our approach solves each sub-problem separately, the generation of large clusters might reduce its performance significantly. In the extreme case, finding a solution for a sub-problem might require the same time as the solution of the whole problem.
-Therefore, in addition to the similarity optimization criteria, our algorithm also aims to generate clusters with an equal number of operations assigned to each cluster.  
+Considering that our approach involves cluster-wise combinatorial optimization, the generation of large clusters might deteriorate the solving performance significantly.
+In the extreme case, all operations could be put into a single cluster representing the entire problem instance.
+% finding a solution for a sub-problem might require the same time as the solution of the whole problem.
+Hence, in addition to the similarity of operations, our decomposition method also aims at balancing the number of operations per cluster.  
 
-Our main procedure starts with the selection of a subset of the extracted features, which allows the clustering algorithm to compute the best possible time window assignments. 
-The procedure follows the forward feature selection principle: start with a small set of features and in every iteration extends it with one feature.
-Run the clustering algorithm on the new set of features and solve the obtained sequence of time windows. The subset of features resulting in the best possible solution quality is preserved and provided for extension in the next loop of the feature selection algorithm. The latter continues until either 
-\begin{enumerate*}[label=\emph{(\roman*)}]
-  \item all features are included in the target set, or 
-  \item any extension of the provided subset of features results in solutions of worse quality than the solution of the given set.
-\end{enumerate*}
- 
 %\begin{algorithm}
 %\caption{Feature Selection Algorithm}\label{alg1}
 %\begin{algorithmic}
@@ -417,42 +414,61 @@ Run the clustering algorithm on the new set of features and solve the obtained s
 %
 %\end{algorithmic}
 %\end{algorithm}
-
-Algorithm~\ref{alg2} shows the pseudocode of the proposed clustering algorithm. Similar to K-Means, we assume that the algorithm gets the number of clusters as input. We calculate the cluster capacity by dividing the total number of operations by the number of clusters. In the next step, the clustering process starts by generating the centroids, where the number of centroids corresponds to the number of clusters. Each centroid in our case corresponds to some randomly selected operation from a set of operations allowing for preserving of sequencing constraints. For example, let us assume that a job consists of 15 operations, and the number of clusters is $3$. The first centroid will be an operation of order $\{1, \dots, 5\}$ in the sequence, the second centroid will be selected from operations with the order $\{6, \dots, 10\}$, and so forth. After generating the centroids, we check for exceeding the number of clusters and the cluster capacity, respectively. 
+%
+\begin{algorithm}[t]
+  \caption{Constrained Clustering Algorithm}\label{alg2}
+  \begin{algorithmic}
+  \Require $\mathit{operations}$, $\mathit{num\_clusters}$
+  %\Require $n \geq 0$
+  %\Ensure $y = x^n$
+  %\State $count\_clus \gets 0$  
+  \State $\mathit{cluster\_capacity} \gets \ceil*{\frac{|\mathit{operations}|}{\mathit{num\_clusters}}}$
+  \State Generate $\mathit{num\_clusters}$ many centroids
+%  \While{$count\_clus < num\_clus$}
+  \For{$n=1$ \To $\mathit{num\_clusters}$}
+      \State $\mathit{clusters}[n] \gets \emptyset$
+%      \State $count\_cap \gets 0$
+      \State $\mathit{current\_capacity} \gets \mathit{cluster\_capacity}$
+%      \State $curr\_clus \gets count\_clus + 1$
+%    \While{$count\_cap < clus\_capacity$}
+    \While{$0 < \mathit{current\_capacity}$}
+            \State Calculate distance between data objects and $n$th centroid   \Comment{Using Euclidean distance}
+            \State $O_{i,j} \gets \text{Nearest data object from }\mathit{operations}$ % $selected\_data\_obj \gets nearest\_data\_obj$
+            \Repeat
+            \State $\mathit{current\_capacity} \gets \mathit{current\_capacity} - 1$
+            \State $\mathit{operations} \gets \mathit{operations} \setminus \{O_{i,j}\}$
+            \State $\mathit{clusters}[n] \gets \mathit{clusters}[n] \cup \{O_{i,j}\}$ \Comment{Assigning operation $O_{i,j}$ to $n$th TW}
+            \State $j \gets j-1$
+            \Until{$O_{i,j}\notin \mathit{operations}$} \Comment{Satisfying the precedence constraint}
+            %\State $selected\_data\_obj \in curr\_clus$
+%            \State $curr\_clus \gets selected\_data\_obj$    \Comment{Assigning an operation to a TW}
+  
+%            \If{$pred\_selected\_data\_obj \notin clus$}     \Comment{Satisfying the precedence constraint}
+%                \State $curr\_clus \gets pred\_selected\_data\_obj$
+%            \EndIf
+            \State Update the $n$th centroid % $update\_centroid$
+%            \State $count\_cap \gets count\_cap + 1 $
+    \EndWhile
+%      \State $count\_clus \gets count\_clus + 1 $
+%  \EndWhile
+  \EndFor
+%  \State \Return $\mathit{clusters}$
+  \end{algorithmic}
+  \end{algorithm}
+%
+Algorithm~\ref{alg2} provides a pseudocode description of our constrained clustering algorithm.
+Similar to K-Means, we assume that the algorithm gets the target number of clusters 
+into which the operations shall be partitioned as input.
+The cluster capacity, used for balancing the operations per cluster, is then obtained by dividing the total number of operations by the number of clusters.
+Moreover, the clustering process takes care of generating one initial centroid per cluster, given by randomly selected operations that are compatible with the precedence relation.
+For example, when each job consists of $15$ operations and the target number of clusters is $3$,
+the first centroid will be an operation at the first to fifth place of its job,
+the second an operation from place six to ten, and the third an operation at the eleventh
+or later place.
+% After generating the centroids, we check for exceeding the number of clusters and the cluster capacity, respectively. 
 %
 Next, the algorithm calculates the distance between each operation and the centroid of the current cluster using Euclidean distance and assigns the nearest operation to that cluster. In order to satisfy the precedence constraint, we check the assignments of predecessors. If the constraint is satisfied, the algorithm assigns the operation to the cluster, and the centroid is updated. Whenever the maximum number of operations is reached, the algorithm continues with the next cluster. These iterations continue until all operations are assigned to some cluster. 
-
-\begin{algorithm}
-\caption{Clustering Algorithm}\label{alg2}
-\begin{algorithmic}
-\Require $num\_clus$
-%\Require $n \geq 0$
-%\Ensure $y = x^n$
-\State $count\_clus \gets 0$
-
-\State $clus\_capacity \gets \ceil*{\frac{num\_oper}{num\_clus}}$
-\State Generate centroids
-\While{$count\_clus < num\_clus$}
-    \State $count\_cap \gets 0$
-    \State $curr\_clus \gets count\_clus + 1$
-	\While{$count\_cap < clus\_capacity$}
-          \State Calculate distance between data objects and a centroid   \Comment{Using Euclidean distance}
-          \State $selected\_data\_obj \gets nearest\_data\_obj$
-          %\State $selected\_data\_obj \in curr\_clus$
-          \State $curr\_clus \gets selected\_data\_obj$    \Comment{Assigning an operation to a TW}
-
-          \If{$pred\_selected\_data\_obj \notin clus$}     \Comment{Satisfying the precedence constraint}
-              \State $curr\_clus \gets pred\_selected\_data\_obj$
-          \EndIf
-          \State $update\_centroid$
-          \State $count\_cap \gets count\_cap + 1 $
-	\EndWhile
-    \State $count\_clus \gets count\_clus + 1 $
-\EndWhile
-\end{algorithmic}
-\end{algorithm}
-
-
+%
 \iffalse
 \begin{figure}[h!]
   \includegraphics[width=\linewidth]{Flow_chart_9.png}
@@ -460,6 +476,15 @@ Next, the algorithm calculates the distance between each operation and the centr
   \label{fig1}
 \end{figure}
 \fi
+
+Our main procedure starts with the selection of a subset of the extracted features, which allows the clustering algorithm to compute the best possible time window assignments. 
+The procedure follows the forward feature selection principle: start with a small set of features and in every iteration extends it with one feature.
+Run the clustering algorithm on the new set of features and solve the obtained sequence of time windows. The subset of features resulting in the best possible solution quality is preserved and provided for extension in the next loop of the feature selection algorithm. The latter continues until either 
+\begin{enumerate*}[label=\emph{(\roman*)}]
+  \item all features are included in the target set, or 
+  \item any extension of the provided subset of features results in solutions of worse quality than the solution of the given set.
+\end{enumerate*}
+ 
 
 %\newpage
 
