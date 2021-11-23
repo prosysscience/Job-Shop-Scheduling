@@ -13,6 +13,7 @@
 \usepackage{mathtools}
 \usepackage{rotating}
 \usepackage{caption}
+\usepackage{url}
 \usepackage{todonotes}
 \usepackage[inline]{enumitem}
 \usepackage{xspace}
@@ -478,7 +479,7 @@ In order to populate each cluster, the algorithm inspects features to determine 
 \fi
 
 In order to identify the most promising features for distance calculation among those introduced in the previous section,
-we applied the following forward selection principle:
+we suggest the following forward selection principle:
 % Our main procedure starts with the selection of a subset of the extracted features, which allows the clustering algorithm to compute the best possible time window assignments. 
 % The procedure follows the forward feature selection principle:
 start with a small set of features, perform decomposition by Algorithm~\ref{alg2},
@@ -497,17 +498,27 @@ This process continues until either
 
 \section{Evaluation Results}
 \label{sec:eval}
-We use a subset of Taillard's benchmark suite \cite{taillard1993benchmarks}, comprising $10$ randomly generated JSP instances known to be particularly hard for greedy and stochastic optimization techniques, for the empirical evaluation of our approach.
+We use a subset of Taillard's benchmark suite \cite{taillard1993benchmarks}, comprising $10$ randomly generated JSP instances 
+with $50$ jobs, $15$ machines, and $50\times 15=750$ operations each that are
+known to be particularly hard for greedy and stochastic optimization techniques, for the empirical evaluation of our approach.
 %Many researchers have studied these instances and presented different approaches to solving them. We also developed different decomposition strategies to solve those. Therefore, it will be possible to measure the success/failure of our proposed model by comparing the results of the strategies developed in the past with those obtained from the proposed algorithm. 
 For each instance, we extracted the $12$ features described in Section~\ref{sec:features}. In order to assess their impact % of the features
-on the clustering and, consequently, the quality of schedules, we make fix use of the features \stfifo, \stmtwr, and \stest, which provide the starting times obtained by
+on the clustering and, consequently, the quality of schedules, we make fix use of the features \stfifo, \stmtwr, and \stest, which provide the starting times of operations obtained by
 heuristic greedy search methods, as these three features promised to be informative
 in preliminary experiments.
-In contrast to that, the position of operations in jobs (\textit{OP}),
+In contrast to that, considering the position of operations in jobs (\textit{OP}),
 processing times (\textit{PT}), and jobs' time length (\textit{TLJ})
-CONTINUE HERE
+turned out to be counterproductive in our preliminary investigation,
+so that we disregard such features in the following.
+The six leftover features, i.e., remaining processing time (\textit{RPT}),
+earliest starting time (\textit{EST}), machine load (\textit{ML})
+as well as the waiting times \wtfifo, \wtmtwr, and \wtest
+based on schedules computed by corresponding greedy algorithms,
+are added and combined to feature sets as follows:
+\todo{The feature set
+\textit{\{ \stfifo, \stmtwr, \stest, RPT, EST, ML \}} would be logical as \textbf{F8},
+but it's missing.}
 % we store and present the output of the feature selection step and results of the decomposition-based solving using the Answer Set Programming model developed in \cite{el2020job}.
-All experiments were executed with a timeout of 10 minutes. 
 % The feature selection algorithm was initialized with a simple combination that consists of $3$ features: \stfifo, \stmtwr, and \stest. The combinations of the selected features presented below. We neglected the rank of an operation and the time length of a job because they had negative impact results from the preliminary experiments.
 
 \begin{enumerate}[label=]
@@ -563,7 +574,37 @@ All experiments were executed with a timeout of 10 minutes.
   \end{center}
 \end{table}
 
-Table~\ref{tab4} shows the selected features and the performance of each combination for solving benchmark instances of 50 jobs and 15 machines \cite{taillard1993benchmarks}. The first column shows the approaches used for solving the problem in the literature in addition to the combinations of features considered by our feature selection algorithm. The next columns represent the instances of our benchmark set except for the last column, which shows the average of each approach through the whole benchmark set. The first $4$ rows in the table show the values of each makespan obtained by heuristics; FIFO, MTWR, and EST with a single and multi-shot ASP solving. We can conclude that FIFO and MTWR provided the best results compared to the other two heuristics. However for the features combinations, the sets (\textbf{F6}, \textbf{F8}, \textbf{F11}, \textbf{F12} and \textbf{F15}) provided good results according to the cost function in the most cases especially with combinations (\textbf{F6} and \textbf{F15}). It means that the most important features extracted from the problem itself and have a positive impact on the performance are \textit{Remaining Processing Time, Machine Load and Earliest Starting Time}. Also, the information obtained from the solutions of the other heuristics, like \textit{Starting Time} and \textit{Waiting Time}, led our algorithm to better decomposition for the problem at hand. More specifically, combining \textit{Remaining Processing Time} with \textit{Machine Load} provides a good decomposition with/without \textit{Waiting Time} attributes obtained by the other heuristics. In a few instances, our proposed method did not outperform other heuristics. However, in general, the best average makespan of the other approaches was $3331$ by FIFO, and the average makespan of our feature selection algorithm was $3256$. Therefore, the feature selection algorithm outperformed other heuristics in the literature by efficiently combining different heuristic information using clustering and feature selection.
+We utilized the above feature sets for partitioning the operations of JSP instances into
+\todo{Please insert number of time windows.}$X$ clusters or time windows, respectively,
+and then ran the multi-shot optimization approach introduced in~\cite{el2020job} for
+$10$ minutes in total, i.e., \todo{Please insert minutes per time windows.}$X$ minutes per time window,
+on an
+\todo{Please check and update the machine and operating system setup.}
+Intel\textsuperscript{\textregistered} Xeon\textsuperscript{\textregistered} E5520 machine under Linux (Ubuntu 18.04.3).
+The resulting quality of schedules in terms of the achieved makespan for each instance is reported in Table~\ref{tab4},
+where the first four rows include the greedy FIFO and MTWR search methods supplied by the environment in~\cite{tagesc21a}
+as well as single-shot and multi-shot pure ASP optimization, the latter taking earliest starting times instead of 
+clustering for the decomposition into \todo{Please insert number of time windows.}$X$ time windows,
+for reference.
+Among these reference methods, FIFO and MTWR are on par, with a slight advantage of FIFO indicated
+by the average given in the last column, while combinatorial optimization by neither single- nor multi-shot ASP 
+solving is able to keep step and leads to greater makespans within the time limit for all instances.
+
+Among our feature sets for clustering, in preparation of multi-shot optimization by ASP,
+we do not identify any clear winner dominating over all instances.
+However, the feature sets \textbf{F6}, \textbf{F8}, \textbf{F11}, \textbf{F12}, and \textbf{F15}
+yield significant makespan improvements relative to the other alternatives on particular instances.
+This means that considering the features \textit{RPT}, \textit{EST}, \textit{ML}, or
+\wtfifo, \wtmtwr, and \wtest in addition to starting times \stfifo, \stmtwr, and \stest by
+greedy algorithms is beneficial, while the particular combination of features achieving best schedules varies.
+Moreover, our clustering method for JSP instance decomposition consistently outperforms pure ASP optimization,
+and specific feature sets are ahead of the greedy FIFO and MTWR algorithms on seven out of ten instances,
+as indicated by the virtual best clustering results in the last row of Table~\ref{tab4}.
+We thus conclude that the instance decomposition by clustering can enable iterative constraint optimization
+to find better schedules than greedy algorithms in a short amount of time, where alternative feature sets deserve
+attention and trying several of them in parallel seems advisable.
+
+% Table~\ref{tab4} shows the selected features and the performance of each combination for solving benchmark instances of 50 jobs and 15 machines \cite{taillard1993benchmarks}. The first column shows the approaches used for solving the problem in the literature in addition to the combinations of features considered by our feature selection algorithm. The next columns represent the instances of our benchmark set except for the last column, which shows the average of each approach through the whole benchmark set. The first $4$ rows in the table show the values of each makespan obtained by heuristics; FIFO, MTWR, and EST with a single and multi-shot ASP solving. We can conclude that FIFO and MTWR provided the best results compared to the other two heuristics. However for the features combinations, the sets (\textbf{F6}, \textbf{F8}, \textbf{F11}, \textbf{F12} and \textbf{F15}) provided good results according to the cost function in the most cases especially with combinations (\textbf{F6} and \textbf{F15}). It means that the most important features extracted from the problem itself and have a positive impact on the performance are \textit{Remaining Processing Time, Machine Load and Earliest Starting Time}. Also, the information obtained from the solutions of the other heuristics, like \textit{Starting Time} and \textit{Waiting Time}, led our algorithm to better decomposition for the problem at hand. More specifically, combining \textit{Remaining Processing Time} with \textit{Machine Load} provides a good decomposition with/without \textit{Waiting Time} attributes obtained by the other heuristics. In a few instances, our proposed method did not outperform other heuristics. However, in general, the best average makespan of the other approaches was $3331$ by FIFO, and the average makespan of our feature selection algorithm was $3256$. Therefore, the feature selection algorithm outperformed other heuristics in the literature by efficiently combining different heuristic information using clustering and feature selection.
 
 \section{Related Work}
 \label{sec:literature}
