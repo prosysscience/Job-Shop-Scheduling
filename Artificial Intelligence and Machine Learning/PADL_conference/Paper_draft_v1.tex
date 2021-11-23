@@ -497,43 +497,51 @@ This process continues until either
 
 \section{Evaluation Results}
 \label{sec:eval}
-We use a popular benchmark \cite{taillard1993benchmarks} comprising randomly generated JSP instances as an evaluation dataset for our approach.
+We use a subset of Taillard's benchmark suite \cite{taillard1993benchmarks}, comprising $10$ randomly generated JSP instances known to be particularly hard for greedy and stochastic optimization techniques, for the empirical evaluation of our approach.
 %Many researchers have studied these instances and presented different approaches to solving them. We also developed different decomposition strategies to solve those. Therefore, it will be possible to measure the success/failure of our proposed model by comparing the results of the strategies developed in the past with those obtained from the proposed algorithm. 
-For each instance, we extracted the 12 features described in Section \ref{sec:features}. In order to study the impact of the features on the clustering and, consequently, schedule quality, we store and present the output of the feature selection step and results of the decomposition-based solving using the Answer Set Programming model developed in \cite{el2020job}.
+For each instance, we extracted the $12$ features described in Section~\ref{sec:features}. In order to assess their impact % of the features
+on the clustering and, consequently, the quality of schedules, we make fix use of the features \stfifo, \stmtwr, and \stest, which provide the starting times obtained by
+heuristic greedy search methods, as these three features promised to be informative
+in preliminary experiments.
+In contrast to that, the position of operations in jobs (\textit{OP}),
+processing times (\textit{PT}), and jobs' time length (\textit{TLJ})
+CONTINUE HERE
+% we store and present the output of the feature selection step and results of the decomposition-based solving using the Answer Set Programming model developed in \cite{el2020job}.
 All experiments were executed with a timeout of 10 minutes. 
-The feature selection algorithm was initialized with a simple combination that consists of $3$ features: \stfifo, \stmtwr, and \stest. The combinations of the selected features presented below. We neglected the rank of an operation and the time length of a job because they had negative impact results from the preliminary experiments.
+% The feature selection algorithm was initialized with a simple combination that consists of $3$ features: \stfifo, \stmtwr, and \stest. The combinations of the selected features presented below. We neglected the rank of an operation and the time length of a job because they had negative impact results from the preliminary experiments.
 
 \begin{enumerate}[label=]
 \fontsize{9pt}{10pt}
-\item \textbf{F1} \textrightarrow \textit{\{ \stfifo, \stmtwr, \stest \}}
-\item \textbf{F2} \textrightarrow \textit{\{ \stfifo, \stmtwr, \stest, RPT \}}
-\item \textbf{F3} \textrightarrow \textit{\{ \stfifo, \stmtwr, \stest, EST \}} 
-\item \textbf{F4} \textrightarrow \textit{\{ \stfifo, \stmtwr, \stest, ML \}} 
-\item \textbf{F5} \textrightarrow \textit{\{ \stfifo, \stmtwr, \stest, RPT, EST \}}
-\item \textbf{F6} \textrightarrow \textit{\{ \stfifo, \stmtwr, \stest, RPT, ML \}} 
-\item \textbf{F7} \textrightarrow \textit{\{ \stfifo, \stmtwr, \stest, EST, ML \}} 
-\item \textbf{F8} \textrightarrow \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest \}} 
-\item \textbf{F9} \textrightarrow \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, RPT \}} 
-\item \textbf{F10} \textrightarrow \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, EST \}} 
-\item \textbf{F11} \textrightarrow \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, ML \}}
-\item \textbf{F12} \textrightarrow \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, RPT, EST \}}
-\item \textbf{F13} \textrightarrow \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, RPT, ML \}}
-\item \textbf{F14} \textrightarrow \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, EST, ML \}}
-\item \textbf{F15} \textrightarrow \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, RPT, EST, ML \}}
+\item \textbf{F1}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest \}}
+\item \textbf{F2}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, RPT \}}
+\item \textbf{F3}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, EST \}} 
+\item \textbf{F4}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, ML \}} 
+\item \textbf{F5}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, RPT, EST \}}
+\item \textbf{F6}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, RPT, ML \}} 
+\item \textbf{F7}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, EST, ML \}} 
+\item \textbf{F8}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest \}} 
+\item \textbf{F9}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, RPT \}} 
+\item \textbf{F10} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, EST \}} 
+\item \textbf{F11} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, ML \}}
+\item \textbf{F12} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, RPT, EST \}}
+\item \textbf{F13} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, RPT, ML \}}
+\item \textbf{F14} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, EST, ML \}}
+\item \textbf{F15} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, RPT, EST, ML \}}
 \end{enumerate}
 
 \begin{table}[bt]
   \begin{center}
-    \caption{The performance of selected features.}
+    \caption{Solution quality comparison for different sets of features.}
     \label{tab4}
-
-    \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|l|} \hline
-      & \multicolumn{11}{|c|}{\textbf{Instances}} \\ \cline{2-12}
-      \textbf{Approach}   & TA51                           & TA52                           & TA53                           & TA54 & TA55                           & TA56                           & TA57                           & TA58 & TA59                           & TA60 & AVG  \\ \hline
+    \addtolength{\tabcolsep}{1pt}
+    \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|} \hline
+%      & \multicolumn{11}{|c|}{\textbf{Instances}} \\ \cline{2-12}
+      \textbf{Approach}   & TA51                           & TA52                           & TA53                           & TA54 & TA55                           & TA56                           & TA57                           & TA58 & TA59                           & TA60 & AVG  \\ \hline\hline
       \textbf{FIFO}        & 3549                           & 3339                           & \textbf{3160}              & \textbf{3218} & 3291               & 3325                           & 3654                           & \textbf{3299} & \textbf{3344}                           & \textbf{3129} & \textbf{3331} \\
       \textbf{MTWR}        & \textbf{3364}           & \textbf{3304}              & 3168                           & 3494 & \textbf{3237}                           & \textbf{3287}               & \textbf{3633}              & 3591 & 3394                           & 3257 & 3373 \\
-      \textbf{Single-shot} & 3632                           & 3615                           & 3481                           & 3462 & 3552                           & 3610                           & 3778                           & 3718 & 3613                           & 3550 & 3601 \\
-      \textbf{EST}         & 3506                           & 3773                           & 3478                           & 3497 & 3482                           & 3605                           & 3753                           & 3731 & 3398                           & 3247 & 3547 \\ \hline
+      \textbf{Single-shot} & 3632                           & 3615                           & 3481                           & 3462 & 3552                           & 3610                           & 3778                           & 3718 & 3613                           & 3550 & 3601 \\ % \hline
+%      \textbf{EST}         
+      \textbf{Multi-shot}         & 3506                           & 3773                           & 3478                           & 3497 & 3482                           & 3605                           & 3753                           & 3731 & 3398                           & 3247 & 3547 \\ \hline
       \textbf{F1}          & 3506                           & 3277                           & 3382                           & 3414 & 3308                           & 3353                           & 3605                           & 3352 & 3453                           & 3483 & 3413 \\
       \textbf{F2}          & 3362                           & 3318                           & 3585                           & 3425 & 3441                           & 3380                           & 3573                           & 3412 & 3416                           & \textbf{3315} & 3423 \\
       \textbf{F3}          & 3324                           & 3330                           & 3347                           & 3425 & 3424                           & 3548                           & 3601                           & 3370 & 3301                           & 3617 & 3429 \\
@@ -548,8 +556,8 @@ The feature selection algorithm was initialized with a simple combination that c
       \textbf{F12}         & 3682                           & 3494                           & \textbf{3143} & 3270 & 3309                           & 3332                           & 3632                           & 3471 & 3250                           & 3676 & 3426 \\
       \textbf{F13}         & 3624                           & 3505                           & 3427                           & 3236 & 3370                           & 3338                           & 3749                           & 3437 & 3253                           & 3659 & 3460 \\
       \textbf{F14}         & 3554                           & 3373                           & 3524                           & \textbf{3232} & 3385                           & 3483                           & 3573                           & 3365 & 3284                           & 3767 & 3454 \\
-      \textbf{F15}         & 3509                           & \textbf{3184} & 3380                           & 3289 & \textbf{3218} & 3389                           & \textbf{3480} & 3481 & 3290                           & 3569 & 3379 \\ \hline
-      \textbf{Obtained} & 3294                           & 3184 & 3143                           & 3232 & 3218 & 3229                           & 3480 & 3324 & 3145                           & 3315 & \textbf{3256} \\
+      \textbf{F15}         & 3509                           & \textbf{3184} & 3380                           & 3289 & \textbf{3218} & 3389                           & \textbf{3480} & 3481 & 3290                           & 3569 & 3379 \\ % \hline
+      \textbf{Virtual Best} & \textbf{3294}                           & \textbf{3184} & \textbf{3143}                           & \textbf{3232} & \textbf{3218} & \textbf{3229}                           & \textbf{3480} & \textbf{3324} & \textbf{3145}                           & \textbf{3315} & \textbf{3256} \\
 \hline
       \end{tabular}
   \end{center}
