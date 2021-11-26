@@ -498,7 +498,7 @@ This process continues until either
 
 \section{Evaluation Results}
 \label{sec:eval}
-We use a subset of Taillard's benchmark suite \cite{taillard1993benchmarks}, comprising $10$ randomly generated JSP instances 
+We use a subset of Taillard's and Demirkol's benchmark suite \cite{taillard1993benchmarks,demirkol1998benchmarks}, comprising $10$ randomly generated JSP instances 
 with $50$ jobs, $15$ machines, and $50\times 15=750$ operations each that are
 known to be particularly hard for greedy and stochastic optimization techniques, for the empirical evaluation of our approach.
 %Many researchers have studied these instances and presented different approaches to solving them. We also developed different decomposition strategies to solve those. Therefore, it will be possible to measure the success/failure of our proposed model by comparing the results of the strategies developed in the past with those obtained from the proposed algorithm. 
@@ -515,9 +515,9 @@ earliest starting time (\textit{EST}), machine load (\textit{ML})
 as well as the waiting times \wtfifo, \wtmtwr, and \wtest
 based on schedules computed by corresponding greedy algorithms,
 are added and combined to feature sets as follows:
-\todo{The feature set
-\textit{\{ \stfifo, \stmtwr, \stest, RPT, EST, ML \}} would be logical as \textbf{F8},
-but it's missing.}
+%\todo{The feature set
+%\textit{\{ \stfifo, \stmtwr, \stest, RPT, EST, ML \}} would be logical as \textbf{F8},
+%but it's missing.}
 % we store and present the output of the feature selection step and results of the decomposition-based solving using the Answer Set Programming model developed in \cite{el2020job}.
 % The feature selection algorithm was initialized with a simple combination that consists of $3$ features: \stfifo, \stmtwr, and \stest. The combinations of the selected features presented below. We neglected the rank of an operation and the time length of a job because they had negative impact results from the preliminary experiments.
 
@@ -529,20 +529,21 @@ but it's missing.}
 \item \textbf{F4}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, ML \}} 
 \item \textbf{F5}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, RPT, EST \}}
 \item \textbf{F6}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, RPT, ML \}} 
-\item \textbf{F7}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, EST, ML \}} 
-\item \textbf{F8}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest \}} 
-\item \textbf{F9}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, RPT \}} 
-\item \textbf{F10} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, EST \}} 
-\item \textbf{F11} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, ML \}}
-\item \textbf{F12} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, RPT, EST \}}
-\item \textbf{F13} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, RPT, ML \}}
-\item \textbf{F14} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, EST, ML \}}
-\item \textbf{F15} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, RPT, EST, ML \}}
+\item \textbf{F7}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, EST, ML \}}
+\item  \textbf{F8}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, RPT, EST, ML \}}
+\item \textbf{F9}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest \}} 
+\item \textbf{F10}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, RPT \}} 
+\item \textbf{F11} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, EST \}} 
+\item \textbf{F12} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, ML \}}
+\item \textbf{F13} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, RPT, EST \}}
+\item \textbf{F14} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, RPT, ML \}}
+\item \textbf{F15} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, EST, ML \}}
+\item \textbf{F16} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, RPT, EST, ML \}}
 \end{enumerate}
 
 \begin{table}[bt]
   \begin{center}
-    \caption{Solution quality comparison for different sets of features.}
+    \caption{Solution quality comparison for different sets of features (Taillard's instances).}
     \label{tab4}
     \addtolength{\tabcolsep}{1pt}
     \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|} \hline
@@ -560,39 +561,77 @@ but it's missing.}
       \textbf{F5}          & 3346                           & 3243                           & 3517                           & 3397 & 3355                           & 3383                           & 3650                           & 3707 & 3508                           & 3591 & 3470 \\
       \textbf{F6}          & \textbf{3294} & 3275                           & 3250                           & 3265 & 3386                           & 3366                           & \textbf{3480} & \textbf{3324} & 3430                           & 3327 & \textbf{3340} \\
       \textbf{F7}          & 3328                           & 3226                           & 3338                           & 3353 & 3301                           & 3564                           & 3592                           & 3496 & 3352                           & 3399 & 3395 \\
-      \textbf{F8}          & 3588                           & 3397                           & 3251                           & 3563 & 3498                           & \textbf{3229} & 3621                           & 3517 & 3258                           & 3374 & 3430 \\
-      \textbf{F9}          & 3588                           & 3373                           & 3522                           & 3443 & 3385                           & 3306                           & 3543                           & 3716 & 3381                           & 3526 & 3475 \\
-      \textbf{F10}         & 3568                           & 3533                           & 3373                           & 3386 & 3530                           & 3362                           & 3608                           & 3644 & 3402                           & 3637 & 3504 \\
-      \textbf{F11}         & 3514                           & 3256                           & 3585                           & 3352 & 3365                           & 3344                           & 3670                           & 3611 & \textbf{3145} & 3425 & 3427 \\
-      \textbf{F12}         & 3682                           & 3494                           & \textbf{3143} & 3270 & 3309                           & 3332                           & 3632                           & 3471 & 3250                           & 3676 & 3426 \\
-      \textbf{F13}         & 3624                           & 3505                           & 3427                           & 3236 & 3370                           & 3338                           & 3749                           & 3437 & 3253                           & 3659 & 3460 \\
-      \textbf{F14}         & 3554                           & 3373                           & 3524                           & \textbf{3232} & 3385                           & 3483                           & 3573                           & 3365 & 3284                           & 3767 & 3454 \\
-      \textbf{F15}         & 3509                           & \textbf{3184} & 3380                           & 3289 & \textbf{3218} & 3389                           & \textbf{3480} & 3481 & 3290                           & 3569 & 3379 \\ % \hline
+      
+      \textbf{F8}          & 3330                           & 3273                           & 3277                           & 3492 & 3375                           & 3469                           & 3760                           & 3410 & 3485                           & 3573 & 3444 \\
+
+      \textbf{F9}          & 3588                           & 3397                           & 3251                           & 3563 & 3498                           & \textbf{3229} & 3621                           & 3517 & 3258                           & 3374 & 3430 \\
+      \textbf{F10}          & 3588                           & 3373                           & 3522                           & 3443 & 3385                           & 3306                           & 3543                           & 3716 & 3381                           & 3526 & 3475 \\
+      \textbf{F11}         & 3568                           & 3533                           & 3373                           & 3386 & 3530                           & 3362                           & 3608                           & 3644 & 3402                           & 3637 & 3504 \\
+      \textbf{F12}         & 3514                           & 3256                           & 3585                           & 3352 & 3365                           & 3344                           & 3670                           & 3611 & \textbf{3145} & 3425 & 3427 \\
+      \textbf{F13}         & 3682                           & 3494                           & \textbf{3143} & 3270 & 3309                           & 3332                           & 3632                           & 3471 & 3250                           & 3676 & 3426 \\
+      \textbf{F14}         & 3624                           & 3505                           & 3427                           & 3236 & 3370                           & 3338                           & 3749                           & 3437 & 3253                           & 3659 & 3460 \\
+      \textbf{F15}         & 3554                           & 3373                           & 3524                           & \textbf{3232} & 3385                           & 3483                           & 3573                           & 3365 & 3284                           & 3767 & 3454 \\
+      \textbf{F16}         & 3509                           & \textbf{3184} & 3380                           & 3289 & \textbf{3218} & 3389                           & \textbf{3480} & 3481 & 3290                           & 3569 & 3379 \\ % \hline
       \textbf{Virtual Best} & \textbf{3294}                           & \textbf{3184} & \textbf{3143}                           & \textbf{3232} & \textbf{3218} & \textbf{3229}                           & \textbf{3480} & \textbf{3324} & \textbf{3145}                           & \textbf{3315} & \textbf{3256} \\
 \hline
       \end{tabular}
   \end{center}
 \end{table}
 
-We utilized the above feature sets for partitioning the operations of JSP instances into
-\todo{Please insert number of time windows.}$X$ clusters or time windows, respectively,
+We utilized the above feature sets for partitioning the operations of JSP instances into $3$ clusters or time windows, respectively,
 and then ran the multi-shot optimization approach introduced in~\cite{el2020job} for
-$10$ minutes in total, i.e., \todo{Please insert minutes per time windows.}$X$ minutes per time window,
+$10$ minutes in total, i.e., $3.3$ minutes per time window,
 on an
-\todo{Please check and update the machine and operating system setup.}
-Intel\textsuperscript{\textregistered} Xeon\textsuperscript{\textregistered} E5520 machine under Linux (Ubuntu 18.04.3).
-The resulting quality of schedules in terms of the achieved makespan for each instance is reported in Table~\ref{tab4},
+%\todo{Please check and update the machine and operating system setup.}
+Intel\textsuperscript{\textregistered} Core(TM) i7-8650U CPU\textsuperscript{\textregistered} Dell Latitude 5590 under Windows 10.
+
+The resulting quality of schedules in terms of the achieved makespan for each instance is reported in Table~\ref{tab4} and Table~\ref{tab5},
 where the first four rows include the greedy FIFO and MTWR search methods supplied by the environment in~\cite{tagesc21a}
 as well as single-shot and multi-shot pure ASP optimization, the latter taking earliest starting times instead of 
-clustering for the decomposition into \todo{Please insert number of time windows.}$X$ time windows,
+clustering for the decomposition into $3$ time windows,
 for reference.
+\begin{table}[bt]
+  \begin{center}
+    \caption{Solution quality comparison for different sets of features (Demirkol's instances).}
+    \label{tab5}
+
+    \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|l|} \hline
+      & \multicolumn{11}{|c|}{\textbf{Instances}} \\ \cline{2-12}
+      \textbf{Approach}  & Dmu31  & Dmu32 & Dmu33 & Dmu34 & Dmu35 & Dmu71 & Dmu72 & Dmu73 & Dmu74 & Dmu75 & AVG  \\ \hline
+
+      \textbf{FIFO}  & \textbf{6817} & \textbf{6318} & \textbf{6029} & \textbf{6395} & \textbf{6409} & 9678 & 10349 & 9617 & 9847 & 9479 & 8094 \\
+      \textbf{MTWR}  & 7155 & 6042 & 6819 & 6570 & 6881 & 7764 & 8407 & 8411 & 8321 & 7893 & \textbf{7426} \\
+      \textbf{Single-shot} & 10370 & 10214 & 10064 & 10682 & 10203 & 6848 & 28369 & 32954 & 35325 & 6992 & 16202 \\
+      \textbf{EST} & 10318  & 9522  & 9785 & 10775 & 10398 & \textbf{6492}  & \textbf{6935} & \textbf{7202} & \textbf{7128}  & \textbf{6243} & 8480 \\ \hline
+      \textbf{F1}  & 8488  & 8325  & 7831 & 8356 & 8088 & 8593  & 7188 & 7826 & 6611 & 7662 & 7897 \\
+      \textbf{F2}  & 8440  & 8298  & \textbf{7663} & 8479 & 7986 & 6994  & 7606 & 7209 & 6627 & 7069 & 7637 \\
+      \textbf{F3}  & 8234  & 8401  & 8037 & 8444 & 7780 & \textbf{6590}  & 7785 & 7302 & 6690 & 7051 & 7631 \\
+      \textbf{F4}  & 7991  & 8589  & 7996 & 8471 & 8207 & 8091  & 7834 & 6972 & 6708 & 6859 & 7771 \\
+      \textbf{F5}  & 8164  & 8103  & 7835 & 8482 & 7802 & 6807  & 8357 & 7328 & 6774 & 7192 & 7684\\
+      \textbf{F6}  & \textbf{7709} & 8265 & 7795 & 8475 & \textbf{7678}  & 6611 & 6708 & 7030 &6569 & 6867 & \textbf{7371} \\
+      \textbf{F7}  & 8268  & 8553  & 7892 & 8359 & 8032 & 7603  & 6855 & 7223 & 6609 & 7200 & 7659 \\
+      \textbf{F8}  & 8873 & 8879 & 8201 & 9126 & 7982 & 6843 & 7971 & 7106 & 7545 & 6970 & 7950 \\
+      \textbf{F9}  & 8500  & 8185  & 8533 & 8772 & 8535 & 6726 & 6518& 7130 & 6592 & 7262 & 7675 \\
+      \textbf{F10}  & 8322  & 8119  & 8433 & 8910 & 8233 & 6868 & 6764 & 7183 & 6267 & 7459 & 7656 \\
+      \textbf{F11} & 8617  & 8383  & 8614 & 8755 & 7969 & 7587 & \textbf{6512} & \textbf{6762}& 6505 & 7376 & 7708 \\
+      \textbf{F12} & 8400  & 8124  & 8043 & \textbf{8185} & 8799 & 7849 & 6618 & 6876 & 6397 & 7746 & 7704 \\
+      \textbf{F13} & 8916 & 8343  & 8441 & 8331 & 8153 & 7464 & 6757 & 6994 & 6434 & 6961 & 7679 \\
+      \textbf{F14} & 8392  & \textbf{7937} & 7943 & 8375 & 8049 & 7310 & 7703 & 6827 & \textbf{6126} & 6893 & 7555 \\
+      \textbf{F15} & 8412  & 8210  & 8117 & 8563 & 9068 & 7853 & 6968 & 6909 & 6350  & 7011 & 7746 \\
+      \textbf{F16} & 8184 & 8150 & 8295 & 8721 & 8003 & 6997 & 7156 & 6991 & 6355 & \textbf{6584} & 7544 \\ 
+      \textbf{Virtual Best} & \textbf{6817} & \textbf{6318} & \textbf{6029} & \textbf{6395} & \textbf{6409} & \textbf{6492} & \textbf{6512} & \textbf{6762} & \textbf{6126} & \textbf{6243} & \textbf{6410} \\
+\hline
+      \end{tabular}
+  \end{center}
+\end{table}
+
 Among these reference methods, FIFO and MTWR are on par, with a slight advantage of FIFO indicated
 by the average given in the last column, while combinatorial optimization by neither single- nor multi-shot ASP 
 solving is able to keep step and leads to greater makespans within the time limit for all instances.
 
 Among our feature sets for clustering, in preparation of multi-shot optimization by ASP,
 we do not identify any clear winner dominating over all instances.
-However, the feature sets \textbf{F6}, \textbf{F8}, \textbf{F11}, \textbf{F12}, and \textbf{F15}
+However, the feature sets \textbf{F6}, \textbf{F11}, \textbf{F14}, and \textbf{F16}
 yield significant makespan improvements relative to the other alternatives on particular instances.
 This means that considering the features \textit{RPT}, \textit{EST}, \textit{ML}, or
 \wtfifo, \wtmtwr, and \wtest in addition to starting times \stfifo, \stmtwr, and \stest by
