@@ -139,7 +139,7 @@ Further contributions of our work can be summarized as follows:
 \begin{itemize}
   \item Since a typical JSP instance describing jobs, their operations, and available machines does not provide sufficient information by itself for finding some promising decomposition by a clustering algorithm, we incorporate heuristic approaches like \textit{First-In-First-Out} and \textit{Machine Load} to extract features from their solutions.
   \item We implement the proposed constrained clustering algorithm and combine it with the forward selection of features, which is an automatic method for identifying a subset of features allowing the clustering method to compute decompositions resulting in best-quality schedules.
-  \item The evaluation of our approach on Taillard's and Demirkol’s benchmark instances \cite{taillard1993benchmarks, demirkol1998benchmarks} shows that it significantly outperforms baseline heuristic methods and pure ASP optimization wrt.\ the makespan optimization criterion within a timeout limit of 600 seconds.
+  \item The evaluation of our approach on Taillard's and Demirkol's benchmark instances \cite{taillard1993benchmarks, demirkol1998benchmarks} shows that it significantly outperforms baseline heuristic methods and pure ASP optimization wrt.\ the makespan optimization criterion within a timeout limit of 600 seconds.
 \end{itemize}
 %It can be said that the attributes of the classical JSP are quite a few and not sufficient to define the similarity and dissimilarity between the operations. The lack of these attributes guides us to extract more features that could specify which operations are similar and should be in the same window and which shall not be in the same window. The main contribution of this work is to extract some features that have a significant impact on the decomposition process and accordingly on the makespan. 
 %More specifically, we need to extract some features to define which operations are similar to be scheduled in the same window and get a near-optimal solution in a reasonable time. \\
@@ -595,16 +595,26 @@ are added and combined to feature sets as follows:
 
 We utilized the above feature sets for partitioning the operations of JSP instances into $3$ clusters or time windows, respectively,
 and then ran the multi-shot optimization approach introduced in~\cite{el2020job} for
-$10$ minutes in total, i.e., $3.3$ minutes per time window,
+$10$ minutes in total, i.e., $200$ seconds per time window,
 on an
 %\todo{Please check and update the machine and operating system setup.}
-Intel\textsuperscript{\textregistered} Core(TM) i7-8650U CPU\textsuperscript{\textregistered} Dell Latitude 5590 under Windows 10.
-
+Intel\textsuperscript{\textregistered} Core\texttrademark{} i7-8650U CPU % \textsuperscript{\textregistered}
+Dell Latitude 5590 machine under Windows 10.
+%
 The resulting quality of schedules in terms of the achieved makespan for each instance is reported in Table~\ref{tab4} and Table~\ref{tab5},
 where the first four rows include the greedy FIFO and MTWR search methods supplied by the environment in~\cite{tagesc21a}
 as well as single-shot and multi-shot pure ASP optimization, the latter taking earliest starting times instead of 
 clustering for the decomposition into $3$ time windows,
 for reference.
+%
+Regarding these reference methods, FIFO and MTWR are more or less on par, with a slight advantage of FIFO on Taillard's instances and an edge for MTWR on Demirkol's instances, 
+indicated
+by the average makespans given in the last column of each table.
+While combinatorial optimization by neither single- nor multi-shot ASP 
+solving is able to keep step within the time limit and leads to greater averages over all instances, the multi-shot pure ASP optimization approach turns out to be comparably robust
+on half of the instances from Demirkol's benchmark suite,
+which points out the strong impact of instance patterns.
+%
 \begin{table}[bt]
   \begin{center}
     \caption{Solution quality comparison for different feature sets (Demirkol's instances).}
@@ -640,20 +650,22 @@ for reference.
   \end{center}
 \end{table}
 
-Among these reference methods, FIFO and MTWR are on par, with a slight advantage of FIFO indicated
-by the average given in the last column, while combinatorial optimization by neither single- nor multi-shot ASP 
-solving is able to keep step and leads to greater makespans within the time limit for all instances.
-
 Among our feature sets for clustering, in preparation of multi-shot optimization by ASP,
 we do not identify any clear winner dominating over all instances.
-However, the feature sets \textbf{F6}, \textbf{F11}, \textbf{F14}, and \textbf{F16}
+However, the feature sets \textbf{F2}, \textbf{F6}, \textbf{F11}, \textbf{F12}, \textbf{F14}, and \textbf{F16}
 yield significant makespan improvements relative to the other alternatives on particular instances.
 This means that considering the features \textit{RPT}, \textit{EST}, \textit{ML}, or
 \wtfifo, \wtmtwr, and \wtest in addition to starting times \stfifo, \stmtwr, and \stest by
 greedy algorithms is beneficial, while the particular combination of features achieving best schedules varies.
-Moreover, our clustering method for JSP instance decomposition consistently outperforms pure ASP optimization,
-and specific feature sets are ahead of the greedy FIFO and MTWR algorithms on seven out of ten instances,
-as indicated by the virtual best clustering results in the last row of Table~\ref{tab4}. In Table~\ref{tab5}, the feature sets outperformed the greedy on only three out of ten instances. However, feature set \textbf{F6} provided the best obtained average. 
+Moreover, our clustering method for JSP instance decomposition outperforms (multi-shot) pure ASP optimization,
+and specific feature sets are ahead of the greedy FIFO and MTWR algorithms on seven out of ten Taillard's instances as well as half of Demirkol's instances,
+as indicated by the virtual best clustering results in the last row of Table~\ref{tab4}
+and Table~\ref{tab5}.
+Notably, the feature set \textbf{F6} leads to the shortest average makespans for
+our cluster-wise JSP solving approach on both kinds of instances, comes close to
+FIFO on Taillard's and is most robust on Demirkol's instances, but the
+virtual best clustering results still improve significantly.
+% In Table~\ref{tab5}, the feature sets outperformed the greedy on only three out of ten instances. However, feature set \textbf{F6} provided the best obtained average. 
 We thus conclude that the instance decomposition by clustering can enable iterative combinatorial optimization
 to find better schedules than greedy algorithms in a short amount of time, where alternative feature sets deserve
 attention and trying several of them in parallel seems advisable.
