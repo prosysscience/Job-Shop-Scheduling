@@ -139,7 +139,7 @@ Further contributions of our work can be summarized as follows:
 \begin{itemize}
   \item Since a typical JSP instance describing jobs, their operations, and available machines does not provide sufficient information by itself for finding some promising decomposition by a clustering algorithm, we incorporate heuristic approaches like \textit{First-In-First-Out} and \textit{Machine Load} to extract features from their solutions.
   \item We implement the proposed constrained clustering algorithm and combine it with the forward selection of features, which is an automatic method for identifying a subset of features allowing the clustering method to compute decompositions resulting in best-quality schedules.
-  \item The evaluation of our approach on Taillard's and Demirkol's benchmark instances \cite{taillard1993benchmarks, demirkol1998benchmarks} shows that it significantly outperforms baseline heuristic methods and pure ASP optimization wrt.\ the makespan optimization criterion within a timeout limit of 600 seconds.
+  \item The evaluation of our approach on Taillard's and Demirkol's benchmark instances \cite{taillard1993benchmarks, demirkol1998benchmarks} shows that it significantly outperforms baseline heuristic methods and pure ASP optimization wrt.\ the makespan optimization criterion within a short solving time limit of $10$ minutes.
 \end{itemize}
 %It can be said that the attributes of the classical JSP are quite a few and not sufficient to define the similarity and dissimilarity between the operations. The lack of these attributes guides us to extract more features that could specify which operations are similar and should be in the same window and which shall not be in the same window. The main contribution of this work is to extract some features that have a significant impact on the decomposition process and accordingly on the makespan. 
 %More specifically, we need to extract some features to define which operations are similar to be scheduled in the same window and get a near-optimal solution in a reasonable time. \\
@@ -613,7 +613,7 @@ by the average makespans given in the last column of each table.
 While combinatorial optimization by neither single- nor multi-shot ASP 
 solving is able to keep step within the time limit and leads to greater averages over all instances, the multi-shot pure ASP optimization approach turns out to be comparably robust
 on half of the instances from Demirkol's benchmark suite,
-which points out the strong impact of instance patterns.
+which points out the critical impact of instance patterns.
 %
 \begin{table}[bt]
   \begin{center}
@@ -652,7 +652,7 @@ which points out the strong impact of instance patterns.
 
 Among our feature sets for clustering, in preparation of multi-shot optimization by ASP,
 we do not identify any clear winner dominating over all instances.
-However, the feature sets \textbf{F2}, \textbf{F6}, \textbf{F11}, \textbf{F12}, \textbf{F14}, and \textbf{F16}
+However, the feature sets \textbf{F2}, \textbf{F6}, \textbf{F11}, \textbf{F12}, \textbf{F13}, \textbf{F14}, and \textbf{F16}
 yield significant makespan improvements relative to the other alternatives on particular instances.
 This means that considering the features \textit{RPT}, \textit{EST}, \textit{ML}, or
 \wtfifo, \wtmtwr, and \wtest in addition to starting times \stfifo, \stmtwr, and \stest by
@@ -666,7 +666,7 @@ our cluster-wise JSP solving approach on both kinds of instances, comes close to
 FIFO on Taillard's and is most robust on Demirkol's instances, but the
 virtual best clustering results still improve significantly.
 % In Table~\ref{tab5}, the feature sets outperformed the greedy on only three out of ten instances. However, feature set \textbf{F6} provided the best obtained average. 
-We thus conclude that the instance decomposition by clustering can enable iterative combinatorial optimization
+We thus conclude that the instance decomposition by clustering can empower iterative combinatorial optimization
 to find better schedules than greedy algorithms in a short amount of time, where alternative feature sets deserve
 attention and trying several of them in parallel seems advisable.
 
@@ -675,7 +675,7 @@ attention and trying several of them in parallel seems advisable.
 \section{Related Work}
 \label{sec:literature}
 
-Data mining approaches~\cite{ismail2012production} have been extensively proposed and studied to generate % so-called
+Data mining approaches~\cite{ismail2012production} have been extensively proposed and applied to generate % so-called
 dispatching rules~\cite{blackstone1982state} for scheduling problems.
 Unlike combinatorial and stochastic optimization methods, dispatching rules do not take
 complete schedules into account, but address the prioritization of operations for making
@@ -699,7 +699,7 @@ On randomly generated test instances of comparably small size, i.e., $36$ operat
 per instance, the generated dispatching rules were shown to outperform greedy search
 with shortest PT as a rigid criterion for making allocation decisions.
 Genetic algorithms are also utilized in~\cite{harrath2002genetic} to obtain
-promising solutions for JSP instance and extract features to consider for the
+promising solutions for JSP instances and extract features to consider for the
 construction of dispatching rules.
 The specifically generated three-tiered policy comprises shortest PT, smallest JL, and longest RPT as
 dispatching criteria in the order of significance.
@@ -710,8 +710,8 @@ can readily be applied to different instance or feature sets, respectively.
 Beyond static scheduling, dynamic JSP~\cite{french82a} deals with events, such as 
 the release of new jobs or sudden machine breakdowns, along with rescheduling or
 updating dispatching rules, respectively.
-In analogy to static approaches,
-the processing method of~\cite{shahzad2010discovering} applies tabu search to
+In analogy to the static setting,
+the processing approach of~\cite{shahzad2010discovering} applies tabu search to
 training instances and generates allocation policies approximating the optimized
 complete schedules based on features like EST, PT, and RPT of operations.
 Applied in the dynamic JSP setting, the dispatching rules obtained by means of data mining
@@ -742,15 +742,16 @@ in corresponding schedules as instance features.
 Notably, the constrained clustering algorithm in Section~\ref{sec:method} can readily
 be applied to arbitrary feature sets for decomposing the operations of JSP instances
 into balanced time windows, i.e., our clustering method does not presuppose tuning to
-specific instances or features under consideration.
+specific instance or feature sets under consideration.
 The iterative combinatorial optimization by time windows can be viewed as a trade-off
 between efficient dispatching rules, aiming to optimize local allocation decisions by
 prioritizing operations, and the stochastic or combinatorial optimization of
 complete schedules for problem instances.
 While instance size and complexity can make the search for optimal solutions
 with state-of-the-art solvers for ASP, Mixed Integer Programming, or Constraint Programming
-prohibitive~\cite{zhang2010hybrid},
-their real-world application areas in scheduling include, e.g.,
+prohibitive~\cite{coltep19a,zhang2010hybrid},
+successful % their real-world 
+application areas in scheduling include, e.g.,
 industrial printing~\cite{balduccini11a},
 team-building~\cite{rigralmaliiile12a},
 shift design~\cite{abgemuscwo15c},
