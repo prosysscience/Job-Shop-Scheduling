@@ -280,7 +280,7 @@ Table~\ref{tab2} shows one feasible decomposition that we may like to generate.
 The operations $\{ O_{1,1}, O_{1,2}, O_{2,1}, O_{2,2}, O_{3,1} \}$ are here assigned to TW~$1$, and the remaining operations to TW~$2$.
 Given this decomposition, a multi-shot optimization approach,
 as offered by ASP~\cite{gekakasc17a},
-can first optimize a schedule (wrt.\ to the makespan)
+can first optimize a schedule (wrt.\ the makespan)
 for the operations in TW~$1$, and then extend the first part by
 additionally scheduling the operations in TW~$2$ in an optimal way.
 However, considering that the operation $O_{3,2}$ belongs to TW~$2$
@@ -391,14 +391,14 @@ and can thus use them as inputs to our decomposition method presented in the nex
 \section{Constrained Clustering Algorithm}
 \label{sec:method}
 %In this section, we will show the implementation of our proposed model and how it works. 
-Our approximation approach comprises two main steps: 
+Our approximation approach comprises two main phases: 
 \begin{enumerate*}[label=\emph{(\roman*)}]
   \item first, we decompose a problem instance into a sequence of sub-problems, called \emph{time windows}, and
   \item second, the time windows are solved one after another,
         where optimized solutions for preceding time windows are taken as input for solving the next.
 \end{enumerate*}
 As a result, the solution obtained for the last time window provides a complete schedule for the given JSP instance.
-The computational efficiency of this approach and the quality of obtained schedules rely on the decomposition performed in the first step \cite{zhang2010hybrid,zhai2014decomposition}. 
+The computational efficiency of this approach and the quality of obtained schedules rely on the decomposition performed in the first phase \cite{zhang2010hybrid,zhai2014decomposition}. 
 %To address this problem, several decomposition approaches have been presented during the last decades \cite{zhai2014decomposition,singer2001decomposition,ovacik2012decomposition,uzsoy2000performance}.
 Our approach incorporates a novel constrained clustering method for the favorable decomposition of JSP instances based on features of their comprised operations. Each cluster represents a time window, i.e., a subset of operations to be scheduled in one go of an iterative solving algorithm.
 
@@ -778,7 +778,48 @@ medical treatment planning~\cite{dogagrmamopo21a}.
 
 \section{Conclusions}
 \label{sec:conclusions}
-Data mining and machine learning is an area of interest in many manufacturing companies and other fields. In order to increase productivity and decrease the operation cost, there should be high-quality schedules to be used. This study focused on data mining and clustering approaches for solving the Job-shop Scheduling Problem. The first issue in this work is to explore the knowledge in good schedules and try to use this knowledge to get more efficient schedules. We extracted some features from the problem at hand and other features from schedules obtained by heuristics. The second issue is finding a powerful way to decompose the problem into windows where each cluster is a window and solve them sequentially. In order to split the problem, we proposed a constrained clustering algorithm considering the precedence constraints of the JSP. We tested our model on benchmark instances, and the results showed that the performance of the proposed model outperforms other heuristics FIFO, MTWR, and EST in the most cases; and some attributes like (\textit{Starting Time, Waiting Time, Remaining Processing Time, and Machine Load}) played an important role to split the operations in a good way. There are several ways to extend this study. Firstly, solve bigger instances and others in a real-life application in which more features could be extracted. Secondly, develop other clustering algorithms to split the problem more efficiently and get better results.
+Data mining and machine learning are of wide interest in scientific, business, and further fields. % In order to increase productivity and decrease the operation cost, there should be high-quality schedules to be used.
+Our work investigates data mining and clustering methods to optimize solutions for the Job-shop Scheduling Problem within short solving times.
+The idea is to associate clusters of operations with time windows subject to iterative combinatorial optimization, eventually leading to a complete schedule.
+In contrast to usual clustering tasks, however,
+the time windows need to take the sequence of operations in a job into account,
+and the number of operations per cluster should also be balanced for partitioning
+a given problem instance into time windows of roughly similar solving complexity.
+We have thus devised a novel constrained clustering method that takes both concerns
+into account for gathering operations with similar feature values in a consistent and
+balanced way.
+Our experiments show that the decomposition into time windows obtained by clustering
+usually leads to significantly improved outcomes of multi-shot ASP solving in comparison
+to taking earliest starting times as simple (and consistent) partitioning criterion.
+While no single feature set for clustering turns out to be strictly more successful than greedy search
+with FIFO or MTWR allocation policy, schedules of comparable or better quality can be found
+with some feature set in the given solving time for most instances.
+Moreover, the iterative combinatorial optimization by time windows helps to increase
+the robustness of schedules obtained for different kinds of instances.
+
+While search for optimal solutions is beyond reach due to the size and complexity of
+practical scheduling applications,
+reliably computing high-quality approximations is an important subject of future work.
+This includes automatic methods for deciding about the features to consider for
+partitioning operations into clusters, i.e., determining whether an eligible feature is
+informative or noisy, respectively.
+As we can hardly expect that even moderately sized time windows can be solved to
+optimality in a short amount of time or eventual optimization criteria values be
+accurately predicted from solutions for sub-problems,
+it can still be worthwhile to incorporate measures allowing for corrections of 
+partitioning decisions, which can consist of overlapping time windows to enable
+revisions or dynamically relaunching the clustering algorithm wrt.\ computed
+partial schedules.
+Instead of obtaining features by greedy search methods only, we may also take
+the outcomes of one or several multi-shot optimization runs into account as
+features for another clustering and solving round until a fixpoint without
+further improvement is reached.
+That is, there are various opportunities to extend our approach in the future,
+where going beyond the classical Job-shop Scheduling Problem, e.g., by
+considering flexible machine allocations or partially ordered operations,
+can also be relevant for practical application scenarios.
+
+% The first issue in this work is to explore the knowledge in good schedules and try to use this knowledge to get more efficient schedules. We extracted some features from the problem at hand and other features from schedules obtained by heuristics. The second issue is finding a powerful way to decompose the problem into windows where each cluster is a window and solve them sequentially. In order to split the problem, we proposed a constrained clustering algorithm considering the precedence constraints of the JSP. We tested our model on benchmark instances, and the results showed that the performance of the proposed model outperforms other heuristics FIFO, MTWR, and EST in the most cases; and some attributes like (\textit{Starting Time, Waiting Time, Remaining Processing Time, and Machine Load}) played an important role to split the operations in a good way. There are several ways to extend this study. Firstly, solve bigger instances and others in a real-life application in which more features could be extracted. Secondly, develop other clustering algorithms to split the problem more efficiently and get better results.
 
 \bibliographystyle{splncs04}
 \bibliography{references}
