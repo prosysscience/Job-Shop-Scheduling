@@ -542,7 +542,7 @@ are added and combined to feature sets as follows:
 \item \textbf{F7}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, EST, ML \}}
 \item  \textbf{F8}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, RPT, EST, ML \}}
 \item \textbf{F9}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest \}} 
-\item \textbf{F10}\phantom{\textbf{0}} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, RPT \}} 
+\item \textbf{F10} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, RPT \}} 
 \item \textbf{F11} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, EST \}} 
 \item \textbf{F12} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, ML \}}
 \item \textbf{F13} \textrightarrow{} \textit{\{ \stfifo, \stmtwr, \stest, \wtfifo, \wtmtwr, \wtest, RPT, EST \}}
@@ -553,9 +553,9 @@ are added and combined to feature sets as follows:
 
 \begin{table}[bt]
   \begin{center}
-    \caption{Solution quality comparison for different sets of features (Taillard's instances).}
+    \caption{Solution quality comparison for different feature sets (Taillard's instances).}
     \label{tab4}
-    \addtolength{\tabcolsep}{1pt}
+    \addtolength{\tabcolsep}{0.9pt}
     \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|} \hline
 %      & \multicolumn{11}{|c|}{\textbf{Instances}} \\ \cline{2-12}
       \textbf{Approach}   & TA51                           & TA52                           & TA53                           & TA54 & TA55                           & TA56                           & TA57                           & TA58 & TA59                           & TA60 & AVG  \\ \hline\hline
@@ -602,17 +602,17 @@ clustering for the decomposition into $3$ time windows,
 for reference.
 \begin{table}[bt]
   \begin{center}
-    \caption{Solution quality comparison for different sets of features (Demirkol's instances).}
+    \caption{Solution quality comparison for different feature sets (Demirkol's instances).}
     \label{tab5}
+    \addtolength{\tabcolsep}{0.9pt}
+    \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|} \hline
+%      & \multicolumn{11}{|c|}{\textbf{Instances}} \\ \cline{2-12}
+      \textbf{Approach}  & DE31  & DE32 & DE33 & DE34 & DE35 & DE71 & DE72 & DE73 & DE74 & DE75 & AVG  \\ \hline
 
-    \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|l|} \hline
-      & \multicolumn{11}{|c|}{\textbf{Instances}} \\ \cline{2-12}
-      \textbf{Approach}  & Dmu31  & Dmu32 & Dmu33 & Dmu34 & Dmu35 & Dmu71 & Dmu72 & Dmu73 & Dmu74 & Dmu75 & AVG  \\ \hline
-
-      \textbf{FIFO}  & \textbf{6817} & \textbf{6318} & \textbf{6029} & \textbf{6395} & \textbf{6409} & 9678 & 10349 & 9617 & 9847 & 9479 & 8094 \\
-      \textbf{MTWR}  & 7155 & 6042 & 6819 & 6570 & 6881 & 7764 & 8407 & 8411 & 8321 & 7893 & \textbf{7426} \\
+      \textbf{FIFO}  & \textbf{6817} & 6318 & \textbf{6029} & \textbf{6395} & \textbf{6409} & 9678 & 10349 & 9617 & 9847 & 9479 & 8094 \\
+      \textbf{MTWR}  & 7155 & \textbf{6042} & 6819 & 6570 & 6881 & 7764 & 8407 & 8411 & 8321 & 7893 & \textbf{7426} \\
       \textbf{Single-shot} & 10370 & 10214 & 10064 & 10682 & 10203 & 6848 & 28369 & 32954 & 35325 & 6992 & 16202 \\
-      \textbf{EST} & 10318  & 9522  & 9785 & 10775 & 10398 & \textbf{6492}  & \textbf{6935} & \textbf{7202} & \textbf{7128}  & \textbf{6243} & 8480 \\ \hline
+      \textbf{Multi-shot} & 10318  & 9522  & 9785 & 10775 & 10398 & \textbf{6492}  & \textbf{6935} & \textbf{7202} & \textbf{7128}  & \textbf{6243} & 8480 \\ \hline
       \textbf{F1}  & 8488  & 8325  & 7831 & 8356 & 8088 & 8593  & 7188 & 7826 & 6611 & 7662 & 7897 \\
       \textbf{F2}  & 8440  & 8298  & \textbf{7663} & 8479 & 7986 & 6994  & 7606 & 7209 & 6627 & 7069 & 7637 \\
       \textbf{F3}  & 8234  & 8401  & 8037 & 8444 & 7780 & \textbf{6590}  & 7785 & 7302 & 6690 & 7051 & 7631 \\
@@ -629,7 +629,7 @@ for reference.
       \textbf{F14} & 8392  & \textbf{7937} & 7943 & 8375 & 8049 & 7310 & 7703 & 6827 & \textbf{6126} & 6893 & 7555 \\
       \textbf{F15} & 8412  & 8210  & 8117 & 8563 & 9068 & 7853 & 6968 & 6909 & 6350  & 7011 & 7746 \\
       \textbf{F16} & 8184 & 8150 & 8295 & 8721 & 8003 & 6997 & 7156 & 6991 & 6355 & \textbf{6584} & 7544 \\ 
-      \textbf{Virtual Best} & \textbf{6817} & \textbf{6318} & \textbf{6029} & \textbf{6395} & \textbf{6409} & \textbf{6492} & \textbf{6512} & \textbf{6762} & \textbf{6126} & \textbf{6243} & \textbf{6410} \\
+      \textbf{Virtual Best} & \textbf{7709} & \textbf{7937} & \textbf{7663} & \textbf{8185} & \textbf{7678} & \textbf{6590} & \textbf{6512} & \textbf{6762} & \textbf{6126} & \textbf{6584} & \textbf{7175} \\
 \hline
       \end{tabular}
   \end{center}
