@@ -71,7 +71,8 @@ Austria\\%
 Technische Universität Graz, % Graz, 
 Austria\\%
 \and
-Faculty of Computers and Artificial Intelligence, Cairo University, 
+% Faculty of Computers and Artificial Intelligence,
+Cairo University, 
 Egypt\\%
 % \email{mgebser@ist.tugraz.at}
 \email{firstname.lastname@aau.at}}
@@ -511,9 +512,10 @@ This process continues until either
 
 \section{Evaluation Results}
 \label{sec:eval}
-We use a subset of Taillard's and Demirkol's benchmark suite \cite{taillard1993benchmarks,demirkol1998benchmarks}, comprising $10$ randomly generated JSP instances 
-with $50$ jobs, $15$ machines, and $50\times 15=750$ operations each that are
-known to be particularly hard for greedy and stochastic optimization techniques, for the empirical evaluation of our approach.
+We use randomly generated JSP instances
+with $50$ jobs, $15$ machines, and $50\times 15=750$ operations,
+part of which are known to be challenging for greedy and stochastic optimization techniques,
+from Taillard's and Demirkol's benchmark suites \cite{taillard1993benchmarks,demirkol1998benchmarks} for the empirical evaluation of our approach.
 %Many researchers have studied these instances and presented different approaches to solving them. We also developed different decomposition strategies to solve those. Therefore, it will be possible to measure the success/failure of our proposed model by comparing the results of the strategies developed in the past with those obtained from the proposed algorithm. 
 For each instance, we extracted the $12$ features described in Section~\ref{sec:features}. In order to assess their impact % of the features
 on the clustering and, consequently, the quality of schedules, we make fix use of the features \stfifo, \stmtwr, and \stest, which provide the starting times of operations obtained by
