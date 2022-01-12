@@ -2,7 +2,7 @@
 % LLNCS macro package for Springer Computer Science proceedings;
 % Version 2.20 of 2017/10/04
 %
-\documentclass[runningheads]{llncs}
+\documentclass{tlp} % \documentclass[runningheads]{llncs}
 %
 \usepackage{graphicx}
 \usepackage{amsmath}
@@ -18,36 +18,66 @@
 % to display URLs in blue roman font according to Springer's eBook style:
 % \renewcommand\UrlFont{\color{blue}\rmfamily}
 
+\newtheorem{theorem}{Theorem}
+
 \begin{document}
+
+\lefttitle{Mohammed M.\ S.\ El-Kholany, Martin Gebser, Konstantin Schekotihin}
+
+\jnlPage{1}{8}
+\jnlDoiYr{2021}
+\doival{10.1017/xxxxx}
+
 %
-\title{A decomposition Approach for solving the JSP using multi-shot ASP\thanks{Supported by organization x.}}
+\title{A decomposition Approach for solving the JSP using multi-shot ASP}
+% \thanks{This work was partially funded by
+% KWF project 28472,
+% cms electronics GmbH,
+% FunderMax GmbH,
+% Hirsch Armbänder GmbH,
+% incubed IT GmbH,
+% Infineon Technologies Austria AG,
+% Isovolta AG,
+% Kostwein Holding GmbH, and
+% Privatstiftung Kärntner Sparkasse.}}
 %
 %\titlerunning{Abbreviated paper title}
 % If the paper title is too long for the running head, you can set
 % an abbreviated paper title here
 %
-\author{Mohammed M. S. El-Kholany\inst{1}\orcidID{0000-0002-1088-2081} \and
-Martin Gebser\inst{1,2}\orcidID{0000-0002-8010-4752} \and
-Konstantin Schekotihin\inst{1}\orcidID{0000-0002-0286-0958}}
+\begin{authgrp}
+\author{\sn{Mohammed M.\ S.} \gn{El-Kholany}} % \inst{1}\orcidID{0000-0002-1088-2081} \and
+\affiliation{University of Klagenfurt, Austria \and Cairo University, Egypt}
+\author{\sn{Martin} \gn{Gebser}} % \inst{1,2}\orcidID{0000-0002-8010-4752} \and
+\affiliation{University of Klagenfurt, Austria \and Graz University of Technology, Austria}
+\author{\sn{Konstantin} \gn{Schekotihin}} % \inst{1}\orcidID{0000-0002-0286-0958}
+\affiliation{University of Klagenfurt, Austria}
+\end{authgrp}
 %
-\authorrunning{M. El-Kholany et al.}
+%%% \authorrunning{M. El-Kholany et al.}
 % First names are abbreviated in the running head.
 % If there are more than two authors, 'et al.' is used.
 %
-\institute{Alpen-Adria-Universität Klagenfurt, Klagenfurt, Austria 
-\email{\{mohammed.el-kholany, martin.gebser and konstantin.schekotihin\}@aau.at}\\
+%%% \institute{Alpen-Adria-Universität Klagenfurt, Klagenfurt, Austria 
+%%% \email{\{mohammed.el-kholany, martin.gebser and konstantin.schekotihin\}@aau.at}\\
 %\url{http://www.springer.com/gp/computer-science/lncs} \and
-Technische Universität Graz, Graz, Austria\\
-\email{mgebser@ist.tugraz.at}}
-%
+%%% Technische Universität Graz, Graz, Austria\\
+%%% \email{mgebser@ist.tugraz.at}}
+
+\history{\sub{xx xx xxxx;} \rev{xx xx xxxx;} \acc{xx xx xxxx}}
+
 \maketitle              % typeset the header of the contribution
-%
+
 \begin{abstract}
 The abstract should briefly summarize the contents of the paper in
 150--250 words.
 
-\keywords{Job-shop Scheduling Problem  \and Answer Set Programming \and Decomposition.}
+% \keywords{Job-shop Scheduling Problem  \and Answer Set Programming \and Decomposition.}
 \end{abstract}
+%
+\begin{keywords}
+Job-shop Scheduling Problem, Answer Set Programming, Decomposition
+\end{keywords}
 %
 %
 %
@@ -232,7 +262,7 @@ and a homepage~\cite{ref_url1}. Multiple citations are grouped
 % \bibliographystyle{splncs04}
 % \bibliography{mybibliography}
 %
-\bibliographystyle{splncs04}
+\bibliographystyle{tlplike} % \bibliographystyle{splncs04}
 \bibliography{Ref}
 
 \end{document}
