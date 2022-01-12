@@ -1,19 +1,18 @@
-# LLNCS style files for LaTeX
+# A paper of a decomposition strategy for solving Job-shop Scheduling Problem 
 
-Dear LLNCS user,
+This work proposes a decomposition strategy to solve a Job-shop Scheduling Problem (JSP). We have applied Earliest Starting Time Strategy (EST) to decompose the problem into sub-problems. We used Answer Set Programming (ASP) to solve the problem. 
 
-The files in this directory belong to the LaTeX2e package for
-Lecture Notes in Computer Science (LNCS) of Springer-Verlag.
+The files in this directory refers to a draft of a paper planned to be submitted in ICLP. 
 
-It consists of the following files: 
+The directory consists of following files: 
+
 
 <table>
-<tr><th>File name</th><th>File description</th></tr>
-<tr><td>readme.txt</td><td>text version of this file</td></tr>
-<tr><td>history.txt</td><td>the version history of the package</td></tr>
+<tr><th>File/Folder name</th><th>File description</th></tr>
+<tr><td>Listing</td><td>contains the encoding files which are included in the paper draft</td></tr>
+<tr><td>README.md</td><td>text version of this file</td></tr>
+<tr><td>Ref.bib</td><td>a file contains references</td></tr>
 <tr><td>llncs.cls</td><td>the LaTeX2e document class</td></tr>
-<tr><td>samplepaper.tex</td><td>a sample paper</td></tr>
-<tr><td>fig1.eps</td><td>a figure used in the sample paper</td></tr>
-<tr><td>llncsdoc.pdf</td><td>the documentation of the class (PDF version)</td></tr>
+<tr><td>samplepaper.tex</td><td>a paper draft</td></tr>
 <tr><td>splncs04.bst</td><td>current LNCS BibTeX style with alphabetic sorting</td></tr>
 </table>
