@@ -1,4 +1,4 @@
-# A paper of a decomposition strategy for solving Job-shop Scheduling Problem 
+# A paper of a decomposition strategy for solving the Job-shop Scheduling Problem 
 
 This work proposes a decomposition strategy to solve a Job-shop Scheduling Problem (JSP). We have applied Earliest Starting Time Strategy (EST) to decompose the problem into sub-problems. We used Answer Set Programming (ASP) to solve the problem. 
 
