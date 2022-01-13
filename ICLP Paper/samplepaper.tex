@@ -75,15 +75,30 @@
 \maketitle              % typeset the header of the contribution
 %
 \begin{abstract}
-Scheduling methods are important for effective production and logistics management, where tasks need to be allocated to and performed by limited resources.
+Scheduling methods are important for effective production and logistics management, where tasks need to be allocated and performed by limited resources.
 In particular, the Job-shop Scheduling Problem (JSP) is a well-known and challenging
 combinatorial optimization problem in which tasks sharing a machine are to be arranged
-in sequence such that jobs encompassing them can be completed as early as possible.
+in sequence such that encompassing jobs can be completed as early as possible.
 Given that already moderately sized JSP instances can turn out as highly combinatorial,
 so that neither optimal schedules nor the runtime to termination of complete optimization methods
 is known, efficient approaches to approximate good-quality schedules are of interest.
-
-This paper applied a decomposition approach that splits the problem into a pre-defined set of small problems called Time Windows (TWs) and solves each separately in sequential order. Our proposed model is split into two main phases for solving the (JSP). The decomposition phase assigns each operation to a particular TW while satisfying the precedence constraint. The second phase is the scheduling phase, in which the model starts to optimize the first TW and continues until finishing the last TW. We built our model using Answer Set Programming (ASP). A Multi-shot solving paradigm is used to deal with the decomposition approach and differenc logic to handle the constraints. To evaluate the proposed work, we tested our model on a set of benchmark instances with different sizes and the results showed that the multi-shot solving is better than the single-shot when the number of operations increases. 
+In this paper, we propose problem decomposition into time windows whose operations
+can be successively scheduled and optimized by means of multi-shot ASP solving.
+From a computational perspective, decomposition aims to split highly complex scheduling tasks into better manageable subproblems with a balanced number of 
+operations, so that good-quality or even optimal partial solutions can be
+reliably found in a small fraction of runtime.
+Regarding the feasibility and quality of solutions, problem decomposition must
+respect the precedence of operations within their jobs, and partial schedules
+optimized by time windows should yield better global solutions than obtainable
+in similar runtime on the full problem.
+We devise and investigate a variety of decomposition strategies in terms of the number and size of time windows as well as heuristics for choosing their operations.
+Moreover, we incorporate time window overlapping and compression techniques
+into the iterative scheduling process in order to counteract limitations of window-wise optimization restricted to partial schedules.
+Our experiments on JSP benchmark sets of several sizes show that
+successive optimization by multi-shot ASP solving leads to substantially better schedules within the runtime limit than global optimization on the full problem,
+where the gap increases with the number of operations to schedule.
+%
+% This paper applied a decomposition approach that splits the problem into a pre-defined set of small problems called Time Windows (TWs) and solves each separately in sequential order. Our proposed model is split into two main phases for solving the (JSP). The decomposition phase assigns each operation to a particular TW while satisfying the precedence constraint. The second phase is the scheduling phase, in which the model starts to optimize the first TW and continues until finishing the last TW. We built our model using Answer Set Programming (ASP). A Multi-shot solving paradigm is used to deal with the decomposition approach and differenc logic to handle the constraints. To evaluate the proposed work, we tested our model on a set of benchmark instances with different sizes and the results showed that the multi-shot solving is better than the single-shot when the number of operations increases. 
 % \keywords{Job-shop Scheduling Problem  \and Answer Set Programming \and Decomposition.}
 \end{abstract}
 %
