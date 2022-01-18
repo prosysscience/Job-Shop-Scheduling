@@ -104,23 +104,49 @@ where the gap increases with the number of operations to schedule.
 \end{abstract}
 %
 \begin{keywords}
-Job-shop Scheduling Problem, Answer Set Programming, Decomposition
+Job-shop Scheduling Problem, Answer Set Programming, Problem Decomposition
 \end{keywords}
 %
 %
 \section{Introduction}
-In today's competitive markets, manufacturers have to respond quickly to orders and meet shipping dates committed to the customers. This requires the ability to schedule production activities to use the available scarce resources efficiently. Effective scheduling techniques are essential in complex manufacturing systems such as semiconductor manufacturing. In general, scheduling operations is one of the most critical issues in the planning and managing of the manufacturing processes\cite{uzsoy2000performance}. 
+% In today's competitive markets, manufacturers have to respond quickly to orders and meet shipping dates committed to the customers. This requires the ability to schedule production activities to use the available scarce resources efficiently. Effective scheduling techniques are essential in complex manufacturing systems such as semiconductor manufacturing. In general, scheduling operations is one of the most critical issues in the planning and managing of the manufacturing processes\cite{uzsoy2000performance}.
+Effective scheduling methods are essential for complex manufacturing and logistics systems,
+where allocating and performing diverse tasks within resource capacity limits 
+is one of the most critical challenges for production management \citep{uzsoy2000performance}.
+The Job-shop Scheduling Problem (JSP) \citep{baker1974introduction,taillard1993benchmarks}
+constitutes a well-known mathematical abstraction of industrial production scheduling in
+which sequences of operations need to be processed by machines such that a given objective
+like the makespan for completing all jobs or their tardiness w.r.t.\ deadlines is minimized.
+Finding optimal JSP solutions, determined by a sequence of operations for each machine,
+is an NP-hard combinatorial problem
+\citep{garey1976complexity,lenstra1977complexity,liu2008prediction},
+and optimal schedules as well as termination guarantees can be extremely challenging
+or beyond reach 
+of complete optimization methods already for moderately sized instances.
+For example, it took about $20$ years to develop a search procedure able to find a
+(provably) optimal solution for an instance called FT10 with $10$ jobs
+\citep{adams1988shifting,zhang2010hybrid},
+each consisting of a sequence of $10$ operations to be processed by $10$ machines. 
 
-One of the most challenging scheduling problems is the Jop-shop Scheduling Problem (JSP). A set of jobs needs to be processed on a set of machines while optimizing a performance indicator, minimizing makespan, the time needed to complete all the jobs, or tardiness, i.e., the summation of the delays in executing all jobs according to their deadlines. Each job has a set of consecutive operations; each operation requires exactly one machine; machines are continuously available and can process only one operation at a time. The main purpose is to determine the sequence of the operations on each machine to optimize a performance indicator. The JSP is an NP-complete combinatorial optimization problem where obtaining the optimal solution is challenging regardless of the problem scale\cite{garey1976complexity,lenstra1977complexity,liu2008prediction}. For instance, benchmark (FT10) consists of $10$ jobs and $10$ machines took researchers roughly $20$ years to find the optimal solution\cite{adams1988shifting,zhang2010hybrid}.
+% One of the most challenging scheduling problems is the Jop-shop Scheduling Problem (JSP). A set of jobs needs to be processed on a set of machines while optimizing a performance indicator, minimizing makespan, the time needed to complete all the jobs, or tardiness, i.e., the summation of the delays in executing all jobs according to their deadlines. Each job has a set of consecutive operations; each operation requires exactly one machine; machines are continuously available and can process only one operation at a time. The main purpose is to determine the sequence of the operations on each machine to optimize a performance indicator. The JSP is an NP-complete combinatorial optimization problem where obtaining the optimal solution is challenging regardless of the problem scale\cite{garey1976complexity,lenstra1977complexity,liu2008prediction}. For instance, benchmark (FT10) consists of $10$ jobs and $10$ machines took researchers roughly $20$ years to find the optimal solution\cite{adams1988shifting,zhang2010hybrid}.
 
 In real-world production scheduling, the number of operations to process can easily go
 into tens of thousands \citep{coltep19a,kohakamo20a,kotakoscge21a}, which exceeds exact
 optimization capacities even of state-of-the-art solvers for Answer Set Programming (ASP),
 Mixed Integer Programming (MIP), or Constraint Programming (CP)
 \citep{daneshamooz2021mathematical,francescutto2021solving,shi2021solving}.
+Hence, more efficient approaches to approximate good-quality schedules 
+instead of striving for optimal solutions have attracted wide research interest.
+On the one hand, respective methods include greedy and local search techniques such as
+dispatching rules \citep{blackstone1982state}, shifting bottleneck \citep{adams1988shifting} and
+genetic algorithms \citep{pezzella2008genetic}.
+On the other hand, problem decomposition strategies based on a
+rolling horizon \citep{singer2001decomposition,liu2008prediction} or
+bottleneck operations \citep{zhang2010hybrid,zhai2014decomposition} 
+have been proposed to partition large-scale instances into better manageable subproblems,
+where no single strategy strictly dominates \citep{ovacik2012decomposition}.
 
-
-In reality, the number of operations is reaching thousands of operations. Therefore, the exact methods Answer Set Programming (ASP), Constraint Programming and Branch and Bound cannot find the optimal solutions in a reasonable time\cite{daneshamooz2021mathematical,shi2021solving,francescutto2021solving}. Since the performance of the exact methods will be hardly satisfactory, several studies have presented one of the most effective methods for solving the JSP, which is decomposition \cite{zhang2010hybrid}. The decomposition aims to split the problem into a series of subproblems based on a particular decomposition policy and then solve each part separately and obtain the final solution by integrating all of these solutions. Several strategies have been proposed to decompose the JSP, and each varies according to the problem features. More specifically, there is no evidence that one of the introduced strategies is the best for solving all JSP(s) \cite{ovacik2012decomposition}. 
+% In reality, the number of operations is reaching thousands of operations. Therefore, the exact methods Answer Set Programming (ASP), Constraint Programming and Branch and Bound cannot find the optimal solutions in a reasonable time\cite{daneshamooz2021mathematical,shi2021solving,francescutto2021solving}. Since the performance of the exact methods will be hardly satisfactory, several studies have presented one of the most effective methods for solving the JSP, which is decomposition \cite{zhang2010hybrid}. The decomposition aims to split the problem into a series of subproblems based on a particular decomposition policy and then solve each part separately and obtain the final solution by integrating all of these solutions. Several strategies have been proposed to decompose the JSP, and each varies according to the problem features. More specifically, there is no evidence that one of the introduced strategies is the best for solving all JSP(s) \cite{ovacik2012decomposition}. 
 
 In this study, we aim to introduce a new decomposition strategy for solving the JSP. Our study proposes a new policy to efficiently divide the problem into subproblems, aiming to reach a near-optimal solution. Then each part is solved using an ASP scheduler-based, and the solutions are integrated to obtain the solution of the whole problem. We develop and implement our model using ASP, which is considered as one of the most popular paradigms for knowledge representation and reasoning, especially in combinatorial optimization problems \cite{abseher2016shift}. 
 
