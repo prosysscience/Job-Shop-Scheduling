@@ -1,4 +1,5 @@
 @string{springer = {Springer-Verlag}}
+@string{tplp = {Theory and Practice of Logic Programming}}
 
 @book{baker1974introduction,
   title={Introduction to Sequencing and Scheduling},
@@ -23,6 +24,13 @@
   author = {G. {Da Col} and E. Teppan},
   crossref = {cp19},
   pages = {144-160}
+}
+
+@inproceedings{elkgeb20a,
+  title = {Job Shop Scheduling with Multi-shot {ASP}},
+  author = {M. El-Kholany and M. Gebser},
+  crossref = {taasp20},
+  url = {http://www.kr.tuwien.ac.at/events/taasp20/papers/TAASP_2020_paper_4.pdf}
 }
 
 @article{kohakamo20a,
@@ -223,11 +231,21 @@
 }
 
 @inproceedings{gebser2016theory,
-  title={Theory solving made easy with clingo 5},
-  author={Gebser, Martin and Kaminski, Roland and Kaufmann, Benjamin and Ostrowski, Max and Schaub, Torsten and Wanko, Philipp},
-  booktitle={Technical Communications of the 32nd International Conference on Logic Programming (ICLP 2016)},
-  year={2016},
-  organization={Schloss Dagstuhl-Leibniz-Zentrum fuer Informatik}
+  title = {Theory Solving Made Easy with Clingo~5},
+  author = {M. Gebser and R. Kaminski and B. Kaufmann and M. Ostrowski and T. Schaub and P. Wanko},
+  crossref = {iclp-lipics16},
+  pages = {2:1-2:15}
+}
+
+@article{gekakasc17a,
+  title = {Multi-shot {ASP} solving with clingo},
+  author = {M. Gebser and R. Kaminski and B. Kaufmann and T. Schaub},
+  doi = {10.1017/S1471068418000054},
+  journal = tplp,
+  number = {1},
+  pages = {27-82},
+  volume = {19},
+  year = {2019}
 }
 
 @article{abseher2016shift,
@@ -468,4 +486,23 @@
   publisher = {Leibniz International Proceedings in Informatics (LIPIcs)},
   volume = {210},
   year = {2021}
+}
+
+@proceedings{iclp-lipics16,
+  title = {Technical Communications of the Thirty-second International Conference on Logic Programming (ICLP'16)},
+  editor = {M. Carro and A. King},
+  booktitle = {Technical Communications of the Thirty-second International Conference on Logic Programming (ICLP'16)},
+  publisher = {Schloss Dagstuhl--Leibniz-Zentrum fuer Informatik},
+  series = {Open Access Series in Informatics (OASIcs)},
+  volume = {52},
+  year = {2016}
+}
+
+@proceedings{taasp20,
+  title = {Proceedings of the Fourth Workshop on Trends and Applications of Answer Set Programming (TAASP'20)},
+  editor = {M. Gebser and F. Laferri{\`{e}}re and Z. Saribatur},
+  booktitle = {Proceedings of the Fourth Workshop on Trends and Applications of Answer Set Programming (TAASP'20)},
+  optpublisher = {Technische Universit{\"a}t Wien},
+  url = {http://www.kr.tuwien.ac.at/events/taasp20/accepted.html},
+  year = {2020}
 }

@@ -16,6 +16,7 @@
 \newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
 \lstset{numberbychapter=false,numbers=left,numberblanklines=false,basicstyle=\footnotesize\ttfamily,xleftmargin=5ex,breaklines=false}
 \usepackage{multirow}
+\usepackage{xspace}
 \usepackage{comment}
 % Used for displaying a sample figure. If possible, figure files should
 % be included in EPS format.
@@ -23,6 +24,9 @@
 % If you use the hyperref package, please uncomment the following line
 % to display URLs in blue roman font according to Springer's eBook style:
 % \renewcommand\UrlFont{\color{blue}\rmfamily}
+
+\newcommand{\clingo}{\emph{clingo}\xspace}
+\newcommand{\clingodl}{\emph{clingo}[DL]\xspace}
 
 \begin{document}
 
@@ -147,6 +151,13 @@ have been proposed to partition large-scale instances into better manageable sub
 where no single strategy strictly dominates \citep{ovacik2012decomposition}.
 
 % In reality, the number of operations is reaching thousands of operations. Therefore, the exact methods Answer Set Programming (ASP), Constraint Programming and Branch and Bound cannot find the optimal solutions in a reasonable time\cite{daneshamooz2021mathematical,shi2021solving,francescutto2021solving}. Since the performance of the exact methods will be hardly satisfactory, several studies have presented one of the most effective methods for solving the JSP, which is decomposition \cite{zhang2010hybrid}. The decomposition aims to split the problem into a series of subproblems based on a particular decomposition policy and then solve each part separately and obtain the final solution by integrating all of these solutions. Several strategies have been proposed to decompose the JSP, and each varies according to the problem features. More specifically, there is no evidence that one of the introduced strategies is the best for solving all JSP(s) \cite{ovacik2012decomposition}. 
+
+While decision versions of scheduling problems can be successfully modeled and
+solved by an extension of ASP with Difference Logic (DL) constraints
+\citep{gebser2016theory}, implemented by \clingodl on top of the
+(multi-shot) ASP system \clingo \citep{gekakasc17a},
+the optimization capacities of \clingodl come to their limits on moderately sized
+yet highly combinatorial JSP instances \citep{elkgeb20a}.
 
 In this study, we aim to introduce a new decomposition strategy for solving the JSP. Our study proposes a new policy to efficiently divide the problem into subproblems, aiming to reach a near-optimal solution. Then each part is solved using an ASP scheduler-based, and the solutions are integrated to obtain the solution of the whole problem. We develop and implement our model using ASP, which is considered as one of the most popular paradigms for knowledge representation and reasoning, especially in combinatorial optimization problems \cite{abseher2016shift}. 
 
