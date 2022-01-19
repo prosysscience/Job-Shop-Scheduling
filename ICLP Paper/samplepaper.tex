@@ -17,6 +17,7 @@
 \lstset{numberbychapter=false,numbers=left,numberblanklines=false,basicstyle=\footnotesize\ttfamily,xleftmargin=5ex,breaklines=false}
 \usepackage{multirow}
 \usepackage{xspace}
+\usepackage{url}
 \usepackage{comment}
 % Used for displaying a sample figure. If possible, figure files should
 % be included in EPS format.
@@ -158,6 +159,16 @@ solved by an extension of ASP with Difference Logic (DL) constraints
 (multi-shot) ASP system \clingo \citep{gekakasc17a},
 the optimization capacities of \clingodl come to their limits on moderately sized
 yet highly combinatorial JSP instances \citep{elkgeb20a}, for some of which optimal solutions are so far unknown \citep{shysha18a}.
+Successful application areas beyond JSP include 
+industrial printing \citep{balduccini11a},
+team-building \citep{rigralmaliiile12a},
+shift design \citep{abseher2016shift},
+course timetabling \citep{bainkaokscsotawa18a},
+lab resource allocation \citep{francescutto2021solving},
+and
+medical treatment planning \citep{dogagrmamopo21a},
+pointing out the general attractiveness of ASP for modeling and solving scheduling problems.
+
 In this paper, we greatly extend our preliminary study \citep{elkgeb20a} 
 on problem decomposition into time windows and successive schedule optimization
 by means of multi-shot ASP modulo DL solving with \clingodl.
@@ -173,7 +184,7 @@ We address computational efficiency as well as solution quality by devising and 
 time windows and heuristics to choose their operations.
 
 The contributions of our work going beyond the study in \citep{elkgeb20a} are:
-\begin{enumerate}
+\begin{itemize}
 \item In addition to problem decomposition based on the earliest starting times
       of operations, we consider the most total work remaining criterion and
       refinements of both strategies by bottleneck machines.
@@ -186,41 +197,46 @@ The contributions of our work going beyond the study in \citep{elkgeb20a} are:
       offer a chance for revising "decomposition mistakes".
       Moreover, as the makespan objective we apply for the optimization of
       (partial) schedules tolerates unnecessary idle times of machines as long as
-      they do not stretch the scheduling horizon,
+      they do not yield a greater scheduling horizon,
       we devise a stratified ASP encoding to postprocess and compress partial
-      schedules by reassigning operations to earlier idle times of their machines.
-\end{enumerate}
+      schedules by reassigning operations to earlier idle slots available on their machines.
+\item We experimentally evaluate decomposition strategies varying the number of
+      operations per time window as well as multi-shot ASP solving
+      augmented with overlapping and compression techniques
+      on JSP benchmark sets of several sizes.
+      In particular, our experiments demonstrate that successive optimization
+      by multi-shot ASP solving leads to substantially better schedules within
+      tight runtime limits than global optimization on the full problem,
+      where the gap increases with the number of operations to schedule.
+\end{itemize}
 
-% From a computational perspective, decomposition aims to split highly complex scheduling tasks into better manageable subproblems with a balanced number of 
-% operations, so that good-quality or even optimal partial solutions can be
-% reliably found in a small fraction of runtime.
-% Regarding the feasibility and quality of solutions, problem decomposition must
-% respect the precedence of operations within their jobs, and partial schedules
-% optimized by time windows should yield better global solutions than obtainable
-% in similar runtime on the full problem.
-% We devise and investigate a variety of decomposition strategies in terms of the number and size of time windows as well as heuristics for choosing their operations.
-% Moreover, we incorporate time window overlapping and compression techniques
-% into the iterative scheduling process in order to counteract limitations of window-wise optimization restricted to partial schedules.
-% Our experiments on JSP benchmark sets of several sizes show that
-% successive optimization by multi-shot ASP solving leads to substantially better schedules within the runtime limit than global optimization on the full problem,
-% where the gap increases with the number of operations to schedule.
+% In this study, we aim to introduce a new decomposition strategy for solving the JSP. Our study proposes a new policy to efficiently divide the problem into subproblems, aiming to reach a near-optimal solution. Then each part is solved using an ASP scheduler-based, and the solutions are integrated to obtain the solution of the whole problem. We develop and implement our model using ASP, which is considered as one of the most popular paradigms for knowledge representation and reasoning, especially in combinatorial optimization problems \cite{abseher2016shift}. 
 
-In this study, we aim to introduce a new decomposition strategy for solving the JSP. Our study proposes a new policy to efficiently divide the problem into subproblems, aiming to reach a near-optimal solution. Then each part is solved using an ASP scheduler-based, and the solutions are integrated to obtain the solution of the whole problem. We develop and implement our model using ASP, which is considered as one of the most popular paradigms for knowledge representation and reasoning, especially in combinatorial optimization problems \cite{abseher2016shift}. 
+The rest of this 
+paper is organized as follows.
+Section~\ref{sec:preliminaries} briefly introduces ASP along with the relevant
+extensions of multi-shot solving and DL constraints.
+In Section~\ref{sec:problem}, we present our successive optimization approach
+and detail the ASP programs encoding problem decomposition or iterative scheduling by
+time windows, respectively.
+Section~\ref{sec:experiments} provides experimental results on JSP benchmark sets, % of several sizes,
+assessing different decomposition strategies as well as the impact of overlapping and
+compression techniques.
+Conclusions and future work are discussed in Section~\ref{sec:conclusions}.  
+% The following section shows the most related work and which decomposition techniques have been introduced in the past, followed by the problem formulation section illustrates the problem in detail. Section $4$ presents our proposed model, which shows the decomposition techniques we used and describes one in more detail. In addition, we present the schedule model using Answer Set Programming. Our model is tested by performing extensive experiments on a set of benchmark instances in Section $5$. Section $6$ summarizes this work and provides some ideas to extend the current work.
 
-The paper is organized as follows. The following section shows the most related work and which decomposition techniques have been introduced in the past, followed by the problem formulation section illustrates the problem in detail. Section $4$ presents our proposed model, which shows the decomposition techniques we used and describes one in more detail. In addition, we present the schedule model using Answer Set Programming. Our model is tested by performing extensive experiments on a set of benchmark instances in Section $5$. Section $6$ summarizes this work and provides some ideas to extend the current work.
+% \section{Literature Review}
+% This section will review some of the work that has applied the decomposition approach for solving scheduling problems. As mentioned in the previous section, no particular decomposition method has proved its efficiency in solving all scheduling problems. However, many articles have introduced efficient decomposition methods for solving particular scheduling problems with specific features. The decomposition idea for solving JSP has been initially suggested by introducing a \textit{Shifting bottleneck} (SB) procedure which decomposes the problem into parts; each part contains only one machine \cite{adams1988shifting}. At each iteration, the bottleneck machine is determined from a set of unsequenced machines and then scheduled. Afterward, all the previously established sequences are locally reoptimized and iterate until all the machines have been sequenced. The idea of SB had been later improved by integrating an optimization algorithm for solving the one-machine problem with the delayed precedence constraints procedure \cite{balas1995one}.
 
-\section{Literature Review}
-This section will review some of the work that has applied the decomposition approach for solving scheduling problems. As mentioned in the previous section, no particular decomposition method has proved its efficiency in solving all scheduling problems. However, many articles have introduced efficient decomposition methods for solving particular scheduling problems with specific features. The decomposition idea for solving JSP has been initially suggested by introducing a \textit{Shifting bottleneck} (SB) procedure which decomposes the problem into parts; each part contains only one machine \cite{adams1988shifting}. At each iteration, the bottleneck machine is determined from a set of unsequenced machines and then scheduled. Afterward, all the previously established sequences are locally reoptimized and iterate until all the machines have been sequenced. The idea of SB had been later improved by integrating an optimization algorithm for solving the one-machine problem with the delayed precedence constraints procedure \cite{balas1995one}.
+% Another study investigated the performance of a new decomposition procedure based on SB in the Job-shop and flow shop with different levels of bottleneck machines. The computational experiments showed that the proposed method obtained better solutions in a shorter time than for the problems in which the machine's workload is identical. Other different methods have been developed to decompose the JSP. For instance, a rolling horizon heuristic has been presented \cite{singer2001decomposition} to solve a large-scale job shop. The authors have decomposed the problem and solve each independently while minimizing the total weighted tardiness. They tested their model on a set of benchmark instances, and the results showed that the proposed model is superior to large instances. 
 
-Another study investigated the performance of a new decomposition procedure based on SB in the Job-shop and flow shop with different levels of bottleneck machines. The computational experiments showed that the proposed method obtained better solutions in a shorter time than for the problems in which the machine's workload is identical. Other different methods have been developed to decompose the JSP. For instance, a rolling horizon heuristic has been presented \cite{singer2001decomposition} to solve a large-scale job shop. The authors have decomposed the problem and solve each independently while minimizing the total weighted tardiness. They tested their model on a set of benchmark instances, and the results showed that the proposed model is superior to large instances. 
+% The rolling horizon procedure has been extended by constructing a prediction model to obtain the scheduling characteristics values, including the information of the bottleneck jobs. The obtained information aided in decomposing the problem efficiently. In addition, they have proposed a genetic algorithm to solve each sub-problem. In order to evaluate the performance of the proposed model, they performed numerical computational experiments that showed the effectiveness of the model \cite{liu2008prediction}. A decomposition-based hybrid optimization algorithm has been introduced for the JSP, where the total weighted tardiness is minimized. A Simulated Annealing is used to define subproblems iteratively and then is solved by a Genetic Algorithm. They have developed a fuzzy system that provides information about bottleneck jobs. This information is used to guide the process of subproblem-solving to promote the optimization efficiency \cite{zhang2010hybrid}. The numerical computational results showed that the proposed algorithm is effective for large-scale scheduling problems.
 
-The rolling horizon procedure has been extended by constructing a prediction model to obtain the scheduling characteristics values, including the information of the bottleneck jobs. The obtained information aided in decomposing the problem efficiently. In addition, they have proposed a genetic algorithm to solve each sub-problem. In order to evaluate the performance of the proposed model, they performed numerical computational experiments that showed the effectiveness of the model \cite{liu2008prediction}. A decomposition-based hybrid optimization algorithm has been introduced for the JSP, where the total weighted tardiness is minimized. A Simulated Annealing is used to define subproblems iteratively and then is solved by a Genetic Algorithm. They have developed a fuzzy system that provides information about bottleneck jobs. This information is used to guide the process of subproblem-solving to promote the optimization efficiency \cite{zhang2010hybrid}. The numerical computational results showed that the proposed algorithm is effective for large-scale scheduling problems.
+% A decomposition method based on bottleneck machines has been presented for solving the JSP. The proposed model decomposes the problems into subproblems and then detects the multi-bottleneck machines using a critical path method. The information of the bottleneck machines has been employed to improve the solution quality by splitting the operations into bottleneck operations and non-bottleneck operations, where the bottleneck operations are scheduled by the Genetic Algorithm and the non-bottleneck operations are scheduled by dispatching rules \cite{zhai2014decomposition}.
 
-A decomposition method based on bottleneck machines has been presented for solving the JSP. The proposed model decomposes the problems into subproblems and then detects the multi-bottleneck machines using a critical path method. The information of the bottleneck machines has been employed to improve the solution quality by splitting the operations into bottleneck operations and non-bottleneck operations, where the bottleneck operations are scheduled by the Genetic Algorithm and the non-bottleneck operations are scheduled by dispatching rules \cite{zhai2014decomposition}.
+% From the literature, we can find that most of the related work focused on applying the decomposition approach while minimizing the total tardiness, and the number of work tackled large-scale instances to minimize the makespan is relatively low. This paper proposes different decomposition strategies for solving the JSP with larger instances using the ASP model while minimizing the makespan.
 
-From the literature, we can find that most of the related work focused on applying the decomposition approach while minimizing the total tardiness, and the number of work tackled large-scale instances to minimize the makespan is relatively low. This paper proposes different decomposition strategies for solving the JSP with larger instances using the ASP model while minimizing the makespan.
-
-\section{Preliminaries}
+\section{Preliminaries}\label{sec:preliminaries}
 \paragraph{Answer Set Programming (ASP)} is a declarative programming language for solving hard combinatorial optimization problems. ASP has become an established paradigm for knowledge representation and reasoning. ASP has proved its efficiency for solving the combinatorial optimization problem in different applications such as bioinformatics\cite{erdem2015generating,koponen2015optimizing}, databses\cite{caniupan2010consistency} and scheduling and industrial applications~\cite{dodaro2015allotment,dodaro2016combining,fabricius2020towards,dodaro2021operating}.
 
 A logic program is a finite set of rules of the form 
@@ -240,7 +256,7 @@ Multi-shot solving ASP allows solving logic programs dynamically in sequential o
 \end{align*}
  This rule shows that whenever the body is $True$ the inequality constraints must be satisfied.
 
-\section{Problem Formulation}
+\section{Multi-shot JSP Solving}\label{sec:problem}
 The Job-shop Scheduling Problem (JSP) has been a complex and combinatorial optimization problem since the 1950s, and it was shown to be NP-hard. In the JSP, there are a set of jobs to be processed on a set of machines. The number of jobs is $n$, and the number of machines is $m$. Each job $J_i$ contains a chain $ O_{i,1}, O_{i,2},...,O_{i,m} $ of operations must be executed on an known order. The routings of the operations are deterministic and known a priori, as are the processing times of each operation on each machine. We consider here the problem of minimizing the total completion time (makespan). The task of the scheduling is to determine the starting time for each operation while optimizing the makespan. The basic assumptions are as follows:
 
 \begin{enumerate}
@@ -252,7 +268,7 @@ The Job-shop Scheduling Problem (JSP) has been a complex and combinatorial optim
 	\item The jobs and the machines are available at time $0$.
 \end{enumerate}
 
-\subsection{Modelling JSP with Hybrid ASP}
+\subsection{Modeling JSP with Hybrid ASP}
 ASP has been applied to solve different scheduling problems. For example, ASP is used to solve scheduling problems in the healthcare systems \cite{dodaro2017nurse,dodaro2019asp}. One of these studies aimed to assign nurses to shifts according to some constraints\cite{dodaro2017nurse}. In addition, ASP has been proposed to solve a train scheduling problem while minimizing the train delay\cite{abels2019train}. One of the limitations of ASP mentioned in these studies is the grounding issues while solving a large number of instances. One of the recent works has presented a multi-shot solving for scheduling problem \cite{francescutto2021solving}. This paper aims to use different decomposition methods to solve the JSP using ASP with Difference Logic. 
 
 \paragraph{Problem Instances.} 
@@ -298,7 +314,7 @@ The next iteration is to optimize each TW by solving the subproblem(t) where $t$
 The third part of the scheduler is shown in Listing \ref{prg:diff} that handles the difference constraints between the operations. The first rule in lines \ref{prg:diff_log:non_nega:begin}-\ref{prg:diff_log:non_nega:end} ensures that all the operations will be processed starting from time $0$. The second and the third rule fix the execution time of the operations scheduled in the previous TW. The fourth rule aimed to avoid overlapping the operations that either belongs to the same job or are assigned to the same machine. The fifth rule ensures that the ending time of all operations will not exceed the bound variable, which is the makespan in our case. 
 \lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:diff,caption={diff-log}]{listing/diff_log.lp}
 
-\section{Results}
+\section{Experiments}\label{sec:experiments}
 This section will show the computational experiments that we conducted to test the performance of our proposed model. In order to evaluate our model, we performed several experiments on a set of benchmark instances with a different number of jobs and machines. The benchmark instances we considered are generated in 1993 by E. Taillard \cite{taillard1993benchmarks}, and the size of the problems variate starting from $6$ jobs and $6$ machines till $100$ jobs and $20$ machines. We have decided to focus on $3$ different sizes of the problem, which are $50$ jobs, $15$ machines, $50$ jobs and $20$ machines and $100$ jobs and $20$ machines. Our experiments had been conducted on a laptop with Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz 2.11 GHz, 8th generation, and $16$ GB. We split the problem into a different number of TWs starting from $2$ - $10$ throughout each size of the instances we focused on to investigate the most appropriate number of TWs. We run the model with a fixed amount of time $1000$ seconds. We set this amount because we observed that increasing the time more did not provide better results, and when we reduced it, the results became worse. The next table shows the obtained results with solving $50 \times 15$.
 
 \begin{comment}
@@ -465,6 +481,8 @@ This section will show the computational experiments that we conducted to test t
 % }
 %    \hfill\hfill\mbox{~}
 \end{table}
+
+\section{Conclusions}\label{sec:conclusions}
 
 
 %
