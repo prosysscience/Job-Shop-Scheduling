@@ -157,7 +157,53 @@ solved by an extension of ASP with Difference Logic (DL) constraints
 \citep{gebser2016theory}, implemented by \clingodl on top of the
 (multi-shot) ASP system \clingo \citep{gekakasc17a},
 the optimization capacities of \clingodl come to their limits on moderately sized
-yet highly combinatorial JSP instances \citep{elkgeb20a}.
+yet highly combinatorial JSP instances \citep{elkgeb20a}, for some of which optimal solutions are so far unknown \citep{shysha18a}.
+In this paper, we greatly extend our preliminary study \citep{elkgeb20a} 
+on problem decomposition into time windows and successive schedule optimization
+by means of multi-shot ASP modulo DL solving with \clingodl.
+The goal of the decomposition is to split highly complex scheduling tasks into
+balanced portions for which partial schedules of good quality can be reliably
+found within tight runtime limits, and then be merged into a global solution of
+significantly better quality than obtainable in similar runtime 
+with single-shot optimization on the full problem.
+In this process, problem decomposition must respect the precedence of operations
+within their encompassing jobs to guarantee the feasibility of schedules, and as
+a secondary objective, the order by time windows of operations sharing a machine should come close to the sequences of operations in (unknown) optimal schedules.
+We address computational efficiency as well as solution quality by devising and investigating decomposition strategies regarding the size of
+time windows and heuristics to choose their operations.
+
+The contributions of our work going beyond the study in \citep{elkgeb20a} are:
+\begin{enumerate}
+\item In addition to problem decomposition based on the earliest starting times
+      of operations, we consider the most total work remaining criterion and
+      refinements of both strategies by bottleneck machines.
+      We encode static as well as dynamic decomposition variants, the latter taking
+      partial schedules for operations of previous time windows into account, by stratified
+      ASP programs (without DL constraints).
+\item Considering that a decomposition into time windows may be incompatible with
+      the optimal sequences of operations sharing a machine, we incorporate
+      time window overlapping into the iterative scheduling process to
+      offer a chance for revising "decomposition mistakes".
+      Moreover, as the makespan objective we apply for the optimization of
+      (partial) schedules tolerates unnecessary idle times of machines as long as
+      they do not stretch the scheduling horizon,
+      we devise a stratified ASP encoding to postprocess and compress partial
+      schedules by reassigning operations to earlier idle times of their machines.
+\end{enumerate}
+
+% From a computational perspective, decomposition aims to split highly complex scheduling tasks into better manageable subproblems with a balanced number of 
+% operations, so that good-quality or even optimal partial solutions can be
+% reliably found in a small fraction of runtime.
+% Regarding the feasibility and quality of solutions, problem decomposition must
+% respect the precedence of operations within their jobs, and partial schedules
+% optimized by time windows should yield better global solutions than obtainable
+% in similar runtime on the full problem.
+% We devise and investigate a variety of decomposition strategies in terms of the number and size of time windows as well as heuristics for choosing their operations.
+% Moreover, we incorporate time window overlapping and compression techniques
+% into the iterative scheduling process in order to counteract limitations of window-wise optimization restricted to partial schedules.
+% Our experiments on JSP benchmark sets of several sizes show that
+% successive optimization by multi-shot ASP solving leads to substantially better schedules within the runtime limit than global optimization on the full problem,
+% where the gap increases with the number of operations to schedule.
 
 In this study, we aim to introduce a new decomposition strategy for solving the JSP. Our study proposes a new policy to efficiently divide the problem into subproblems, aiming to reach a near-optimal solution. Then each part is solved using an ASP scheduler-based, and the solutions are integrated to obtain the solution of the whole problem. We develop and implement our model using ASP, which is considered as one of the most popular paradigms for knowledge representation and reasoning, especially in combinatorial optimization problems \cite{abseher2016shift}. 
 
