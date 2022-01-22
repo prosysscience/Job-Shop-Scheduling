@@ -284,7 +284,7 @@ into the iterative scheduling process.
 % 	\item The jobs and the machines are available at time $0$.
 % \end{enumerate}
 
-\subsection{Instance Format}\label{subsec:instance}
+\subsection{Problem Instances}\label{subsec:instance}
 % ASP has been applied to solve different scheduling problems. For example, ASP is used to solve scheduling problems in the healthcare systems \cite{dodaro2017nurse,dodaro2019asp}. One of these studies aimed to assign nurses to shifts according to some constraints\cite{dodaro2017nurse}. In addition, ASP has been proposed to solve a train scheduling problem while minimizing the train delay\cite{abels2019train}. One of the limitations of ASP mentioned in these studies is the grounding issues while solving a large number of instances. One of the recent works has presented a multi-shot solving for scheduling problem \cite{francescutto2021solving}. This paper aims to use different decomposition methods to solve the JSP using ASP with Difference Logic. 
 % 
 % \paragraph{Problem Instances.} 
@@ -293,11 +293,26 @@ Each job in a JSP instance is a sequence of operations with associated
 machines and processing times.
 Corresponding facts for an example instance with three jobs and three
 machines are displayed in Listing~\ref{prg:facts}.
-
-In order to encode the problem using ASP, we should define a set of predicates that represents the problem instances. For instance, the operations are encoded with the predicate \lstinline{operation/2} where the first variable denotes the job number and the second is the operation number, see lines \ref{prg:facts:ops:begin}-\ref{prg:facts:ops:end} in Listing \ref{prg:facts}. The time needed to finish an operation is represented by the predicate \lstinline{pro/3} in which the operation is determined by the first two terms and the third represents the processing time in lines \ref{prg:facts:pro:begin}-\ref{prg:facts:pro:end}. For the machine assignment, the predicate \lstinline{assign/3} shows that a particular operation is executed by a machine in lines \ref{prg:facts:mach:begin}-\ref{prg:facts:mach:end}. For instance, \emph{operation(1,1)} is processed by machine 2. 
+An atom of the form
+\lstinline{operation(}$j$\lstinline{,}$s$\lstinline{,}$m$\lstinline{,}$p$\lstinline{)}
+denotes that the step~$s$ of job~$j$ needs to be processed by machine~$m$ for $p$ time units.
+For example, the second operation of job~\lstinline{3} has a processing time of
+\lstinline{3} time units on machine~\lstinline{1},
+as specified by the fact
+\lstinline{operation(3,}\linebreak[1]\lstinline{2,}\linebreak[1]\lstinline{1,3).}
+The operation cannot be performed before the first operation of job~\lstinline{3}
+is completed,
+and its execution must not intersect with the first operation of job~\lstinline{1}
+or the second operation of job~\lstinline{2},
+which need to be processed by machine~\lstinline{1} as well.
+That is, a schedule for the example instance must determine a sequence in which
+to process the three mentioned operations on machine~\lstinline{1},
+and likewise for operations sharing machine~\lstinline{2} or~\lstinline{3}, respectively.
+%
+% In order to encode the problem using ASP, we should define a set of predicates that represents the problem instances. For instance, the operations are encoded with the predicate \lstinline{operation/2} where the first variable denotes the job number and the second is the operation number, see lines \ref{prg:facts:ops:begin}-\ref{prg:facts:ops:end} in Listing \ref{prg:facts}. The time needed to finish an operation is represented by the predicate \lstinline{pro/3} in which the operation is determined by the first two terms and the third represents the processing time in lines \ref{prg:facts:pro:begin}-\ref{prg:facts:pro:end}. For the machine assignment, the predicate \lstinline{assign/3} shows that a particular operation is executed by a machine in lines \ref{prg:facts:mach:begin}-\ref{prg:facts:mach:end}. For instance, \emph{operation(1,1)} is processed by machine 2. 
 \lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:facts,caption={Example JSP instance},linerange={1-3}]{listing/facts.lp}
 
-\subsection{Decomposition strategies}
+\subsection{Problem Decomposition}\label{subsec:decomposition}
 As we mentioned in the previous sections, it is hard to solve the JSP and reach a near-optimal solution in a reasonable time, especially when the number of operations to be processed is high. The decomposition approach has been widely used to solve the JSP by many researchers and proved its efficiency.
 
 This section will mention $4$ different decomposition strategies that we developed to split the problem into parts, describe one of them in detail, and show the encoding. The decomposition strategies can be classified into two categories; time-based and machine-based. The time-based decomposition aims to prioritize the operations based on the processing time. However, machine-based decomposition methods consider the processing time of the operations and the machine's workload. The main idea behind the decomposition procedure is to find a criterion that ranks the operations to assign in the proper time window to obtain higher-quality schedules without violating the precedence constraints. Earliest Starting Time (EST) and Most Total Work Remaining (MTWR) procedures have been applied to rank the order the operations. The decomposition procedures will be shown as follows:
