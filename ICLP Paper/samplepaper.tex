@@ -3,21 +3,30 @@
 % Version 2.20 of 2017/10/04
 %
 \documentclass{tlp} % \documentclass[runningheads]{llncs}
-%
+
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{helvet,times,courier}
-\usepackage{listings}
 \usepackage[inline]{enumitem}
 \usepackage{adjustbox}
 \usepackage{array}
 \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
 \newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
-\lstset{numberbychapter=false,numbers=left,numberblanklines=false,basicstyle=\footnotesize\ttfamily,xleftmargin=5ex,breaklines=false}
+
+\usepackage{calc}
+\newlength\listingnumberwidth
+\setlength\listingnumberwidth{\widthof{\scriptsize 00} + 10pt}
+% \setlength{\mathindent}{\listingnumberwidth}
+
+\usepackage{listings}
+\lstset{numberbychapter=false,numbers=left,numberblanklines=false,basicstyle=\ttfamily\small,%xleftmargin=5ex,
+xleftmargin=\listingnumberwidth,captionpos=b,breaklines=false,frame=single}
+
 \usepackage{multirow}
 \usepackage{xspace}
 \usepackage{url}
+
 \usepackage{comment}
 % Used for displaying a sample figure. If possible, figure files should
 % be included in EPS format.
@@ -257,24 +266,36 @@ Multi-shot solving ASP allows solving logic programs dynamically in sequential o
  This rule shows that whenever the body is $True$ the inequality constraints must be satisfied.
 
 \section{Multi-shot JSP Solving}\label{sec:problem}
-The Job-shop Scheduling Problem (JSP) has been a complex and combinatorial optimization problem since the 1950s, and it was shown to be NP-hard. In the JSP, there are a set of jobs to be processed on a set of machines. The number of jobs is $n$, and the number of machines is $m$. Each job $J_i$ contains a chain $ O_{i,1}, O_{i,2},...,O_{i,m} $ of operations must be executed on an known order. The routings of the operations are deterministic and known a priori, as are the processing times of each operation on each machine. We consider here the problem of minimizing the total completion time (makespan). The task of the scheduling is to determine the starting time for each operation while optimizing the makespan. The basic assumptions are as follows:
+This section describes our successive optimization approach to
+JSP solving by means of multi-shot ASP with \clingodl.
+We start with specifying the fact format for JSP instances,
+then detail problem decomposition based on earliest starting times of operations,
+present our ASP encoding with DL constraints for optimizing the makespan of partial schedules, and
+finally outline the incorporation of time window overlapping and compression
+into the iterative scheduling process.   
+% The Job-shop Scheduling Problem (JSP) has been a complex and combinatorial optimization problem since the 1950s, and it was shown to be NP-hard. In the JSP, there are a set of jobs to be processed on a set of machines. The number of jobs is $n$, and the number of machines is $m$. Each job $J_i$ contains a chain $ O_{i,1}, O_{i,2},...,O_{i,m} $ of operations must be executed on an known order. The routings of the operations are deterministic and known a priori, as are the processing times of each operation on each machine. We consider here the problem of minimizing the total completion time (makespan). The task of the scheduling is to determine the starting time for each operation while optimizing the makespan. The basic assumptions are as follows:
+%
+% \begin{enumerate}
+% 	\item The processing time of each operation is fixed.
+% 	\item Machine breakdown preemption of the operations are not allowed.
+% 	\item Each machine can process only one operation at a time.
+% 	\item Each operation can be executed by only one machine.
+% 	\item A machine cannot process more than one operation at a time.
+% 	\item The jobs and the machines are available at time $0$.
+% \end{enumerate}
 
-\begin{enumerate}
-	\item The processing time of each operation is fixed.
-	\item Machine breakdown preemption of the operations are not allowed.
-	\item Each machine can process only one operation at a time.
-	\item Each operation can be executed by only one machine.
-	\item A machine cannot process more than one operation at a time.
-	\item The jobs and the machines are available at time $0$.
-\end{enumerate}
-
-\subsection{Modeling JSP with Hybrid ASP}
-ASP has been applied to solve different scheduling problems. For example, ASP is used to solve scheduling problems in the healthcare systems \cite{dodaro2017nurse,dodaro2019asp}. One of these studies aimed to assign nurses to shifts according to some constraints\cite{dodaro2017nurse}. In addition, ASP has been proposed to solve a train scheduling problem while minimizing the train delay\cite{abels2019train}. One of the limitations of ASP mentioned in these studies is the grounding issues while solving a large number of instances. One of the recent works has presented a multi-shot solving for scheduling problem \cite{francescutto2021solving}. This paper aims to use different decomposition methods to solve the JSP using ASP with Difference Logic. 
-
-\paragraph{Problem Instances.} 
+\subsection{Instance Format}\label{subsec:instance}
+% ASP has been applied to solve different scheduling problems. For example, ASP is used to solve scheduling problems in the healthcare systems \cite{dodaro2017nurse,dodaro2019asp}. One of these studies aimed to assign nurses to shifts according to some constraints\cite{dodaro2017nurse}. In addition, ASP has been proposed to solve a train scheduling problem while minimizing the train delay\cite{abels2019train}. One of the limitations of ASP mentioned in these studies is the grounding issues while solving a large number of instances. One of the recent works has presented a multi-shot solving for scheduling problem \cite{francescutto2021solving}. This paper aims to use different decomposition methods to solve the JSP using ASP with Difference Logic. 
+% 
+% \paragraph{Problem Instances.} 
+%
+Each job in a JSP instance is a sequence of operations with associated
+machines and processing times.
+Corresponding facts for an example instance with three jobs and three
+machines are displayed in Listing~\ref{prg:facts}.
 
 In order to encode the problem using ASP, we should define a set of predicates that represents the problem instances. For instance, the operations are encoded with the predicate \lstinline{operation/2} where the first variable denotes the job number and the second is the operation number, see lines \ref{prg:facts:ops:begin}-\ref{prg:facts:ops:end} in Listing \ref{prg:facts}. The time needed to finish an operation is represented by the predicate \lstinline{pro/3} in which the operation is determined by the first two terms and the third represents the processing time in lines \ref{prg:facts:pro:begin}-\ref{prg:facts:pro:end}. For the machine assignment, the predicate \lstinline{assign/3} shows that a particular operation is executed by a machine in lines \ref{prg:facts:mach:begin}-\ref{prg:facts:mach:end}. For instance, \emph{operation(1,1)} is processed by machine 2. 
-\lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:facts,caption={Problem instance}, linerange={1-11} ]{listing/facts.lp}
+\lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:facts,caption={Example JSP instance},linerange={1-3}]{listing/facts.lp}
 
 \subsection{Decomposition strategies}
 As we mentioned in the previous sections, it is hard to solve the JSP and reach a near-optimal solution in a reasonable time, especially when the number of operations to be processed is high. The decomposition approach has been widely used to solve the JSP by many researchers and proved its efficiency.
