@@ -375,6 +375,8 @@ which in turn means that the schedule shown in Figure~\ref{fig:schedule} is opti
 
 \subsection{Problem Decomposition}\label{subsec:decomposition}
 As we mentioned in the previous sections, it is hard to solve the JSP and reach a near-optimal solution in a reasonable time, especially when the number of operations to be processed is high. The decomposition approach has been widely used to solve the JSP by many researchers and proved its efficiency.
+%
+\lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:decomposition,caption={Time-based EST decomposition}]{listing/decomposition.lp}
 
 This section will mention $4$ different decomposition strategies that we developed to split the problem into parts, describe one of them in detail, and show the encoding. The decomposition strategies can be classified into two categories; time-based and machine-based. The time-based decomposition aims to prioritize the operations based on the processing time. However, machine-based decomposition methods consider the processing time of the operations and the machine's workload. The main idea behind the decomposition procedure is to find a criterion that ranks the operations to assign in the proper time window to obtain higher-quality schedules without violating the precedence constraints. Earliest Starting Time (EST) and Most Total Work Remaining (MTWR) procedures have been applied to rank the order the operations. The decomposition procedures will be shown as follows:
 
