@@ -25,11 +25,11 @@
 
 \usepackage{calc}
 \newlength\listingnumberwidth
-\setlength\listingnumberwidth{\widthof{\scriptsize 00} + 10pt}
+\setlength\listingnumberwidth{\widthof{\scriptsize 00} + 7pt}
 % \setlength{\mathindent}{\listingnumberwidth}
 
 \usepackage{listings}
-\lstset{numberbychapter=false,numbers=left,numberblanklines=false,basicstyle=\ttfamily\small,%xleftmargin=5ex,
+\lstset{numberbychapter=false,numbers=left,numberblanklines=false,basicstyle=\ttfamily\small,numbersep=7pt,%xleftmargin=5ex,
 xleftmargin=\listingnumberwidth,captionpos=b,breaklines=false,frame=single}
 
 \usepackage{multirow}
@@ -374,7 +374,6 @@ which in turn means that the schedule shown in Figure~\ref{fig:schedule} is opti
 \end{figure}
 
 \subsection{Problem Decomposition}\label{subsec:decomposition}
-As we mentioned in the previous sections, it is hard to solve the JSP and reach a near-optimal solution in a reasonable time, especially when the number of operations to be processed is high. The decomposition approach has been widely used to solve the JSP by many researchers and proved its efficiency.
 %
 \lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:decomposition,caption={Time-based EST decomposition}]{listing/decomposition.lp}
 
@@ -402,6 +401,9 @@ After running the decomposition encoding, we described above; we get an assignme
 \lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:tw,caption={Time Window Assignment}, linerange={1-7} ]{listing/TW.lp}
 
 \subsection{Multi-shot with JSP}
+%
+\lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:encoding,caption={Multi-shot ASP modulo DL encoding}]{listing/encoding.lp}
+
 This section will show how to solve the problem dynamically, where the output of each iteration is an input to the next and merging them to obtain the solution of the whole problem. In the first step, we consider the output of the decomposition phase, which is the assignment of the operations to TW as facts. For the multi-shot solving, the encoding is split into two parts; the base, which is run and grounded one time at the beginning of the optimization process presented in Listing \ref{prg:base}. The first rule is to determine the logical sequence between operations of same job in lines \ref{prg:base:same_job:begin}-\ref{prg:base:same_job:end} which is represented in predicate \lstinline{seqL/3}. On the other hand, Lines \ref{prg:base:sharing_machine:begin}-\ref{prg:base:sharing_machine:end} identify the sequence of the operations assigned to the same machine with predicate \lstinline{sameMach/4}.
 
 \lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:base,caption={base-prog} ]{listing/base.lp}
