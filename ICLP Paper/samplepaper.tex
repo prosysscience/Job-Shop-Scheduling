@@ -25,12 +25,12 @@
 
 \usepackage{calc}
 \newlength\listingnumberwidth
-\setlength\listingnumberwidth{\widthof{\scriptsize 00} + 7pt}
+\setlength\listingnumberwidth{\widthof{\scriptsize 00} + 5pt}
 % \setlength{\mathindent}{\listingnumberwidth}
 
 \usepackage{listings}
-\lstset{numberbychapter=false,numbers=left,numberblanklines=false,basicstyle=\ttfamily\small,numbersep=7pt,%xleftmargin=5ex,
-xleftmargin=\listingnumberwidth,captionpos=b,breaklines=false,frame=single}
+\lstset{numberbychapter=false,numbers=left,numberblanklines=false,basicstyle=\ttfamily\small,numbersep=5pt,mathescape=true,escapeinside={\#(}{\#)},%xleftmargin=5ex,
+xleftmargin=\listingnumberwidth,xrightmargin=3pt,captionpos=b,breaklines=false,frame=single}
 
 \usepackage{multirow}
 \usepackage{xspace}
@@ -325,7 +325,7 @@ to process the three mentioned operations on machine~\lstinline{1},
 and likewise for operations sharing machine~\lstinline{2} or~\lstinline{3}, respectively.
 %
 % In order to encode the problem using ASP, we should define a set of predicates that represents the problem instances. For instance, the operations are encoded with the predicate \lstinline{operation/2} where the first variable denotes the job number and the second is the operation number, see lines \ref{prg:facts:ops:begin}-\ref{prg:facts:ops:end} in Listing \ref{prg:facts}. The time needed to finish an operation is represented by the predicate \lstinline{pro/3} in which the operation is determined by the first two terms and the third represents the processing time in lines \ref{prg:facts:pro:begin}-\ref{prg:facts:pro:end}. For the machine assignment, the predicate \lstinline{assign/3} shows that a particular operation is executed by a machine in lines \ref{prg:facts:mach:begin}-\ref{prg:facts:mach:end}. For instance, \emph{operation(1,1)} is processed by machine 2. 
-\lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:facts,caption={Example JSP instance},linerange={1-3}]{listing/facts.lp}
+\lstinputlisting[float=t,label=prg:facts,caption={Example JSP instance},linerange={1-3},numbers=none,xleftmargin=3pt]{listing/facts.lp}
 
 Figure~\ref{fig:schedule} depicts an optimal schedule in terms of makespan,
 i.e., the latest completion time of any job/operation,
@@ -375,45 +375,187 @@ which in turn means that the schedule shown in Figure~\ref{fig:schedule} is opti
 
 \subsection{Problem Decomposition}\label{subsec:decomposition}
 %
-\lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:decomposition,caption={Time-based EST decomposition}]{listing/decomposition.lp}
+Since JSP instances are highly combinatorial and the ground representation size
+can also become problematic for large real-world scheduling problems, achieving
+scalability of complete optimization methods necessitates problem decomposition.
+To this end, we consider strategies for partitioning the operations of JSP instances
+into balanced time windows, which respect the operation precedence within jobs and
+enable a successive extension of good-quality partial schedules to a global solution.
+In the following, we first detail problem decomposition based on earliest starting
+times of operations, and then outline further strategies that can be encoded
+by stratified ASP programs as well.
 
-This section will mention $4$ different decomposition strategies that we developed to split the problem into parts, describe one of them in detail, and show the encoding. The decomposition strategies can be classified into two categories; time-based and machine-based. The time-based decomposition aims to prioritize the operations based on the processing time. However, machine-based decomposition methods consider the processing time of the operations and the machine's workload. The main idea behind the decomposition procedure is to find a criterion that ranks the operations to assign in the proper time window to obtain higher-quality schedules without violating the precedence constraints. Earliest Starting Time (EST) and Most Total Work Remaining (MTWR) procedures have been applied to rank the order the operations. The decomposition procedures will be shown as follows:
-
-\paragraph{\textbf{EST Time-based}:} it ranks the operations based on calculating the earliest possible starting time for each operation. It is calculated by aggregating its predecessor(s) processing time. The operation with smaller EST will be assigned to a time window before the others with greater EST.
-
-\paragraph{\textbf{MTWR Time-based}:} the operation rank is determined based on the work remaining of a job to be completed. The operation belongs to a job with a high remaining processing time, will be assigned earlier to a time window.
-
-\paragraph{\textbf{EST Machine-based}:} it applies the same idea as EST Time-based. However, the bottleneck machine is taken into account throughout the decomposition process. More specifically, the operation with smaller EST and executed by a bottleneck machine will be assigned earlier to a time window.
-
-\paragraph{\textbf{MTWR Machine-based}:} we calculate the MTWR of each operation, and the operation with the Largest MTWR and processed by a bottleneck machine will be assigned earlier to a time window.
-
-In this study, we will describe in detail the decomposition of the operations based on the \textbf{EST Time-based}. We have split the decomposition encoding into two parts; the first part is for the pre-decomposition phase, which is in Listing \ref{prg:predeco}. The first two lines are to determine the number of time windows, which is two in this example. The lines \ref{prg:predeco:jmo:begin}-\ref{prg:predeco:jmo:end} are to calculate the total number of jobs and machines of a particular instance, respectively. Therefore, the total number of operations to be scheduled is computed by the rule in lines \ref{prg:predeco:o:begin}-\ref{prg:predeco:o:end}. In line \ref{prg:predeco:optw:begin}, the number of operations assigned to a time window is determined. 
-
-\lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:predeco,caption={Pre-decomposition}, linerange={1-15} ]{listing/pre_deco.lp}
-Listing \ref{prg:deco} shows the decomposition using \emph{EST Time-based} strategy. The first two rules in the lines \ref{prg:assignment_process:est:begin}-\ref{prg:assignment_process:est:end} calculate the earliest possible start time of each operation, where the EST for the first operation of all jobs are $0$ in line \ref{prg:assignment_process:est:begin}. The second rule calculates the other operations by aggregating the processing time of their predecessors. 
-
-We prioritize the operations based on the estimated starting time, calculating an index for each operation. The operation with a shorter estimated start time will get a smaller index than the others with a higher estimated starting time. If the estimated starting time between two operations or more is similar, we check the processing time; the higher the processing time, the smaller index, and, therefore, the higher priority to be assigned earlier. If the processing time is equal, we look at the operation number and then the job number. This strategy is encoded in lines \ref{prg:assignment_process:rank:begin}-\ref{prg:assignment_process:rank:end}. The fourth rule in lines \ref{prg:assignment_process:assign:begin}-\ref{prg:assignment_process:assign:end} is to assign each operation to a time window.
-
-\lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:deco,caption={EST-decomposition}, linerange={1-20} ]{listing/assignment_process.lp}
-
-After running the decomposition encoding, we described above; we get an assignment of each operation to a TW. This assignment is represented by a set of atoms shown in the Listing \ref{prg:tw}. We can see that the operations operations $\{ O_{1,1}, O_{2,1}, O_{2,2}, O_{3,1}, O_{3,2} \}$ are assigned to the first TW and the rest to the second TW.
-
-\lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:tw,caption={Time Window Assignment}, linerange={1-7} ]{listing/TW.lp}
-
-\subsection{Multi-shot with JSP}
+\lstinputlisting[float=t,label=prg:decomposition,caption={Job-based EST decomposition encoding}]{listing/decomposition.lp}
 %
-\lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:encoding,caption={Multi-shot ASP modulo DL encoding}]{listing/encoding.lp}
+Our encoding for \emph{Job-based Earliest Starting Time (EST)} decomposition
+in Listing~\ref{prg:decomposition} takes a JSP instance specified by facts over
+\lstinline{operation/4} as input.
+In addition, a constant~\lstinline{n},
+set to the default value~\lstinline{2} in line~\ref{prg:predeco:tw:begin},
+determines the number of time windows into which the given operations
+shall be split.
+As we aim at time windows of (roughly) similar size,
+the target number of operations per time window is in line~\ref{prg:predeco:optw:begin}
+calculated by $\lceil \text{\lstinline{N}} / \text{\lstinline{n}}\rceil$,
+where \lstinline{N} is the total number of operations.
+For example, we obtain \lstinline{width(5)} for partitioning the nine operations
+of the JSP instance in Listing~\ref{prg:facts} into two time windows.
+
+The rules in lines~\ref{prg:assignment_process:est:begin} and~\ref{prg:assignment_process:est:end}
+encode the EST calculation per operation of a job,
+given by the sum of processing times for predecessor operations belonging to the same job.
+This yields, e.g., 
+\lstinline{est(3,1,9,0)},
+\lstinline{est(3,2,3,9)}, and
+\lstinline{est(3,3,8,12)}
+for the three operations of job~\lstinline{3} in our example instance,
+where the third argument of an atom over \lstinline{est/4} provides
+the processing time and the fourth the earliest starting time of an operation.
+Note that the obtained earliest starting times match the first feasible time
+points for scheduling operations and do thus constitute an optimistic
+estimation of when to process the operations.
+
+With the earliest starting times of operations at hand,
+the rule in lines \ref{prg:assignment_process:rank:begin}-\ref{prg:assignment_process:rank:end}
+determines a \emph{total order} of operations in terms of consecutive indexes ranging
+from~\lstinline{0}.
+That is, each operation is mapped to the number of operations with
+(i) a smaller earliest starting time,
+(ii) the same earliest starting time and shorter processing time, or
+(iii) a smaller job identifier as tie breaker in case of similar
+earliest starting and processing times.
+For the example JSP instance in Listing~\ref{prg:facts},
+we obtain the indexes~\lstinline{0} to~\lstinline{2} for the first operations of the
+three jobs,
+the indexes~\lstinline{3} and~\lstinline{4} for the second operation of
+job~\lstinline{1} or~\lstinline{2}, respectively,
+in view of their earliest starting times~\lstinline{3} and~\lstinline{4},
+and indexes from~\lstinline{5} to~\lstinline{8} for the remaining operations.
+A relevant condition that is guaranteed by such a total order is that
+indexes increase according to the precedence of operations within their jobs,
+given that earliest starting times grow along the sequence of operations in a job.
+
+The last rule in line~\ref{prg:assignment_process:assign:begin} inspects the total
+order of operations to partition them into time windows of the size~\lstinline{W}
+determined by \lstinline{width(W)},
+where only the last time window may possibly include fewer operations in case the
+split is uneven.
+As the ASP program encoding problem decomposition is stratified, its ground
+instantiation can be simplified to (derived) facts, as shown in Listing~\ref{prg:tw}
+for our example instance.
+Time window numbers from~\lstinline{1} to~\lstinline{n = 2} are given by
+the third argument of atoms over \lstinline{window/3}, so that the second operation
+of job~\lstinline{3} and the third operation of each job form the time window~\lstinline{2},
+while time window~\lstinline{1} consists of the five other operations.
+%
+\lstinputlisting[float=t,label=prg:tw,caption={Example time windows},numbers=none,xleftmargin=3pt]{listing/TW.lp}
+
+In addition to Job-based EST decomposition,
+we have devised a similar ASP program for
+\emph{Job-based Most Total Work Remaining (MTWR)} decomposition,
+where the total order of operations is decreasing by the sum of processing
+times for an operation and its successors in a job.
+For example, we obtain the MTWR values~\lstinline{7}, \lstinline{12}, and~\lstinline{20}
+for the first operation of job~\lstinline{1}, \lstinline{2}, or~\lstinline{3},
+respectively, for the JSP instance in Listing~\ref{prg:facts},
+matching the time for executing all three operations of each job.
+Hence, the first operation of job~\lstinline{3} is considered most
+important and associated with the index~\lstinline{0}, and the other
+operations follow in the total order taken for partitioning into time windows.
+As MTWR values are decreasing along the sequence of operations in a job, the obtained time windows
+also respect the precedence of operations.
+
+Instead of assessing EST and MTWR values in a purely job-based fashion,
+we have encoded \emph{Machine-based} decomposition in which an operation
+from a bottleneck machine with greatest sum of processing times for yet
+unordered operations is considered next.
+For our example instance, the sum of processing times for operations 
+is~\lstinline{12}, \lstinline{15}, or again \lstinline{12}, respectively,
+for the machines~\lstinline{1}, \lstinline{2}, and~\lstinline{3}.
+Hence, the operation to be inserted into the total order first is picked from
+machine~\lstinline{2}, where the smallest EST or greatest MTWR value is
+used for choosing a particular job/operation.
+Unlike Job-based decomposition, this may lead to the choice of an operation
+such that predecessor operations processed by other machines are yet unordered.
+In this case, they are inserted into the total order directly before the
+operation from a bottleneck machine,
+and all machine loads are reduced by processing times
+before determining the next machine to consider.
+
+Moreover, we have devised dynamic versions of the Job- and Machine-based 
+decomposition strategies in which partial schedules are taken into account,
+and already scheduled operations from previous time windows may increase the
+EST and MTWR values used to order the yet unscheduled operations.
+However, the principle of applying a stratified ASP program to determine
+operations for the time window to schedule next is similar for all decomposition
+strategies, and we experimentally evaluate them in Section~\ref{sec:experiments}.
+
+% This section will mention $4$ different decomposition strategies that we developed to split the problem into parts, describe one of them in detail, and show the encoding. The decomposition strategies can be classified into two categories; time-based and machine-based. The time-based decomposition aims to prioritize the operations based on the processing time. However, machine-based decomposition methods consider the processing time of the operations and the machine's workload. The main idea behind the decomposition procedure is to find a criterion that ranks the operations to assign in the proper time window to obtain higher-quality schedules without violating the precedence constraints. Earliest Starting Time (EST) and Most Total Work Remaining (MTWR) procedures have been applied to rank the order the operations. The decomposition procedures will be shown as follows:
+
+% \paragraph{\textbf{EST Time-based}:} it ranks the operations based on calculating the earliest possible starting time for each operation. It is calculated by aggregating its predecessor(s) processing time. The operation with smaller EST will be assigned to a time window before the others with greater EST.
+
+% \paragraph{\textbf{MTWR Time-based}:} the operation rank is determined based on the work remaining of a job to be completed. The operation belongs to a job with a high remaining processing time, will be assigned earlier to a time window.
+
+% \paragraph{\textbf{EST Machine-based}:} it applies the same idea as EST Time-based. However, the bottleneck machine is taken into account throughout the decomposition process. More specifically, the operation with smaller EST and executed by a bottleneck machine will be assigned earlier to a time window.
+
+% \paragraph{\textbf{MTWR Machine-based}:} we calculate the MTWR of each operation, and the operation with the Largest MTWR and processed by a bottleneck machine will be assigned earlier to a time window.
+
+% In this study, we will describe in detail the decomposition of the operations based on the \textbf{EST Time-based}. We have split the decomposition encoding into two parts; the first part is for the pre-decomposition phase, which is in Listing \ref{prg:predeco}. The first two lines are to determine the number of time windows, which is two in this example. The lines \ref{prg:predeco:jmo:begin}-\ref{prg:predeco:jmo:end} are to calculate the total number of jobs and machines of a particular instance, respectively. Therefore, the total number of operations to be scheduled is computed by the rule in lines \ref{prg:predeco:o:begin}-\ref{prg:predeco:o:end}. In line \ref{prg:predeco:optw:begin}, the number of operations assigned to a time window is determined. 
+
+% % \lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:predeco,caption={Pre-decomposition}, linerange={1-15} ]{listing/pre_deco.lp}
+% Listing \ref{prg:deco} shows the decomposition using \emph{EST Time-based} strategy. The first two rules in the lines \ref{prg:assignment_process:est:begin}-\ref{prg:assignment_process:est:end} calculate the earliest possible start time of each operation, where the EST for the first operation of all jobs are $0$ in line \ref{prg:assignment_process:est:begin}. The second rule calculates the other operations by aggregating the processing time of their predecessors. 
+
+% We prioritize the operations based on the estimated starting time, calculating an index for each operation. The operation with a shorter estimated start time will get a smaller index than the others with a higher estimated starting time. If the estimated starting time between two operations or more is similar, we check the processing time; the higher the processing time, the smaller index, and, therefore, the higher priority to be assigned earlier. If the processing time is equal, we look at the operation number and then the job number. This strategy is encoded in lines \ref{prg:assignment_process:rank:begin}-\ref{prg:assignment_process:rank:end}. The fourth rule in lines \ref{prg:assignment_process:assign:begin}-\ref{prg:assignment_process:assign:end} is to assign each operation to a time window.
+
+% \lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:deco,caption={EST-decomposition}, linerange={1-20} ]{listing/assignment_process.lp}
+
+% After running the decomposition encoding, we described above; we get an assignment of each operation to a TW. This assignment is represented by a set of atoms shown in the Listing \ref{prg:tw}. We can see that the operations operations $\{ O_{1,1}, O_{2,1}, O_{2,2}, O_{3,1}, O_{3,2} \}$ are assigned to the first TW and the rest to the second TW.
+
+\subsection{Problem Encoding}\label{subsec:encoding}
+%
+\lstinputlisting[float=t,label=prg:encoding,caption={Multi-shot ASP modulo DL encoding}]{listing/encoding.lp}
 
 This section will show how to solve the problem dynamically, where the output of each iteration is an input to the next and merging them to obtain the solution of the whole problem. In the first step, we consider the output of the decomposition phase, which is the assignment of the operations to TW as facts. For the multi-shot solving, the encoding is split into two parts; the base, which is run and grounded one time at the beginning of the optimization process presented in Listing \ref{prg:base}. The first rule is to determine the logical sequence between operations of same job in lines \ref{prg:base:same_job:begin}-\ref{prg:base:same_job:end} which is represented in predicate \lstinline{seqL/3}. On the other hand, Lines \ref{prg:base:sharing_machine:begin}-\ref{prg:base:sharing_machine:end} identify the sequence of the operations assigned to the same machine with predicate \lstinline{sameMach/4}.
 
-\lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:base,caption={base-prog} ]{listing/base.lp}
+% \lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:base,caption={base-prog} ]{listing/base.lp}
 
 The next iteration is to optimize each TW by solving the subproblem(t) where $t$ refers to the current TW we aim to optimize. The model starts to schedule and optimize the first TW and after a fixed amount of time, the solver stops and obtain the makespan of the current TW and the execution time of each operation represented by an atom \lstinline{startTime((Job, Step), ST, t)} where the first term is an operation, the second is the starting time and the last is the current time window. The solver moves to the next TW, where the starting time of the scheduled operations obtained from the first TW is sent entirely as an input to the next TW. Listing \ref{prg:sub} handles the sequence between the operations in different cases. The first rule in lines \ref{prg:sub_pro:logic_seq:begin}-\ref{prg:sub_pro:logic_seq:end} derives a new atom with a predicate \lstinline{seq/4} represents the logical sequence between two operations of a same job. In this rule, the first term of the head is the predecessor of a particular operation followed by the successor, the third term defines the minimum waiting time between the starting of the both, and the last term defines the TW of the successor. The second and third rules handle the case of two operations assigned to the same machine and in the same TW. On the other hand, if two operations are assigned to the same machine and different TW, the fourth and fifth rules ensure that the operation assigned to the earlier TW will be executed before the other is assigned to the subsequent TW. For instance, the fourth rule assumes that the \lstinline{operation (Job1, Step1)} is assigned to an earlier TW than \lstinline{operation (Job2, Step2)}.
 
 % \lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:sub,caption={sub-prog}, linerange={1-40} ]{listing/sub_pro.lp}
 
 The third part of the scheduler is shown in Listing \ref{prg:diff} that handles the difference constraints between the operations. The first rule in lines \ref{prg:diff_log:non_nega:begin}-\ref{prg:diff_log:non_nega:end} ensures that all the operations will be processed starting from time $0$. The second and the third rule fix the execution time of the operations scheduled in the previous TW. The fourth rule aimed to avoid overlapping the operations that either belongs to the same job or are assigned to the same machine. The fifth rule ensures that the ending time of all operations will not exceed the bound variable, which is the makespan in our case. 
-\lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:diff,caption={diff-log}]{listing/diff_log.lp}
+% \lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:diff,caption={diff-log}]{listing/diff_log.lp}
+%
+\begin{figure}[t]
+\begin{tikzpicture}[x=3.5ex,y=3.5ex,label distance=-1ex,thick]
+\SetScales
+\foreach \i in {1,...,3} {
+  \node[label=left:Machine \i] at (0,3.5-\i) {};
+}
+\foreach \i in {0,...,20} {
+  \draw[dotted] (\i,0) -- (\i,3) node [below] at (\i,0) {$\i$};
+}
+\foreach \i in {0,...,3} {
+  \draw[dotted] (0,\i) -- (20,\i);
+}
+\node[minimum width=3\scaledx-0.05\scaledx,minimum height=1\scaledy-0.05\scaledy,inner sep=0,rectangle,draw,anchor=south west,pattern color=lightgray,pattern=north west lines] at (0,2) {\textbf{1}-\textbf{1}};
+\node[minimum width=3\scaledx-0.05\scaledx,minimum height=1\scaledy-0.05\scaledy,inner sep=0,rectangle,draw,anchor=south west,pattern color=lightgray,pattern=crosshatch] at (10,2) {\textbf{3}-\textbf{2}};
+\node[minimum width=6\scaledx-0.05\scaledx,minimum height=1\scaledy-0.05\scaledy,inner sep=0,rectangle,draw,anchor=south west,pattern color=lightgray,pattern=grid] at (4,2) {\textbf{2}-\textbf{2}};
+\node[minimum width=4\scaledx-0.05\scaledx,minimum height=1\scaledy-0.05\scaledy,inner sep=0,rectangle,draw,anchor=south west,pattern color=lightgray,pattern=grid] at (0,1) {\textbf{2}-\textbf{1}};
+\node[minimum width=3\scaledx-0.05\scaledx,minimum height=1\scaledy-0.05\scaledy,inner sep=0,rectangle,draw,anchor=south west,pattern color=lightgray,pattern=north west lines] at (4,1) {\textbf{1}-\textbf{2}};
+\node[minimum width=8\scaledx-0.05\scaledx,minimum height=1\scaledy-0.05\scaledy,inner sep=0,rectangle,draw,anchor=south west,pattern color=lightgray,pattern=crosshatch] at (13,1) {\textbf{3}-\textbf{3}};
+\node[minimum width=9\scaledx-0.05\scaledx,minimum height=1\scaledy-0.05\scaledy,inner sep=0,rectangle,draw,anchor=south west,pattern color=lightgray,pattern=crosshatch] at (0,0) {\textbf{3}-\textbf{1}};
+\node[minimum width=1\scaledx-0.05\scaledx,minimum height=1\scaledy-0.05\scaledy,inner sep=0,rectangle,draw,anchor=south west,pattern color=lightgray,pattern=north west lines] at (12,0) {\textbf{1}-\textbf{3}};
+\node[minimum width=2\scaledx-0.05\scaledx,minimum height=1\scaledy-0.05\scaledy,inner sep=0,rectangle,draw,anchor=south west,pattern color=lightgray,pattern=grid] at (10,0) {\textbf{2}-\textbf{3}};
+\draw[ultra thick,double] (9,0) -- (9,1);
+% \draw[ultra thick] (7,1) -- (9,1);
+\draw[ultra thick,double] (7,1) -- (7,2);
+% \draw[ultra thick] (7,2) -- (10,2);
+\draw[ultra thick,double] (10,2) -- (10,3);
+\end{tikzpicture}
+\figspace
+\caption{Decomposed schedule for example JSP instance\label{fig:decomposed}}% in Listing~\ref{prg:facts}\label{fig:schedule}}
+\end{figure}
 
 \section{Experiments}\label{sec:experiments}
 This section will show the computational experiments that we conducted to test the performance of our proposed model. In order to evaluate our model, we performed several experiments on a set of benchmark instances with a different number of jobs and machines. The benchmark instances we considered are generated in 1993 by E. Taillard \cite{taillard1993benchmarks}, and the size of the problems variate starting from $6$ jobs and $6$ machines till $100$ jobs and $20$ machines. We have decided to focus on $3$ different sizes of the problem, which are $50$ jobs, $15$ machines, $50$ jobs and $20$ machines and $100$ jobs and $20$ machines. Our experiments had been conducted on a laptop with Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz 2.11 GHz, 8th generation, and $16$ GB. We split the problem into a different number of TWs starting from $2$ - $10$ throughout each size of the instances we focused on to investigate the most appropriate number of TWs. We run the model with a fixed amount of time $1000$ seconds. We set this amount because we observed that increasing the time more did not provide better results, and when we reduced it, the results became worse. The next table shows the obtained results with solving $50 \times 15$.

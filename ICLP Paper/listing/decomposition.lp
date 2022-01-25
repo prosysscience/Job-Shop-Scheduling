@@ -1,6 +1,4 @@
 #const n = 2.  #(\label{prg:predeco:tw:begin}#)
-windows(1..n). #(\label{prg:predeco:tw:end}#)
-
 width((N + n - 1) / n) :- N = #count{J,S : operation(J,S,M,P)}. #(\label{prg:predeco:optw:begin}#)
 
 est(J,1,P,0)      :- operation(J,1,M,P).        #(\label{prg:assignment_process:est:begin}#)
