@@ -26,7 +26,7 @@ order((J,S1),(J,S2),P,w) :- operation(J,S1,M,P), window(J,S2,w), #(\label{prg:ba
 &diff{(J,S) - makespan} <= -P :- operation(J,S,M,P), window(J,S,w), #(\label{prg:diff_log:oper_limit:begin}#)
                                  not window(J,S + 1,w). #(\label{prg:diff_log:oper_limit:end}#)
 
-#program optimize(m).
+#program optimize(m). #(\label{prg:diff_log:oper_min}#)
 #external horizon(m).                                           #(\label{prg:diff_log:oper_min:begin}#)
 
 &diff{makespan - 0} <= m :- horizon(m).                     #(\label{prg:diff_log:oper_min:end}#)

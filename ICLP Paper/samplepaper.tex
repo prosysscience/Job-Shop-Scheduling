@@ -575,15 +575,75 @@ derives an atom signaling the inverse, given that the operations must not inters
 %
 \lstinputlisting[float=t,label=prg:encoding,caption={Multi-shot ASP modulo DL encoding}]{listing/encoding.lp}
 
-This section will show how to solve the problem dynamically, where the output of each iteration is an input to the next and merging them to obtain the solution of the whole problem. In the first step, we consider the output of the decomposition phase, which is the assignment of the operations to TW as facts. For the multi-shot solving, the encoding is split into two parts; the base, which is run and grounded one time at the beginning of the optimization process presented in Listing \ref{prg:base}. The first rule is to determine the logical sequence between operations of same job in lines \ref{prg:base:same_job:begin}-\ref{prg:base:same_job:end} which is represented in predicate \lstinline{seqL/3}. On the other hand, Lines \ref{prg:base:sharing_machine:begin}-\ref{prg:base:sharing_machine:end} identify the sequence of the operations assigned to the same machine with predicate \lstinline{sameMach/4}.
+While the rules up to line~\ref{prg:base:order:end} yield atoms of the form
+\lstinline{order(}$o_1$\lstinline{,}$o_2$\lstinline{,}$p_1$\lstinline{,}$w$\lstinline{)},
+expressing the hard requirement or choice to perform an operation~$o_1$
+with processing time~$p_1$ before the operation~$o_2$ belonging to time window~$w$,
+the remaining rules assert corresponding DL constraints. % on the starting time of~$o_2$.
+To begin with,
+the starting times of operations~$o$ from the previous time window $w-1$ (if any)
+are in the lines~\ref{prg:diff_log:freez1:begin} and~\ref{prg:diff_log:freez2:begin}
+fixed to the value~$t$ in an (optimized) partial schedule for time window $w-1$, 
+as supplied by reified facts \lstinline{start(}$o${,}$t$\lstinline{,}$w-1$\lstinline{).}
+In line~\ref{prg:diff_log:non_nega:begin},
+the lower bound~$0$ is asserted for the starting time of the first operation of some job,
+included in the time window~$w$ for which a partial schedule is to be determined next.
+In addition, constraints reflecting the order of performing operations are imposed 
+in line~\ref{prg:diff_log:oper_const:begin},
+which concerns operations sharing a machine as well as successor operations within jobs.
+Since such constraints trace the sequence of operations in a job, they establish the
+earliest starting time, considered for problem decomposition in Section~\ref{subsec:decomposition},
+as lower bound for scheduling an operation, and the execution order on the machine
+processing the operation can increase its starting time further.
+The last rule of the \lstinline{step(w)} subprogram in lines
+\ref{prg:diff_log:oper_limit:begin}-\ref{prg:diff_log:oper_limit:end} asserts
+that the value for the DL variable \lstinline{makespan} cannot be less than the
+completion time of any operation of the time window~$w$.
+That is, the least feasible \lstinline{makespan} value provides the
+scheduling horizon of a partial schedule for operations of time windows up to~$w$.
+
+The task of optimizing the horizon of a (partial) schedule means choosing
+the execution order of operations of the latest time window sharing a machine
+such that the value for the \lstinline{makespan} variable is minimized.
+In single-shot ASP modulo DL solving with \clingodl, this can be accomplished
+via the command-line option \lstinline{--minimize-variable=makespan}.
+For the successive optimization by time windows, where the scheduling
+horizon gradually increases, we require a dedicated treatment of DL constraints
+limiting the value for \lstinline{makespan}.
+To this end, the \lstinline{optimize(m)} subprogram below line~\ref{prg:diff_log:oper_min}
+declares an external atom \lstinline{horizon(m)} for controlling whether a DL
+constraint asserted in line~\ref{prg:diff_log:oper_min:end} is active and limits
+the \lstinline{makespan} value to an integer supplied for the parameter~\lstinline{m}.
+When launching the optimization process for a new time window, any instance of the
+\lstinline{horizon(m)} atom introduced before is set to false for making sure that
+some (partial) schedule is feasible.
+Once some schedule with a horizon $h+1$ is found,
+the subprogram \lstinline{optimize(}$h$\lstinline{)} is instantiated on demand, i.e.,
+in case $h$ has not been passed as a value for~\lstinline{m} before, and
+the corresponding \lstinline{horizon(}$h$\lstinline{)} atom is set to true for activating the DL
+constraint reducing the admitted scheduling horizon to~$h$.
+The process of successively reducing the horizon~$h$ in order to find better partial schedules
+is repeated until the imposed \lstinline{makespan} value turns out to be infeasible,
+meaning that an optimal partial schedule has been found.
+As already mentioned above, the introduced instances of the external \lstinline{horizon(m)} atom
+are then set to false and the successive optimization proceeds by instantiating the
+\lstinline{step(}$w+1$\lstinline{)} subprogram for the next time window $w+1$ (if any), and
+also supplying the determined starting times of operations from time window~$w$
+by reified facts.
+The described control loop for successively extending good-quality partial schedules to
+a global solution is implemented by means of the Python interface of \clingodl,
+where a time limit can be configured to restrict the optimization efforts per time window
+and thus make sure that the iterative scheduling progresses.
+
+% This section will show how to solve the problem dynamically, where the output of each iteration is an input to the next and merging them to obtain the solution of the whole problem. In the first step, we consider the output of the decomposition phase, which is the assignment of the operations to TW as facts. For the multi-shot solving, the encoding is split into two parts; the base, which is run and grounded one time at the beginning of the optimization process presented in Listing \ref{prg:base}. The first rule is to determine the logical sequence between operations of same job in lines \ref{prg:base:same_job:begin}-\ref{prg:base:same_job:end} which is represented in predicate \lstinline{seqL/3}. On the other hand, Lines \ref{prg:base:sharing_machine:begin}-\ref{prg:base:sharing_machine:end} identify the sequence of the operations assigned to the same machine with predicate \lstinline{sameMach/4}.
 
 % \lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:base,caption={base-prog} ]{listing/base.lp}
 
-The next iteration is to optimize each TW by solving the subproblem(t) where $t$ refers to the current TW we aim to optimize. The model starts to schedule and optimize the first TW and after a fixed amount of time, the solver stops and obtain the makespan of the current TW and the execution time of each operation represented by an atom \lstinline{startTime((Job, Step), ST, t)} where the first term is an operation, the second is the starting time and the last is the current time window. The solver moves to the next TW, where the starting time of the scheduled operations obtained from the first TW is sent entirely as an input to the next TW. Listing \ref{prg:sub} handles the sequence between the operations in different cases. The first rule in lines \ref{prg:sub_pro:logic_seq:begin}-\ref{prg:sub_pro:logic_seq:end} derives a new atom with a predicate \lstinline{seq/4} represents the logical sequence between two operations of a same job. In this rule, the first term of the head is the predecessor of a particular operation followed by the successor, the third term defines the minimum waiting time between the starting of the both, and the last term defines the TW of the successor. The second and third rules handle the case of two operations assigned to the same machine and in the same TW. On the other hand, if two operations are assigned to the same machine and different TW, the fourth and fifth rules ensure that the operation assigned to the earlier TW will be executed before the other is assigned to the subsequent TW. For instance, the fourth rule assumes that the \lstinline{operation (Job1, Step1)} is assigned to an earlier TW than \lstinline{operation (Job2, Step2)}.
+% The next iteration is to optimize each TW by solving the subproblem(t) where $t$ refers to the current TW we aim to optimize. The model starts to schedule and optimize the first TW and after a fixed amount of time, the solver stops and obtain the makespan of the current TW and the execution time of each operation represented by an atom \lstinline{startTime((Job, Step), ST, t)} where the first term is an operation, the second is the starting time and the last is the current time window. The solver moves to the next TW, where the starting time of the scheduled operations obtained from the first TW is sent entirely as an input to the next TW. Listing \ref{prg:sub} handles the sequence between the operations in different cases. The first rule in lines \ref{prg:sub_pro:logic_seq:begin}-\ref{prg:sub_pro:logic_seq:end} derives a new atom with a predicate \lstinline{seq/4} represents the logical sequence between two operations of a same job. In this rule, the first term of the head is the predecessor of a particular operation followed by the successor, the third term defines the minimum waiting time between the starting of the both, and the last term defines the TW of the successor. The second and third rules handle the case of two operations assigned to the same machine and in the same TW. On the other hand, if two operations are assigned to the same machine and different TW, the fourth and fifth rules ensure that the operation assigned to the earlier TW will be executed before the other is assigned to the subsequent TW. For instance, the fourth rule assumes that the \lstinline{operation (Job1, Step1)} is assigned to an earlier TW than \lstinline{operation (Job2, Step2)}.
 
 % \lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:sub,caption={sub-prog}, linerange={1-40} ]{listing/sub_pro.lp}
 
-The third part of the scheduler is shown in Listing \ref{prg:diff} that handles the difference constraints between the operations. The first rule in lines \ref{prg:diff_log:non_nega:begin}-\ref{prg:diff_log:non_nega:end} ensures that all the operations will be processed starting from time $0$. The second and the third rule fix the execution time of the operations scheduled in the previous TW. The fourth rule aimed to avoid overlapping the operations that either belongs to the same job or are assigned to the same machine. The fifth rule ensures that the ending time of all operations will not exceed the bound variable, which is the makespan in our case. 
+% The third part of the scheduler is shown in Listing \ref{prg:diff} that handles the difference constraints between the operations. The first rule in lines \ref{prg:diff_log:non_nega:begin}-\ref{prg:diff_log:non_nega:end} ensures that all the operations will be processed starting from time $0$. The second and the third rule fix the execution time of the operations scheduled in the previous TW. The fourth rule aimed to avoid overlapping the operations that either belongs to the same job or are assigned to the same machine. The fifth rule ensures that the ending time of all operations will not exceed the bound variable, which is the makespan in our case. 
 % \lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:diff,caption={diff-log}]{listing/diff_log.lp}
 %
 \begin{figure}[t]
