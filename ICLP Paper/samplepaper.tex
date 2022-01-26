@@ -645,6 +645,28 @@ and thus make sure that the iterative scheduling progresses.
 
 % The third part of the scheduler is shown in Listing \ref{prg:diff} that handles the difference constraints between the operations. The first rule in lines \ref{prg:diff_log:non_nega:begin}-\ref{prg:diff_log:non_nega:end} ensures that all the operations will be processed starting from time $0$. The second and the third rule fix the execution time of the operations scheduled in the previous TW. The fourth rule aimed to avoid overlapping the operations that either belongs to the same job or are assigned to the same machine. The fifth rule ensures that the ending time of all operations will not exceed the bound variable, which is the makespan in our case. 
 % \lstinputlisting[float=bt,mathescape=true,escapeinside={\#(}{\#)},basicstyle={\ttfamily\small},label=prg:diff,caption={diff-log}]{listing/diff_log.lp}
+
+For illustrating some phenomena going along with problem decomposition
+and iterative scheduling, let us inspect the schedule in Figure~\ref{fig:decomposed}
+that can be obtained with the decomposition into windows given in Listing~\ref{prg:tw}.
+The separation between the two time windows is indicated by bold double lines marking
+the completion of the latest operation of the first time window on each of the three machines.
+Notably, the partial schedule for the first time window as well as its extension to the
+second time window are optimal in terms of makespan.
+However, the obtained global solution has a makespan of~$21$ rather than just~$20$
+as for the optimal schedule in Figure~\ref{fig:schedule}.
+The reason is that the second operation of job~\lstinline{3} would need to be
+scheduled before the second operation of job~\lstinline{2} on machine~\lstinline{1},
+while the decomposition into time windows dictates the inverse order and necessitates
+the later completion of job~\lstinline{3}.
+Given the resulting buffer for scheduling operations with comparably short processing
+times on machine~\lstinline{3},
+the third operation of job~\lstinline{1} can be performed after the third operation
+of job~\lstinline{2} without deteriorating the makespan,
+yet introducing an unnecessary idle time of machine~\lstinline{3} from~$9$ to~$10$
+that could be avoided by choosing the inverse execution order.
+Even though this may seem negligible for the example instance at hand,
+idle slots can potentially propagate when a partial schedule gets extended to later time windows.
 %
 \begin{figure}[t]
 \begin{tikzpicture}[x=3.5ex,y=3.5ex,label distance=-1ex,thick]
