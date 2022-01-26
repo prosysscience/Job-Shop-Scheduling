@@ -666,7 +666,7 @@ of job~\lstinline{2} without deteriorating the makespan,
 yet introducing an unnecessary idle time of machine~\lstinline{3} from~$9$ to~$10$
 that could be avoided by choosing the inverse execution order.
 Even though this may seem negligible for the example instance at hand,
-idle slots can potentially propagate when a partial schedule gets extended to later time windows.
+idle slots can potentially propagate when a partial schedule gets extended to later time windows.%
 %
 \begin{figure}[t]
 \begin{tikzpicture}[x=3.5ex,y=3.5ex,label distance=-1ex,thick]
@@ -698,6 +698,37 @@ idle slots can potentially propagate when a partial schedule gets extended to la
 \figspace
 \caption{Decomposed schedule for example JSP instance\label{fig:decomposed}}% in Listing~\ref{prg:facts}\label{fig:schedule}}
 \end{figure}
+
+In order to counteract limitations of window-wise successive optimization
+due to "decomposition mistakes" and unnecessary idle times that do not directly
+affect the makespan to some extent,
+we have devised two additional techniques that can be incorporated into the
+iterative scheduling process.
+The first extension is time window \emph{overlapping}, where a configurable percentage
+of the operations per time window can still be rescheduled when proceeding
+to the next time window.
+To this end, an (optimized) partial schedule is postprocessed and the configured
+number of operations to overlap are picked in decreasing order of starting times.
+For example, if one operation from the first time window is supposed overlap for the
+decomposed schedule in Figure~\ref{fig:decomposed}, the second operation of job~\lstinline{2}
+whose starting time~\lstinline{4} is latest may be chosen,
+which in turn enables its processing after the second operation of job~\lstinline{3}
+by rescheduling together with operations of the second time window.
+The addition of overlapping operations to the encoding in Listing~\ref{prg:encoding}
+requires handling them similar to operations of the time window to schedule,
+i.e., enabling the choice of an execution order by the rules in lines
+\ref{prg:base:order}-\ref{prg:base:order:end} rather than fixing the order
+by the rule in line~\ref{prg:base:ordered}.
+As the second extension, we can make use of a stratified ASP program to
+postprocess an (optimized) partial schedule by inspecting operations of the
+latest time window in the order of starting times whether idle slots
+on their machines allow for an earlier execution.
+The starting times obtained by the \emph{compression} are then taken instead
+of those calculated in the actual schedule optimization, and, e.g.,
+the starting time~\lstinline{12} of the third operation of job~\lstinline{1}
+would be turned into~\lstinline{9} to fill the idle slot available on
+machine~\lstinline{3} when compressing the decomposed schedule displayed in Figure~\ref{fig:decomposed}.
+
 
 \section{Experiments}\label{sec:experiments}
 This section will show the computational experiments that we conducted to test the performance of our proposed model. In order to evaluate our model, we performed several experiments on a set of benchmark instances with a different number of jobs and machines. The benchmark instances we considered are generated in 1993 by E. Taillard \cite{taillard1993benchmarks}, and the size of the problems variate starting from $6$ jobs and $6$ machines till $100$ jobs and $20$ machines. We have decided to focus on $3$ different sizes of the problem, which are $50$ jobs, $15$ machines, $50$ jobs and $20$ machines and $100$ jobs and $20$ machines. Our experiments had been conducted on a laptop with Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz 2.11 GHz, 8th generation, and $16$ GB. We split the problem into a different number of TWs starting from $2$ - $10$ throughout each size of the instances we focused on to investigate the most appropriate number of TWs. We run the model with a fixed amount of time $1000$ seconds. We set this amount because we observed that increasing the time more did not provide better results, and when we reduced it, the results became worse. The next table shows the obtained results with solving $50 \times 15$.
