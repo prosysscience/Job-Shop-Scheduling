@@ -512,6 +512,66 @@ strategies, and we experimentally evaluate them in Section~\ref{sec:experiments}
 % After running the decomposition encoding, we described above; we get an assignment of each operation to a TW. This assignment is represented by a set of atoms shown in the Listing \ref{prg:tw}. We can see that the operations operations $\{ O_{1,1}, O_{2,1}, O_{2,2}, O_{3,1}, O_{3,2} \}$ are assigned to the first TW and the rest to the second TW.
 
 \subsection{Problem Encoding}\label{subsec:encoding}
+
+Given a JSP instance as in Listing~\ref{prg:facts} along with facts like those
+in Listing~\ref{prg:tw} providing a decomposition into time windows,
+the idea of successive schedule optimization is to consider time windows
+one after the other and gradually extend a partial schedule that fixes the
+operations of previous time windows.
+In this process, we adopt the makespan as optimization objective for scheduling
+the operations of each time window,
+thus applying the rule of thumb that small scheduling horizons for
+partial schedules are likely to lead towards a global solution with short makespan.
+While we use DL variables to compactly represent the starting times of operations to schedule,
+we assume that a partial schedule for the operations of previous time windows is reified
+in terms of additional input facts of the form 
+\lstinline{start((}$j$\lstinline{,}$s$\lstinline{),}$t$\lstinline{,}$w$\lstinline{).},
+where $t$ is the starting time scheduled for the step~$s$ of job~$j$ at the previous
+time window indicated by~$w$.
+
+The \lstinline{step(w)} subprogram until line~\ref{prg:diff_log:oper_limit:end} 
+constitutes the central part of our multi-shot ASP modulo DL encoding in Listing~\ref{prg:encoding}, whose parameter~\lstinline{w} stands for consecutive integers from~\lstinline{1}
+identifying time windows to schedule.
+Auxiliary atoms of the form \lstinline{use(}$m$\lstinline{,}$w'$\lstinline{,}$w$\lstinline{)},
+supplied by the rules in lines~\ref{prg:encoding:use1} and~\ref{prg:encoding:use2},
+indicate the latest time window $1\leq w'\leq w$ including some operation that needs
+to be processed by machine~$m$.
+The next rule in lines \ref{prg:base:sharing_machine:begin}-\ref{prg:base:sharing_machine:end}
+identifies pairs \lstinline{(}$j_1$\lstinline{,}$s_1$\lstinline{)} and
+\lstinline{(}$j_2$\lstinline{,}$s_2$\lstinline{)} of operations sharing
+the same machine~$m$,
+where
+\lstinline{(}$j_2$\lstinline{,}$s_2$\lstinline{)} belongs to the time window~$w$ and
+\lstinline{(}$j_1$\lstinline{,}$s_1$\lstinline{)} is either 
+(i)
+contained in the latest time window $1\leq w'< w$ indicated by
+\lstinline{use(}$m$\lstinline{,}$w'$\lstinline{,}$w-1$\lstinline{)} or
+(ii)
+also part of the time window~$w$, in which case $j_1 < j_2$ establishes
+an asymmetric representation for the pair of operations in derived atoms
+\lstinline{share((}$j_1$\lstinline{,}$s_1$\lstinline{),(}$j_2$\lstinline{,}$s_2$\lstinline{),}$p_1$\lstinline{,}$p_2$\lstinline{,}$x$\lstinline{,}$w$\lstinline{)}.
+If the flag $x=\text{\lstinline{1}}$ signals that 
+\lstinline{(}$j_1$\lstinline{,}$s_1$\lstinline{)}
+belongs to a previous time window~$w'$,
+the rule in line~\ref{prg:base:ordered} % applies and 
+derives the atom
+\lstinline{order((}$j_1$\lstinline{,}$s_1$\lstinline{),(}$j_2$\lstinline{,}$s_2$\lstinline{),}$p_1$\lstinline{,}$w$\lstinline{)}
+to signal that \lstinline{(}$j_1$\lstinline{,}$s_1$\lstinline{)} needs to be completed
+before performing \lstinline{(}$j_2$\lstinline{,}$s_2$\lstinline{)}, i.e.,
+the execution order must comply with the decomposition into time windows.
+The rule in lines \ref{prg:base:same_job:begin}-\ref{prg:base:same_job:end} yields
+a similar atom when \lstinline{(}$j_1$\lstinline{,}$s_1$\lstinline{)}
+is the predecessor operation $s_1 = s_2-1$ of \lstinline{(}$j_2$\lstinline{,}$s_2$\lstinline{)}
+in the same job $j_1=j_2$.
+In contrast to the cases in which 
+\lstinline{(}$j_1$\lstinline{,}$s_1$\lstinline{)} must be processed before
+\lstinline{(}$j_2$\lstinline{,}$s_2$\lstinline{)},
+the choice rule in line~\ref{prg:base:order}
+allows for performing two operations sharing a machine in the lexicographic order
+of their jobs if the operations belong to the same time window.
+In case the atom representing execution in lexicographic order is not chosen,
+the rule in lines \ref{prg:base:order:begin}-\ref{prg:base:order:end}
+derives an atom signaling the inverse, given that the operations must not intersect and some sequence has to be determined.%
 %
 \lstinputlisting[float=t,label=prg:encoding,caption={Multi-shot ASP modulo DL encoding}]{listing/encoding.lp}
 
