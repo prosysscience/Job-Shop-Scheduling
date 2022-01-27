@@ -261,18 +261,57 @@ Conclusions and future work are discussed in Section~\ref{sec:conclusions}.
 % From the literature, we can find that most of the related work focused on applying the decomposition approach while minimizing the total tardiness, and the number of work tackled large-scale instances to minimize the makespan is relatively low. This paper proposes different decomposition strategies for solving the JSP with larger instances using the ASP model while minimizing the makespan.
 
 \section{Preliminaries}\label{sec:preliminaries}
-\paragraph{Answer Set Programming (ASP)} is a declarative programming language for solving hard combinatorial optimization problems. ASP has become an established paradigm for knowledge representation and reasoning. ASP has proved its efficiency for solving the combinatorial optimization problem in different applications such as bioinformatics\cite{erdem2015generating,koponen2015optimizing}, databses\cite{caniupan2010consistency} and scheduling and industrial applications~\cite{dodaro2015allotment,dodaro2016combining,fabricius2020towards,dodaro2021operating}.
 
-A logic program is a finite set of rules of the form 
-\begin{equation}
-	a_0 \gets a_1, \ldots, a_m, \sim a_{m+1}, \dots, \sim a_n
-	\label{rule1}
-\end{equation}
-where $a_i$ is an atom for $0 \leq i \leq n$ and ``$\sim$''  is a default negation. If $n$ quals to $0$, then a rule \eqref{rule1} is a fact. If $a_0$ is omitted, the rule is an integrity constraint. An \emph{atom} is an expression of the form $p(t_1,\ldots,t_l)$, where $p$ is a predicate and $t_1,\ldots,t_l$ are \emph{terms}. Each term can be a variable or a constant. A \emph{literal} is either an atom or its negation. 
-Given a rule $r$ of the form \eqref{rule1}, the set $H(r)=a_0$ denotes the \emph{head} atom and the set $B(r) = B^+(r) \cup B^-(r) = \{a_1,\dots,a_m\} \cup \{\sim a_{m+1}, \dots \sim a_n\}$ is the \emph{body} of $r$ where $B^+(r)$ and $B^+(r)$ represent the positive and negative body literals, respectively.
+\paragraph{Answer Set Programming (ASP)} \citep{lifschitz19a}
+is a knowledge representation and reasoning paradigm geared for the effective 
+modeling and solving of combinatorial (optimization) problems. % ASP has become an established paradigm for knowledge representation and reasoning. 
+% ASP has proved its efficiency for solving the combinatorial optimization problem in different applications such as bioinformatics\cite{erdem2015generating,koponen2015optimizing}, databses\cite{caniupan2010consistency} and scheduling and industrial applications~\cite{dodaro2015allotment,dodaro2016combining,fabricius2020towards,dodaro2021operating}.
+A (first-order) ASP program consists of \emph{rules} of the form
+% \begin{lstlisting}[numbers=none,frame=none]
+% h :- b#($_1$#), #(\dots#), b#($_n$#).
+% \end{lstlisting}
+\lstinline{h :- b}$_1$\lstinline{, }$\dots$\lstinline{, b}$_n$\lstinline{.},
+in which the head \lstinline{h} is an atom
+\lstinline{p(t}$_1$\lstinline{,}$\dots$\lstinline{,t}$_m$\lstinline{)} or a
+choice
+\lstinline{{p(t}$_1$\lstinline{,}$\dots$\lstinline{,t}$_m$\lstinline|)}|
+and each body literal \lstinline{b}$_i$ is an atom
+\lstinline{p(t}$_1$\lstinline{,}$\dots$\lstinline{,t}$_m$\lstinline{)},
+possibly preceded by the default negation connective \lstinline{not} and/or
+followed by a condition
+\lstinline|: c|$_1$\lstinline{, }$\dots$\lstinline{, c}$_l$, 
+a built-in comparison \lstinline{t}$_1\circ{}$\lstinline{t}$_2$
+with $\circ\in\{\text{\lstinline{<}},\text{\lstinline{=}}\}$,
+or an aggregate
+\lstinline|t|$_0$\lstinline| = #count{t|$_1$\lstinline{,}$\dots$\lstinline{,t}$_m$%
+\lstinline| : c|$_1$\lstinline{, }$\dots$\lstinline{, c}$_l$\lstinline|}|.
+Each \lstinline|t|$_j$ denotes a term, i.e., a constant, variable, tuple,
+or arithmetic expression, and each element \lstinline|c|$_k$ of a condition is
+an atom that may be preceded by \lstinline{not} or a built-in comparison.
+Roughly speaking, an ASP program is a shorthand for its ground instantiation,
+obtainable by substituting variables with all of the available constants
+and evaluating arithmetic expressions,
+and the semantics is given by \emph{answer sets}, i.e.,
+sets of (true) ground atoms such that all rules of the ground instantiation
+are satisfied and allow for deriving each of the ground atoms in the head of
+some rule whose body is satisfied.
+The syntax of the considered ASP programs is a fragment of the modeling languages
+described in \citep{cafageiakakrlemarisc20a,gehakalisc15a},
+the ground instantiation process is detailed in \citep{kamsch21a},
+and the answer set semantics is further elaborated in \citep{gehakalisc15a,lifschitz19a}.
+%
+% A logic program is a finite set of rules of the form 
+% \begin{equation}
+% 	a_0 \gets a_1, \ldots, a_m, \sim a_{m+1}, \dots, \sim a_n
+% 	\label{rule1}
+% \end{equation}
+% where $a_i$ is an atom for $0 \leq i \leq n$ and ``$\sim$''  is a default negation. If $n$ quals to $0$, then a rule \eqref{rule1} is a fact. If $a_0$ is omitted, the rule is an integrity constraint. An \emph{atom} is an expression of the form $p(t_1,\ldots,t_l)$, where $p$ is a predicate and $t_1,\ldots,t_l$ are \emph{terms}. Each term can be a variable or a constant. A \emph{literal} is either an atom or its negation. 
+% Given a rule $r$ of the form \eqref{rule1}, the set $H(r)=a_0$ denotes the \emph{head} atom and the set $B(r) = B^+(r) \cup B^-(r) = \{a_1,\dots,a_m\} \cup \{\sim a_{m+1}, \dots \sim a_n\}$ is the \emph{body} of $r$ where $B^+(r)$ and $B^+(r)$ represent the positive and negative body literals, respectively.
+
 \paragraph{Multi-shot Solving:}
 Multi-shot solving ASP allows solving logic programs dynamically in sequential order. This can be manipulated using APIs implementation via an imperative programming language. Such programming language is used to control the grounding and solving processes and allows the usage of external variables that could be set to $True$ or $False$ to control some logic rules. The main advantage of \emph{multi-shot} solving is to avoid the re-grounding and exploit conflicts learned over time.
 %ASP is a paradigm that deals with continuously changing logic programs. In a single-shot approach, an ASP system takes a logic program, computes answer sets and exits. However, the idea of Multi-shot is to consider evolving grounding and solving processes. \emph{clingo} systems enhances the ASP declaritive language with control capacities. 
+
 \paragraph{ASP Difference Logic:}
 \emph{clingo}[DL] is an extension of the input language \emph{clingo} by theory atoms representing difference constraints \cite{gebser2016theory,janhunen2017clingo}. Difference constraints are defined by specific constraint atoms of the form $\text{\lstinline{&diff}}\{u-v\} \leq k$ where $u$ and $v$ are terms which are interpreted as integer variables and $k$ is an integer constant. \emph{clingo}[DL] provides the following extension of the normal form \eqref{rule1}: 
 \begin{align*}
