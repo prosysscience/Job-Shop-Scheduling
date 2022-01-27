@@ -740,11 +740,11 @@ This section will show the computational experiments that we conducted to test t
 %    \resizebox{0.8\textwidth}{!}{%
 %    \begin{minipage}{\textwidth}
     \centering
-    \begin{tabular}{l l r r r r r r r r r r}
+    \begin{tabular}{r l r r r r r r r r r r}
     \hline
 %       & {}        & \multicolumn{6}{c}{Group of Instances}  \\
     &  &  \multicolumn{10}{c}{Number of Time Windows} \\
-    Instances & Comparison & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
+    Size & Comparison & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
                      
     \hline\\[-2.75mm]
     {50$\times$15}       & Makespan             & $3542.1$   & $3149.7$	     &  \boldmath{$3083.8$} & $3110.7$ & $3213.6$ & $3225.3$ & $3350.5$ & $3378.5$ & $3495.0$ & $3524.9$ \\
@@ -774,34 +774,36 @@ This section will show the computational experiments that we conducted to test t
 \end{comment}
 
 \begin{table}[t]
-    \caption{Results for three sizes of job shop scheduling instances with different numbers of time windows using static machine-based EST decomposition \label{tab:Table01}}%
+    \caption{%
+      Experiments varying the number of time windows on JSP benchmark sets of three sizes\label{tab:Table01}}%
+      % Results for three sizes of job shop scheduling instances with different numbers of time windows using static machine-based EST decomposition \label{tab:Table01}}%
 %    \mbox{~}\hfill
 %    \resizebox{0.8\textwidth}{!}{%
 %    \begin{minipage}{\textwidth}
     \centering
-    \begin{tabular}{l l r r r r r r r}
-    \hline
+    \begin{tabular}{r l r r r r r r r}
+    \topline%\hline
 %       & {}        & \multicolumn{6}{c}{Group of Instances}  \\
-    &  &  \multicolumn{7}{c}{Number of Time Windows} \\
-    Instances & Comparison & 1 & 2 & 3 & 4 & 5 & 6 & 10 \\
+%    &  &  \multicolumn{7}{c}{Number of Time Windows} \\
+    Size & Result & 1 & 2 & 3 & 4 & 5 & 6 & 10 % \\
                      
-    \hline\\[-2.75mm]
+    \midline%\hline% \\[-2.75mm]
     
     {50$\times$15}       & Makespan             & $3542.1$   & $3149.7$	     &  \boldmath{$3083.8$} & $3110.7$ & $3213.6$ & $3225.3$ & $3524.9$ \\
-    & CPU(Sec)             & $1000.0$	& $1000.0$   & $1000.0$	 & $934.4$ & $615.5$  & $243.8$  & $18.5$  \\
-    & Interrupted Calls    & $1.0$	    & $2.0$      & $3.0$	& $3.6$  & $2.7$  & $1.0$  & $0.1$       \\[1.5mm]
+    & Time             & $1000.0$	& $1000.0$   & $1000.0$	 & $934.4$ & $615.5$  & $243.8$  & $18.5$  \\
+    & Interrupts    & $1.0$	    & $2.0$      & $3.0$	& $3.6$  & $2.7$  & $1.0$  & $0.1$       \\[1.5mm]
     
 
     {50$\times$20}       & Makespan             & $3879.4$   & $3479.4$	      & $3290.5$  &  \boldmath{$3260.3$} &  $3355.5$ & $3414.8$ & $3793.1$ \\
-    & CPU(Sec)             & $1000.0$	    & $1000.0$	   & $1000.0$	  & $944.9$  & $583.4$  & $321.5$   & $33.3$     \\
-    & Interrupted Calls    & $1.0$	    & $2.0$      & $3.0$	& $3.5$ & $2.5$  & $1.6$  & $0.1$      \\[1.5mm]
+    & Time             & $1000.0$	    & $1000.0$	   & $1000.0$	  & $944.9$  & $583.4$  & $321.5$   & $33.3$     \\
+    & Interrupts    & $1.0$	    & $2.0$      & $3.0$	& $3.5$ & $2.5$  & $1.6$  & $0.1$      \\[1.5mm]
 
     {100$\times$20}      & Makespan             & $46786.1$  &  $26210.4$  & $7201.5$ &  $6288.7$                & $6106.1$  &  \boldmath{$6031.9$}   & $6234.0$  \\
-    & CPU(Sec) & $1000.0$	    & $1000.0$	   & $1000.0$	   & $1000.0$	    & $1000.0$	& $1000.0$	& $861.8$            \\
-    & Interrupted Calls    & $1.0$	    & $2.0$      & $3.0$	& $4.0$ & $5.0$  & $6.0$ & $7.9$      \\[1.5mm]
+    & Time & $1000.0$	    & $1000.0$	   & $1000.0$	   & $1000.0$	    & $1000.0$	& $1000.0$	& $861.8$            \\
+    & Interrupts    & $1.0$	    & $2.0$      & $3.0$	& $4.0$ & $5.0$  & $6.0$ & $7.9$      % \\%[1.5mm]
                      
-    \\[-2.75mm]
-    \hline
+    % \\[-2.75mm]
+    \botline%\hline
     \end{tabular}
    % }
 %    \end{minipage}
@@ -820,32 +822,22 @@ The number of windows with the best obtained average makespan $3260.3$ for sched
 %    \resizebox{0.8\textwidth}{!}{%
 %    \begin{minipage}{\textwidth}
     \centering
-    \begin{tabular}{c c c c c c c c c c}
-    \hline
+    \begin{tabular}{r r r r r r r r r r}
+    \topline% \hline
   
-\multirow{2}*{Strategy} & \multicolumn{3}{c}{50$\times$15} & \multicolumn{3}{c}{50$\times$20} & \multicolumn{3}{c}{100$\times$20}\\
-    & Makespan & Time & IC & Makespan & Time & IC & Makespan & Time & IC \\
-    \hline\\[-2.75mm]
-    M-Based EST (S)             & $3083.8$  & $1000.0$   & $3.0$	& \boldmath{$3260.3$}      & $944.9$ & $3.5$ & $6031.9$ & $1000.0$ & $6.0$\\
+Size & \multicolumn{3}{c}{50$\times$15} & \multicolumn{3}{c}{50$\times$20} & \multicolumn{3}{c}{100$\times$20}\\
+Strategy & Makespan & Time & IC & Makespan & Time & IC & Makespan & Time & IC % \\
+    \midline% \hline\\[-2.75mm]
+    J-EST            & $3524.8$ & $1000.0$   & $2.0$	   & $3540.8$      & $1000.0$ & $2.0$ & $6964.4$ & $1000.0$ & $4.0$\\ 
+    J-MTWR            & $3456.2$  & $1000.0$   & $2.0$	& $3561.0$      & $1000.0$ & $2.0$ & $7149.6$ & $1000.0$ & $4.0$\\ 
     [1.5mm]
+    M-EST             & $3083.8$  & $1000.0$   & $3.0$	& \boldmath{$3260.3$}      & $944.9$ & $3.5$ & $6031.9$ & $1000.0$ & $6.0$\\
+    M-MTWR        & \boldmath{$3060.3$}  & $1000.0$   & $3.0$	& $3287.9$      & $986.1$ & $3.9$ & \boldmath{$5948.6$} & $1000.0$ & $7.0$\\ 
+    [1.5mm]
+    M-EST$^\text{\,dyn}$            & $3098.4$  & $1000.0$   & $3.0$	& $3309.5$     & $1000.0$ & $3.3$ & $6115.1$ & $1000.0$ & $6.9$% \\[1.5mm]
 
-    T-based EST (S)            & $3524.8$ & $1000.0$   & $2.0$	   & $3540.8$      & $1000.0$ & $2.0$ & $6964.4$ & $1000.0$ & $4.0$\\ 
-    [1.5mm]
-    
-    M-based MTWR (S)        & \boldmath{$3060.3$}  & $1000.0$   & $3.0$	& $3287.9$      & $986.1$ & $3.9$ & \boldmath{$5948.6$} & $1000.0$ & $7.0$\\ 
-    [1.5mm]
-    
-    T-based MTWR (S)            & $3456.2$  & $1000.0$   & $2.0$	& $3561.0$      & $1000.0$ & $2.0$ & $7149.6$ & $1000.0$ & $4.0$\\ 
-    [1.5mm]
-
-    M-based EST (D)            & $3098.4$  & $1000.0$   & $3.0$	& $3309.5$     & $1000.0$ & $3.3$ & $6115.1$ & $1000.0$ & $6.9$\\ 
-    [1.5mm]
-
-    \\[-2.75mm]
-    \hline
-    
-    
-    
+    % \\[-2.75mm]
+    \botline% \hline
     \end{tabular}
    % }
 %    \end{minipage}
