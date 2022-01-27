@@ -785,20 +785,20 @@ This section will show the computational experiments that we conducted to test t
     \topline%\hline
 %       & {}        & \multicolumn{6}{c}{Group of Instances}  \\
 %    &  &  \multicolumn{7}{c}{Number of Time Windows} \\
-    Size & Result & 1 & 2 & 3 & 4 & 5 & 6 & 10 % \\
+    Size & Average & 1 & 2 & 3 & 4 & 5 & 6 & 10 % \\
                      
     \midline%\hline% \\[-2.75mm]
     
-    {50$\times$15}       & Makespan             & $3542.1$   & $3149.7$	     &  \boldmath{$3083.8$} & $3110.7$ & $3213.6$ & $3225.3$ & $3524.9$ \\
+    {$50\times15$}       & Makespan             & $3542.1$   & $3149.7$	     &  \boldmath{$3083.8$} & $3110.7$ & $3213.6$ & $3225.3$ & $3524.9$ \\
     & Time             & $1000.0$	& $1000.0$   & $1000.0$	 & $934.4$ & $615.5$  & $243.8$  & $18.5$  \\
     & Interrupts    & $1.0$	    & $2.0$      & $3.0$	& $3.6$  & $2.7$  & $1.0$  & $0.1$       \\[1.5mm]
     
 
-    {50$\times$20}       & Makespan             & $3879.4$   & $3479.4$	      & $3290.5$  &  \boldmath{$3260.3$} &  $3355.5$ & $3414.8$ & $3793.1$ \\
+    {$50\times20$}       & Makespan             & $3879.4$   & $3479.4$	      & $3290.5$  &  \boldmath{$3260.3$} &  $3355.5$ & $3414.8$ & $3793.1$ \\
     & Time             & $1000.0$	    & $1000.0$	   & $1000.0$	  & $944.9$  & $583.4$  & $321.5$   & $33.3$     \\
     & Interrupts    & $1.0$	    & $2.0$      & $3.0$	& $3.5$ & $2.5$  & $1.6$  & $0.1$      \\[1.5mm]
 
-    {100$\times$20}      & Makespan             & $46786.1$  &  $26210.4$  & $7201.5$ &  $6288.7$                & $6106.1$  &  \boldmath{$6031.9$}   & $6234.0$  \\
+    {$100\times20$}      & Makespan             & $46786.1$  &  $26210.4$  & $7201.5$ &  $6288.7$                & $6106.1$  &  \boldmath{$6031.9$}   & $6234.0$  \\
     & Time & $1000.0$	    & $1000.0$	   & $1000.0$	   & $1000.0$	    & $1000.0$	& $1000.0$	& $861.8$            \\
     & Interrupts    & $1.0$	    & $2.0$      & $3.0$	& $4.0$ & $5.0$  & $6.0$ & $7.9$      % \\%[1.5mm]
                      
@@ -817,7 +817,7 @@ The columns represent how many windows split the original problem where TW $1$ r
 The number of windows with the best obtained average makespan $3260.3$ for scheduling $50\times20$ is $4$ with an average timeout of $944.9$. We observe that assigning $250$ operations to each window leads to getting the best average makespan for the first two sets. For the $100\times20$ set, we got an average makespan of $6031.9$ with $6$ TWs and $1000$ seconds timeout, where the optimizer could not reach a sub-optimal for any TW. 
 
 \begin{table}[t]
-    \caption{Comparing different static/dynamic decomposition strategies \label{tab:Table02}}%
+    \caption{Experiments comparing Job- and Machine-based problem decomposition strategies\label{tab:Table02}}%
 %    \mbox{~}\hfill
 %    \resizebox{0.8\textwidth}{!}{%
 %    \begin{minipage}{\textwidth}
@@ -825,8 +825,8 @@ The number of windows with the best obtained average makespan $3260.3$ for sched
     \begin{tabular}{r r r r r r r r r r}
     \topline% \hline
   
-Size & \multicolumn{3}{c}{50$\times$15} & \multicolumn{3}{c}{50$\times$20} & \multicolumn{3}{c}{100$\times$20}\\
-Strategy & Makespan & Time & IC & Makespan & Time & IC & Makespan & Time & IC % \\
+Size & \multicolumn{3}{c}{$50\times15$} & \multicolumn{3}{c}{$50\times20$} & \multicolumn{3}{c}{$100\times20$}\\
+Strategy & Makespan & Time & Ints & Makespan & Time & Ints & Makespan & Time & Ints % \\
     \midline% \hline\\[-2.75mm]
     J-EST            & $3524.8$ & $1000.0$   & $2.0$	   & $3540.8$      & $1000.0$ & $2.0$ & $6964.4$ & $1000.0$ & $4.0$\\ 
     J-MTWR            & $3456.2$  & $1000.0$   & $2.0$	& $3561.0$      & $1000.0$ & $2.0$ & $7149.6$ & $1000.0$ & $4.0$\\ 
@@ -834,7 +834,7 @@ Strategy & Makespan & Time & IC & Makespan & Time & IC & Makespan & Time & IC % 
     M-EST             & $3083.8$  & $1000.0$   & $3.0$	& \boldmath{$3260.3$}      & $944.9$ & $3.5$ & $6031.9$ & $1000.0$ & $6.0$\\
     M-MTWR        & \boldmath{$3060.3$}  & $1000.0$   & $3.0$	& $3287.9$      & $986.1$ & $3.9$ & \boldmath{$5948.6$} & $1000.0$ & $7.0$\\ 
     [1.5mm]
-    M-EST$^\text{\,dyn}$            & $3098.4$  & $1000.0$   & $3.0$	& $3309.5$     & $1000.0$ & $3.3$ & $6115.1$ & $1000.0$ & $6.9$% \\[1.5mm]
+    M-EST$^\text{\,dyn}$            & $3098.4$  & $1000.0$   & $3.0$	& $3309.5$     & $1000.0$ & $4.0$ & $6115.1$ & $1000.0$ & $7.0$% \\[1.5mm]
 
     % \\[-2.75mm]
     \botline% \hline
@@ -848,45 +848,47 @@ Strategy & Makespan & Time & IC & Makespan & Time & IC & Makespan & Time & IC % 
 
 
 \begin{table}[t]
-    \caption{Comparing results of best decomposition strategy with/without dompression and overlapping \label{tab:Table03}}%
+    \caption{Experiments comparing time window overlapping and compression techniques\label{tab:Table03}}%
 %    \mbox{~}\hfill
 %    \resizebox{0.8\textwidth}{!}{%
 %    \begin{minipage}{\textwidth}
     \centering
-    \begin{tabular}{c c c c c c c c c c}
+    \begin{tabular}{r r r r r r r r r r}
 
-    \hline
-    \multicolumn{10}{c}{\textbf{Without Compressing Time Windows}}\\        
-\multirow{2}*{Overlap} & \multicolumn{3}{c}{50$\times$15} & \multicolumn{3}{c}{50$\times$20} & \multicolumn{3}{c}{100$\times$20}\\
-    & Makespan & CPU(Sec) & IC & Makespan & CPU(Sec) & IC & Makespan & CPU(Sec) & IC \\
-    \hline\\[-2.75mm]
+    \topline%\hline
+%     \multicolumn{10}{c}{\textbf{Without Compressing Time Windows}}\\        
+% \multirow{2}*{Overlap} & 
+    Size & \multicolumn{3}{c}{$50\times15$} & \multicolumn{3}{c}{$50\times20$} & \multicolumn{3}{c}{$100\times20$} \\
+    Overlap & Makespan & Time & Ints & Makespan & Time & Ints & Makespan & Time & Ints % \\
+    \midline % \hline\\[-2.75mm]
     0\%              & $3083.8$  & $1000.0$   & $3.0$	& $3260.3$      & $944.9$ & $3.5$ & $6031.9$ & $1000.0$ & $6.0$\\
-    [1.5mm]
+     %[1.5mm]
                      
     10\%             & $3050.0$  & $1000.0$   & $3.0$	& \boldmath{$3194.9$}     & $1000.0$ & $4.0$ & $5979.9$ & $1000.0$ & $6.0$\\ 
     
     20\%             & \boldmath{$3046.0$} & $1000.0$   & $3.0$	   & $3200.6$      & $1000.0$ & $4.0$ & \boldmath{$5954.3$} & $1000.0$ & $6.0$\\ 
     
-    30\%             & $3051.2$  & $1000.0$   & $3.0$	& $3451.8$      & $1000.0$ & $4.0$ & $6933.3$ & $1000.0$ & $6.0$\\ 
-                     [1.5mm]
-                     
-    \\[-2.75mm]
-    
-    \multicolumn{10}{c}{\textbf{Compressing Time Windows}}\\
-    \hline
-    \multirow{2}*{Overlap} & \multicolumn{3}{c}{50$\times$15} & \multicolumn{3}{c}{50$\times$20} & \multicolumn{3}{c}{100$\times$20}\\
-    & Makespan & CPU(Sec) & IC & Makespan & CPU(Sec) & IC & Makespan & CPU(Sec) & IC \\
-    \hline\\[-2.75mm]
+    30\%             & $3051.2$  & $1000.0$   & $3.0$	& $3451.8$      & $1000.0$ & $4.0$ & $6933.3$ & $1000.0$ & $6.0$ % \\ 
+%                     [1.5mm]
+%                     
+%    \\[-2.75mm]
+%    
+%    \multicolumn{10}{c}{\textbf{Compressing Time Windows}}\\
+%    \hline
+%    \multirow{2}*{Overlap} & \multicolumn{3}{c}{50$\times$15} & \multicolumn{3}{c}{50$\times$20} & \multicolumn{3}{c}{100$\times$20}\\
+%     & Makespan & CPU(Sec) & IC & Makespan & CPU(Sec) & IC & Makespan & CPU(Sec) & IC \\
+%     \hline\\[-2.75mm]
+    \midline
     0\%              & $3013.3$  & $572.3$   & $3.7$	   & $3186.8$      & $540.8$ & $3.3$ & $5713.0$ & $589.2$ & $8.6$\\
-    [1.5mm]
+    % [1.5mm]
                      
     10\%             & $2970.2$  & $600.0$   & $4.0$	   & $3149.8$      & $600.0$ & $4.0$ & $5656.0$ & $600.0$ & $9.0$\\ 
     
     20\%             & $2952.2$  & $600.0$   & $4.0$	   & \boldmath{$3147.7$}      & $600.0$ & $4.0$ & \boldmath{$5619.2$} & $600.0$ & $9.0$\\ 
     
-    30\%             & \boldmath{$2943.1$}  & $600.0$   & $4.0$	   & $3162.2$      & $600.0$ & $4.0$ & $5857.0$ & $600.0$ & $9.0$\\ 
-                     [1.5mm]
-    \hline
+    30\%             & \boldmath{$2943.1$}  & $600.0$   & $4.0$	   & $3162.2$      & $600.0$ & $4.0$ & $5857.0$ & $600.0$ & $9.0$%\\ 
+                     % [1.5mm]
+    \botline %\hline
     \end{tabular}
    % }
 %    \end{minipage}
