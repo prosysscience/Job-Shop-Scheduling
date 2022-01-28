@@ -35,6 +35,7 @@ xleftmargin=\listingnumberwidth,xrightmargin=3pt,captionpos=b,breaklines=false,f
 \usepackage{multirow}
 \usepackage{xspace}
 \usepackage{url}
+\urldef\myurl\url{https://github.com/prosysscience/Job-Shop-Scheduling/tree/master/ICLP%20Paper/Implementation}
 
 \usepackage{comment}
 % Used for displaying a sample figure. If possible, figure files should
@@ -802,7 +803,28 @@ machine~\lstinline{3} when compressing the decomposed schedule displayed in Figu
 
 
 \section{Experiments}\label{sec:experiments}
-This section will show the computational experiments that we conducted to test the performance of our proposed model. In order to evaluate our model, we performed several experiments on a set of benchmark instances with a different number of jobs and machines. The benchmark instances we considered are generated in 1993 by E. Taillard \cite{taillard1993benchmarks}, and the size of the problems variate starting from $6$ jobs and $6$ machines till $100$ jobs and $20$ machines. We have decided to focus on $3$ different sizes of the problem, which are $50$ jobs, $15$ machines, $50$ jobs and $20$ machines and $100$ jobs and $20$ machines. Our experiments had been conducted on a laptop with Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz 2.11 GHz, 8th generation, and $16$ GB. We split the problem into a different number of TWs starting from $2$ - $10$ throughout each size of the instances we focused on to investigate the most appropriate number of TWs. We run the model with a fixed amount of time $1000$ seconds. We set this amount because we observed that increasing the time more did not provide better results, and when we reduced it, the results became worse. The next table shows the obtained results with solving $50 \times 15$.
+% This section will show the computational experiments that we conducted to test the performance of our proposed model.
+In order to evaluate our multi-shot ASP modulo DL approach to JSP solving,
+we ran experiments on JSP benchmark sets by \cite{taillard1993benchmarks}
+of several sizes,
+considering ten instances each with
+$50\times15$, $50\times20$, or $100\times20$ jobs and machines.
+The instances are generated such that each job includes one operation per machine, e.g.,
+$15$ operations in case of the $50\times15$ instances,
+where the sequence in which the operations of a job are allocated to machines varies.
+In our experiments, we assess decomposition strategies presented in Section~\ref{subsec:decomposition}
+with different number and size of time windows as well as the impact of
+time window overlapping and compression techniques described in Section~\ref{subsec:encoding}.
+For the comparability of results between runs with a different number of time windows
+and respective optimization subproblems addressed by multi-shot solving,
+we divide the total runtime limit of $1000$ seconds for \clingodl (version 1.3.0) by the number
+of time windows to evenly spend optimization efforts on subproblems.
+Our experiments have been run on an 
+Intel\textsuperscript{\textregistered} Core\texttrademark{} i7-8650U CPU % \textsuperscript{\textregistered}
+Dell Latitude 5590 machine under Windows 10.%
+\footnote{The benchmarks and our implementation are available at: \myurl}
+
+% a set of benchmark instances with a different number of jobs and machines. The benchmark instances we considered are generated in 1993 by E. Taillard \cite{taillard1993benchmarks}, and the size of the problems variate starting from $6$ jobs and $6$ machines till $100$ jobs and $20$ machines. We have decided to focus on $3$ different sizes of the problem, which are $50$ jobs, $15$ machines, $50$ jobs and $20$ machines and $100$ jobs and $20$ machines. Our experiments had been conducted on a laptop with Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz 2.11 GHz, 8th generation, and $16$ GB. We split the problem into a different number of TWs starting from $2$ - $10$ throughout each size of the instances we focused on to investigate the most appropriate number of TWs. We run the model with a fixed amount of time $1000$ seconds. We set this amount because we observed that increasing the time more did not provide better results, and when we reduced it, the results became worse. The next table shows the obtained results with solving $50 \times 15$.
 
 \begin{comment}
 \begin{table}[t]
