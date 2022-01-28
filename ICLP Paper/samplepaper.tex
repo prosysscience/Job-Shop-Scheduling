@@ -308,7 +308,16 @@ and the answer set semantics is further elaborated in \citep{gehakalisc15a,lifsc
 % where $a_i$ is an atom for $0 \leq i \leq n$ and ``$\sim$''  is a default negation. If $n$ quals to $0$, then a rule \eqref{rule1} is a fact. If $a_0$ is omitted, the rule is an integrity constraint. An \emph{atom} is an expression of the form $p(t_1,\ldots,t_l)$, where $p$ is a predicate and $t_1,\ldots,t_l$ are \emph{terms}. Each term can be a variable or a constant. A \emph{literal} is either an atom or its negation. 
 % Given a rule $r$ of the form \eqref{rule1}, the set $H(r)=a_0$ denotes the \emph{head} atom and the set $B(r) = B^+(r) \cup B^-(r) = \{a_1,\dots,a_m\} \cup \{\sim a_{m+1}, \dots \sim a_n\}$ is the \emph{body} of $r$ where $B^+(r)$ and $B^+(r)$ represent the positive and negative body literals, respectively.
 
-\paragraph{Multi-shot Solving:}
+\paragraph{Multi-shot ASP solving} \citep{gekakasc17a}
+allows for iterative reasoning processes by controlling and interleaving
+the grounding and search phases of a stateful ASP system.
+For identifying a collection of rules to instantiate,
+the input language of \clingo supports \lstinline{#program name(c).}
+directives, where the constant~\lstinline{c} is a placeholder for some value, e.g.,
+the current time step in case of a planning problem,
+supplied upon instantiating the rules below such a directive.
+
+
 Multi-shot solving ASP allows solving logic programs dynamically in sequential order. This can be manipulated using APIs implementation via an imperative programming language. Such programming language is used to control the grounding and solving processes and allows the usage of external variables that could be set to $True$ or $False$ to control some logic rules. The main advantage of \emph{multi-shot} solving is to avoid the re-grounding and exploit conflicts learned over time.
 %ASP is a paradigm that deals with continuously changing logic programs. In a single-shot approach, an ASP system takes a logic program, computes answer sets and exits. However, the idea of Multi-shot is to consider evolving grounding and solving processes. \emph{clingo} systems enhances the ASP declaritive language with control capacities. 
 
@@ -873,8 +882,8 @@ Strategy & Makespan & Time & Ints & Makespan & Time & Ints & Makespan & Time & I
     M-EST             & $3083.8$  & $1000.0$   & $3.0$	& \boldmath{$3260.3$}      & $944.9$ & $3.5$ & $6031.9$ & $1000.0$ & $6.0$\\
     M-MTWR        & $3060.3$  & $1000.0$   & $3.0$	& $3287.9$      & $986.1$ & $3.9$ & \boldmath{$5948.6$} & $1000.0$ & $7.0$\\ 
     [1.5mm]
-    M-EST$^\text{\,dyn}$            & $3098.4$  & $1000.0$   & $3.0$	& $3309.5$     & $1000.0$ & $4.0$ & $6115.1$ & $1000.0$ & $7.0$ \\
-    M-MTWR$^\text{\,dyn}$            & \boldmath{$3041.6$}  & $1000.0$   & $3.0$	& $3287.0$     & $980.4$ & $3.9$ & $6167.3$ & $1000.0$ & $5.0$
+    M-EST$^\text{\,d}$            & $3098.4$  & $1000.0$   & $3.0$	& $3309.5$     & $1000.0$ & $4.0$ & $6115.1$ & $1000.0$ & $7.0$ \\
+    M-MTWR$^\text{\,d}$            & \boldmath{$3041.6$}  & $1000.0$   & $3.0$	& $3287.0$     & $980.4$ & $3.9$ & $6167.3$ & $1000.0$ & $5.0$
 
     % \\[-2.75mm]
     \botline% \hline
