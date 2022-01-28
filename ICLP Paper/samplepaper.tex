@@ -311,22 +311,45 @@ and the answer set semantics is further elaborated in \citep{gehakalisc15a,lifsc
 \paragraph{Multi-shot ASP solving} \citep{gekakasc17a}
 allows for iterative reasoning processes by controlling and interleaving
 the grounding and search phases of a stateful ASP system.
-For identifying a collection of rules to instantiate,
+For referring to a collection of rules to instantiate,
 the input language of \clingo supports \lstinline{#program name(c).}
-directives, where the constant~\lstinline{c} is a placeholder for some value, e.g.,
-the current time step in case of a planning problem,
-supplied upon instantiating the rules below such a directive.
-
-
-Multi-shot solving ASP allows solving logic programs dynamically in sequential order. This can be manipulated using APIs implementation via an imperative programming language. Such programming language is used to control the grounding and solving processes and allows the usage of external variables that could be set to $True$ or $False$ to control some logic rules. The main advantage of \emph{multi-shot} solving is to avoid the re-grounding and exploit conflicts learned over time.
+directives, where \lstinline{name} denotes a \emph{subprogram} comprising
+the rules below such a directive and the parameter~\lstinline{c} is a
+placeholder for some value, e.g., the current time step in case of a
+planning problem, supplied upon instantiating the subprogram.
+Moreover, \lstinline{#external h : b}$_1$\lstinline{, }$\dots$\lstinline{, b}$_n$\lstinline{.}
+statements are formed similar to rules yet declare an atom~\lstinline{h} as
+\emph{external} when the body is satisfied:
+such an external atom can be freely set to true or false by means of the
+Python interface of \clingo,
+so that rules including it in the body can be selectively (de)activated
+to direct the search.
+%
+% Multi-shot solving ASP allows solving logic programs dynamically in sequential order. This can be manipulated using APIs implementation via an imperative programming language. Such programming language is used to control the grounding and solving processes and allows the usage of external variables that could be set to $True$ or $False$ to control some logic rules. The main advantage of \emph{multi-shot} solving is to avoid the re-grounding and exploit conflicts learned over time.
 %ASP is a paradigm that deals with continuously changing logic programs. In a single-shot approach, an ASP system takes a logic program, computes answer sets and exits. However, the idea of Multi-shot is to consider evolving grounding and solving processes. \emph{clingo} systems enhances the ASP declaritive language with control capacities. 
 
-\paragraph{ASP Difference Logic:}
-\emph{clingo}[DL] is an extension of the input language \emph{clingo} by theory atoms representing difference constraints \cite{gebser2016theory,janhunen2017clingo}. Difference constraints are defined by specific constraint atoms of the form $\text{\lstinline{&diff}}\{u-v\} \leq k$ where $u$ and $v$ are terms which are interpreted as integer variables and $k$ is an integer constant. \emph{clingo}[DL] provides the following extension of the normal form \eqref{rule1}: 
-\begin{align*}
-	\text{\lstinline{&diff}}\{u-v\} \leq k \gets a_1, \ldots, a_m, \sim a_{m+1}, \ldots, \sim a_n.
-\end{align*}
- This rule shows that whenever the body is $True$ the inequality constraints must be satisfied.
+\paragraph{ASP modulo DL}
+integrates DL constraints \citep{cotmal06a}, i.e., expressions written as
+\lstinline|&diff{t|$_1$\lstinline| - t|$_2$\lstinline|} <= t|$_3$, in the head of rules.
+With the exception of the constant~\lstinline{0}, which denotes the number zero,
+the terms \lstinline|t|$_1$ and \lstinline|t|$_2$ represent DL variables that can be
+assigned any integer value.
+However, the difference \lstinline|t|$_1$\lstinline| - t|$_2$ must not exceed the
+integer constant~\lstinline|t|$_3$ if the body of a rule with the DL constraint in the
+head is satisfied.
+That is, the DL constraints asserted by rules whose body is satisfied restrict the
+feasible values for DL variables,
+and the \clingodl system extends \clingo by checking the consistency of DL constraints
+imposed by an answer set.
+If these DL constraints are satisfiable, a canonical assignment of smallest feasible
+integer values to DL variables can be determined in polynomial time and is output
+together with the answer set.
+%
+% \emph{clingo}[DL] is an extension of the input language \emph{clingo} by theory atoms representing difference constraints \cite{gebser2016theory,janhunen2017clingo}. Difference constraints are defined by specific constraint atoms of the form $\text{\lstinline{&diff}}\{u-v\} \leq k$ where $u$ and $v$ are terms which are interpreted as integer variables and $k$ is an integer constant. \emph{clingo}[DL] provides the following extension of the normal form \eqref{rule1}: 
+% \begin{align*}
+% 	\text{\lstinline{&diff}}\{u-v\} \leq k \gets a_1, \ldots, a_m, \sim a_{m+1}, \ldots, \sim a_n.
+% \end{align*}
+%  This rule shows that whenever the body is $True$ the inequality constraints must be satisfied.
 
 \section{Multi-shot JSP Solving}\label{sec:problem}
 This section describes our successive optimization approach to
