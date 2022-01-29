@@ -32,6 +32,7 @@
 \lstset{numberbychapter=false,numbers=left,numberblanklines=false,basicstyle=\ttfamily\small,numbersep=5pt,mathescape=true,escapeinside={\#(}{\#)},%xleftmargin=5ex,
 xleftmargin=\listingnumberwidth,xrightmargin=3pt,captionpos=b,breaklines=false,frame=single}
 
+\usepackage{enumitem}
 \usepackage{multirow}
 \usepackage{xspace}
 \usepackage{url}
@@ -166,7 +167,7 @@ optimization capacities even of state-of-the-art solvers for Answer Set Programm
 Mixed Integer Programming (MIP), or Constraint Programming (CP)
 \citep{daneshamooz2021mathematical,francescutto2021solving,shi2021solving}.
 Hence, more efficient approaches to approximate good-quality schedules 
-instead of striving for optimal solutions have attracted wide research interest.
+instead of striving for optimal solutions have attracted broad research interest.
 On the one hand, respective methods include greedy and local search techniques such as
 dispatching rules \citep{blackstone1982state}, shifting bottleneck \citep{adams1988shifting} and
 genetic algorithms \citep{pezzella2008genetic}.
@@ -194,21 +195,21 @@ and
 medical treatment planning \citep{dogagrmamopo21a},
 pointing out the general attractiveness of ASP for modeling and solving scheduling problems.
 
-In this paper, we greatly extend our preliminary study \citep{elkgeb20a} 
+In this paper, we significantly extend our preliminary study \citep{elkgeb20a} 
 on problem decomposition into time windows and successive schedule optimization
-by means of multi-shot ASP modulo DL solving with \clingodl.
+through multi-shot ASP modulo DL solving with \clingodl.
 The goal of the decomposition is to split highly complex scheduling tasks into
 balanced portions for which partial schedules of good quality can be reliably
-found within tight runtime limits, and then be merged into a global solution of
-significantly better quality than obtainable in similar runtime 
-with single-shot optimization on the full problem.
-In this process, problem decomposition must respect the precedence of operations
-within their encompassing jobs to guarantee the feasibility of schedules, and as
-a secondary objective, the order by time windows of operations sharing a machine should come close to the sequences of operations in (unknown) optimal schedules.
+found within tight runtime limits. Then, the partial schedules are merged into a global solution of significantly better quality than obtainable in similar runtime with single-shot optimization on the entire problem.
+In this process, problem decomposition must satisfy two criteria: 
+\begin{enumerate*}[label=\emph{(\roman*)}]
+  \item the precedence of operations within their encompassing jobs to guarantee the feasibility of partial schedules, and 
+  \item the ordering by time windows of operations sharing a machine should come close to the sequences of operations in (unknown) optimal schedules.
+\end{enumerate*}
 We address computational efficiency as well as solution quality by devising and investigating decomposition strategies regarding the size of
 time windows and heuristics to choose their operations.
 
-The contributions of our work going beyond the study in \citep{elkgeb20a} are:
+This work goes beyond the study of \cite{elkgeb20a} and makes the following contributions:
 \begin{itemize}
 \item In addition to problem decomposition based on the earliest starting times
       of operations, we consider the most total work remaining criterion and
@@ -216,17 +217,14 @@ The contributions of our work going beyond the study in \citep{elkgeb20a} are:
       We encode static as well as dynamic decomposition variants, the latter taking
       partial schedules for operations of previous time windows into account, by stratified
       ASP programs (without DL constraints).
-\item Considering that a decomposition into time windows may be incompatible with
+\item Since a decomposition into time windows may be incompatible with
       the optimal sequences of operations sharing a machine, we incorporate
-      time window overlapping into the iterative scheduling process to
-      offer a chance for revising "decomposition mistakes".
-      Moreover, as the makespan objective we apply for the optimization of
-      (partial) schedules tolerates unnecessary idle times of machines as long as
-      they do not yield a greater scheduling horizon,
-      we devise a stratified ASP encoding to postprocess and compress partial
-      schedules by reassigning operations to earlier idle slots available on their machines.
+      overlapping time windows into the iterative scheduling process to
+      offer a chance for revising ``decomposition mistakes''.
+      Moreover, the makespan objective, which we apply to optimize (partial) schedules, tolerates unnecessary idle times of machines as long as they do not yield a greater scheduling horizon. 
+      Therefore, we devise a stratified ASP encoding to postprocess and compress partial schedules by reassigning operations to earlier idle slots available on their machines.
 \item We experimentally evaluate decomposition strategies varying the number of
-      operations per time window as well as multi-shot ASP solving
+      operations per time window, as well as multi-shot ASP, solving
       augmented with overlapping and compression techniques
       on JSP benchmark sets of several sizes.
       In particular, our experiments demonstrate that successive optimization
@@ -237,16 +235,12 @@ The contributions of our work going beyond the study in \citep{elkgeb20a} are:
 
 % In this study, we aim to introduce a new decomposition strategy for solving the JSP. Our study proposes a new policy to efficiently divide the problem into subproblems, aiming to reach a near-optimal solution. Then each part is solved using an ASP scheduler-based, and the solutions are integrated to obtain the solution of the whole problem. We develop and implement our model using ASP, which is considered as one of the most popular paradigms for knowledge representation and reasoning, especially in combinatorial optimization problems \cite{abseher2016shift}. 
 
-The rest of this 
-paper is organized as follows.
+The paper is organized as follows:
 Section~\ref{sec:preliminaries} briefly introduces ASP along with the relevant
 extensions of multi-shot solving and DL constraints.
 In Section~\ref{sec:problem}, we present our successive optimization approach
-and detail the ASP programs encoding problem decomposition or iterative scheduling by
-time windows, respectively.
-Section~\ref{sec:experiments} provides experimental results on JSP benchmark sets, % of several sizes,
-assessing different decomposition strategies as well as the impact of overlapping and
-compression techniques.
+and detail the ASP programs encoding problem decomposition or iterative scheduling by time windows, respectively.
+Section~\ref{sec:experiments} provides experimental results on JSP benchmark sets, assessing different decomposition strategies as well as the impact of overlapping and compression techniques.
 Conclusions and future work are discussed in Section~\ref{sec:conclusions}.  
 % The following section shows the most related work and which decomposition techniques have been introduced in the past, followed by the problem formulation section illustrates the problem in detail. Section $4$ presents our proposed model, which shows the decomposition techniques we used and describes one in more detail. In addition, we present the schedule model using Answer Set Programming. Our model is tested by performing extensive experiments on a set of benchmark instances in Section $5$. Section $6$ summarizes this work and provides some ideas to extend the current work.
 
