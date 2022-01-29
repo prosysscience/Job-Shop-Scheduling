@@ -903,11 +903,50 @@ Dell Latitude 5590 machine under Windows 10.%
 % }
 %    \hfill\hfill\mbox{~}
 \end{table}
+%
+Our first series of experiments shown in Table~\ref{tab:Table01} concerns the number
+of time windows into which the $750$, $1000$, or $2000$ operations, respectively,
+of the instances with $50\times15$, $50\times20$, and $100\times20$ jobs and machines
+are split.
+We use the static Machine-based EST decomposition strategy, which augments the encoding
+given in Listing~\ref{prg:decomposition} with bottleneck machines for inserting 
+their operations into time windows, as baseline because it leads to more robust
+solution quality than Job-based problem decomposition.
+For each of the three problem sizes,
+we report the average makespan over ten instances,
+where smaller values indicate better schedules,
+the average runtime of \clingodl, and the
+average number of interrupted optimization runs on subproblems.
+We gradually increase the number of time windows from~$1$ to~$6$ and additionally
+include results for~$10$ time windows to outline the trend of degrading
+solution quality when the partition into time windows becomes too fragmented
+for merging (optimized) partial schedules into proficient global solutions.
+In fact, the shortest makespans, highlighted in boldface,
+are obtained with problem decomposition into
+$3$, $4$, or $6$ time windows, respectively, for the instances of size 
+$50\times15$, $50\times20$, and $100\times20$.
+Compared to the results for $1$ time window,
+which represent global optimization on the full problem up to the
+runtime limit of $1000$ seconds,
+we observe substantial makespan improvements, amounting to almost one order
+of magnitude for the largest instances with $100\times20$ jobs and machines.
+These advantages do not come as a surprise considering that the JSP instances
+are highly combinatorial \citep{shysha18a} and each global optimization run
+times out with a more or less optimized solution, 
+where a good-quality schedule is the more difficult to find the greater the
+number of operations gets.
+Except for about 12\% completed optimization runs in multi-shot solving with
+$4$ time windows on the $50\times20$ instances,
+the best schedules are obtained with optimization runs timing out on subproblems,
+yet with good-quality partial schedules that can be merged into better global
+solutions than achievable with more time windows, which
+become smaller and easier to solve but also cut off good-quality
+schedules.
 
-Table \ref{tab:Table01} shows the results of solving the mentioned different sizes before with a machine-based EST decomposition method.
-The columns represent how many windows split the original problem where TW $1$ refers that the problem is not decomposed. The results of $7, 8$ and $9$ TWs have not been presented because they have not changed the tendency of the results. Every three rows show the average makespan, running time and the number of interrupted calls of a particular size of the instances. We run the model with a fixed amount of time $1000$ seconds divided by TWs for each window. It is observed that increasing the timeout does not provide better results, and when we decrease it, the results become worse. The best-obtained average makespan for the $50\times15$ instances is $3083.8$ with $3$ TWs where the number of operations assigned to each window is $250$. In addition, increasing the TWs supported the optimizer to reach an optimal of a sub-problem, as the number of operations assigned to a TW decreased. Therefore, The average running time for 10 TWs is $18.5$ seconds. However, the average makespan is getting worse.\\
-
-The number of windows with the best obtained average makespan $3260.3$ for scheduling $50\times20$ is $4$ with an average timeout of $944.9$. We observe that assigning $250$ operations to each window leads to getting the best average makespan for the first two sets. For the $100\times20$ set, we got an average makespan of $6031.9$ with $6$ TWs and $1000$ seconds timeout, where the optimizer could not reach a sub-optimal for any TW. 
+% Table \ref{tab:Table01} shows the results of solving the mentioned different sizes before with a machine-based EST decomposition method.
+% The columns represent how many windows split the original problem where TW $1$ refers that the problem is not decomposed. The results of $7, 8$ and $9$ TWs have not been presented because they have not changed the tendency of the results. Every three rows show the average makespan, running time and the number of interrupted calls of a particular size of the instances. We run the model with a fixed amount of time $1000$ seconds divided by TWs for each window. It is observed that increasing the timeout does not provide better results, and when we decrease it, the results become worse. The best-obtained average makespan for the $50\times15$ instances is $3083.8$ with $3$ TWs where the number of operations assigned to each window is $250$. In addition, increasing the TWs supported the optimizer to reach an optimal of a sub-problem, as the number of operations assigned to a TW decreased. Therefore, The average running time for 10 TWs is $18.5$ seconds. However, the average makespan is getting worse.
+% 
+% The number of windows with the best obtained average makespan $3260.3$ for scheduling $50\times20$ is $4$ with an average timeout of $944.9$. We observe that assigning $250$ operations to each window leads to getting the best average makespan for the first two sets. For the $100\times20$ set, we got an average makespan of $6031.9$ with $6$ TWs and $1000$ seconds timeout, where the optimizer could not reach a sub-optimal for any TW. 
 
 \begin{table}[t]
     \caption{Experiments comparing Job- and Machine-based problem decomposition strategies\label{tab:Table02}}%
