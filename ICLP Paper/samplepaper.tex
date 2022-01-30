@@ -516,7 +516,7 @@ In addition to J-EST decomposition, we have devised a similar ASP program for
 \emph{Job-based Most Total Work Remaining (J-MTWR)} decomposition,
 where the total order of operations is decreasing by the sum of processing
 times for an operation and its successors in a job.
-For example, we obtain the MTWR values~\lstinline{7}, \lstinline{12}, and~\lstinline{20}
+For example, we obtain the J-MTWR values~\lstinline{7}, \lstinline{12}, and~\lstinline{20}
 for the first operation of job~\lstinline{1}, \lstinline{2}, or~\lstinline{3},
 respectively, for the JSP instance in Listing~\ref{prg:facts},
 matching the time for executing all three operations of each job.
@@ -531,19 +531,16 @@ For our example instance, the sum of processing times for operations
 is~\lstinline{12}, \lstinline{15}, or again \lstinline{12}, respectively,
 for the machines~\lstinline{1}, \lstinline{2}, and~\lstinline{3}.
 Hence, the operation to be inserted into the total order first is picked from
-machine~\lstinline{2}, where the smallest EST or greatest MTWR value is
+machine~\lstinline{2}, where the smallest M-EST or greatest M-MTWR value is
 used for choosing a particular job/operation.
-Unlike Job-based decomposition, this may lead to the choice of an operation
+Unlike Job-based decompositions, this may lead to the choice of an operation
 such that predecessor operations processed by other machines are yet unordered.
 In this case, they are inserted into the total order directly before the
-operation from a bottleneck machine,
-and all machine loads are reduced by processing times
-before determining the next machine to consider.
+operation from a bottleneck machine, and all machine loads are reduced by processing times before determining the next machine to consider.
 
-Moreover, we have devised dynamic versions of the Job- and Machine-based 
+Moreover, we have devised \emph{dynamic versions} of the Job- and Machine-based 
 decomposition strategies in which partial schedules are taken into account,
-and already scheduled operations from previous time windows may increase the
-EST and MTWR values are used to order the yet unscheduled operations.
+and already scheduled operations from previous time windows may change the EST and MTWR values used to order the yet unscheduled operations.
 However, the principle of applying a stratified ASP program to determine
 operations for the time window to schedule next is similar for all decomposition
 strategies, and we experimentally evaluate them in Section~\ref{sec:experiments}.
@@ -977,7 +974,7 @@ runs in columns headed by Ints, leading to the shortest average makespan.
 The considerably increased average makespans in the first two rows clearly indicate that
 time windows determined with Job-based decomposition strategies are less adequate than
 those investigating bottleneck machines in the first place, and then picking their operations
-based on the smallest EST or greatest MTWR value as secondary criterion.
+based on the smallest EST or greatest MTWR value as a secondary criterion.
 While Machine-based decomposition turns out to be advantageous,
 there is no clear gap between the static M-EST and M-MTWR variants as well as their dynamic
 versions M-EST$^\text{\,d}$ and M-MTWR$^\text{\,d}$.
