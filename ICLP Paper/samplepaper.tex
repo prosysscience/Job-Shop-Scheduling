@@ -49,7 +49,7 @@ xleftmargin=\listingnumberwidth,xrightmargin=3pt,captionpos=b,breaklines=false,f
 \newcommand{\clingo}{\emph{clingo}\xspace}
 \newcommand{\clingodl}{\emph{clingo}[DL]\xspace}
 \newcommand{\figspace}{\vspace{-1ex}}
-
+\newcommand{\ksverify}[1]{\textcolor{red}{#1}}
 \makeatletter
 \def\fcapsize@figure{\normalfont\normalsize\rmfamily}
 \def\fcapstyle@figure{\normalfont\normalsize\itshape}
@@ -585,7 +585,7 @@ where $t$ is the starting time scheduled for the step~$s$ of job~$j$ at the prev
 time window indicated by~$w$.
 
 The \lstinline{step(w)} subprogram until line~\ref{prg:diff_log:oper_limit:end} 
-constitutes the central part of our multi-shot ASP modulo DL encoding in Listing~\ref{prg:encoding}, whose parameter~\lstinline{w} stands for consecutive integers from~\lstinline{1}
+in Listing~\ref{prg:encoding} constitutes the central part of our multi-shot ASP modulo DL encoding, whose parameter~\lstinline{w} stands for consecutive integers from~\lstinline{1}
 identifying time windows to schedule.
 Auxiliary atoms of the form \lstinline{use(}$m$\lstinline{,}$w'$\lstinline{,}$w$\lstinline{)},
 supplied by the rules in lines~\ref{prg:encoding:use1} and~\ref{prg:encoding:use2},
@@ -849,89 +849,68 @@ Dell Latitude 5590 machine under Windows 10.%
 
 \end{comment}
 
+
+%
+Our first experiments, shown in Table~\ref{tab:Table01}, concern instances with $50\times15$, $50\times20$, and $100\times20$ jobs and machines with $750$, $1000$, or $2000$ operations, respectively. These operations were split into time windows with the M-EST decomposition strategy as a baseline because it leads to more robust solution quality than Job-based problem decompositions.
+% KS removed, since it was already explained in Section 3.2
+%The latter augments the encoding given in Listing~\ref{prg:decomposition} with bottleneck machines for inserting their operations into time windows, 
+For each of the three problem sizes, we report the average makespan over ten instances, where smaller values indicate better schedules, the average runtime of \clingodl, and the average number of interrupted optimization runs on subproblems.
+Each run was executed with a total timeout of $1000$ seconds, where each of $n$ subproblems got at most $1000/n$ seconds computation time.
+
+For every set of instances, we gradually increase the number of time windows from~$1$ to~$6$ and additionally include results for~$10$ time windows to outline the trend of degrading solution quality when the partition into time windows becomes too fragmented for merging (optimized) partial schedules into proficient global solutions.
+In fact, the shortest makespans, highlighted in boldface, were obtained with problem decomposition into $3$, $4$, or $6$ time windows, respectively, for the instances of size $50\times15$, $50\times20$, and $100\times20$.
+Compared to the results for $1$ time window, 
+which represent global optimization on the full problem,
+we observe substantial makespan improvements, amounting to almost one order
+of magnitude for the largest instances with $100\times20$ jobs and machines.
+These advantages are not surprising, considering that the JSP instances are highly combinatorial \citep{shysha18a} and each global optimization run times out with a more or less optimized solution, where a good-quality schedule is the more challenging to find, the greater the number of operations gets.
+Except for about 12\% completed optimization runs in multi-shot solving with $4$ time windows on the $50\times20$ instances, the best schedules were obtained with optimization runs timing out on subproblems. 
+Nevertheless, they resulted in good-quality partial schedules that can be merged into better global solutions than achievable with more time windows, which become smaller and easier to solve but also cut off good-quality schedules.
+
 \begin{table}[t]
-    \caption{%
-      Experiments varying the number of time windows on JSP benchmark sets of three sizes\label{tab:Table01}}%
-      % Results for three sizes of job shop scheduling instances with different numbers of time windows using static machine-based EST decomposition \label{tab:Table01}}%
+  \caption{%
+    Experiments varying the number of time windows on JSP benchmark sets of three sizes\label{tab:Table01}}%
+    % Results for three sizes of job shop scheduling instances with different numbers of time windows using static machine-based EST decomposition \label{tab:Table01}}%
 %    \mbox{~}\hfill
 %    \resizebox{0.8\textwidth}{!}{%
 %    \begin{minipage}{\textwidth}
-    \centering
-    \begin{tabular}{r l r r r r r r r}
-    \topline%\hline
+  \centering
+  \begin{tabular}{r l r r r r r r r}
+  \topline%\hline
 %       & {}        & \multicolumn{6}{c}{Group of Instances}  \\
-%    &  &  \multicolumn{7}{c}{Number of Time Windows} \\
-    Size & Average & 1 & 2 & 3 & 4 & 5 & 6 & 10 % \\
-                     
-    \midline%\hline% \\[-2.75mm]
-    
-    {$50\times15$}       & Makespan             & $3542.1$   & $3149.7$	     &  \boldmath{$3083.8$} & $3110.7$ & $3213.6$ & $3225.3$ & $3524.9$ \\
-    & Time             & $1000.0$	& $1000.0$   & $1000.0$	 & $934.4$ & $615.5$  & $243.8$  & $18.5$  \\
-    & Interrupts    & $1.0$	    & $2.0$      & $3.0$	& $3.6$  & $2.7$  & $1.0$  & $0.1$       \\[1.5mm]
-    
+%  &  &  \multicolumn{7}{c}{Number of Time Windows} \\ [2pt] \cline{3-9} 
+  Size & Average & 1 & 2 & 3 & 4 & 5 & 6 & 10  % \\
+                   
+  \midline%\hline% \\[-2.75mm]
+  
+  {$50\times15$}       & Makespan             & $3542.1$   & $3149.7$	     &  \boldmath{$3083.8$} & $3110.7$ & $3213.6$ & $3225.3$ & $3524.9$ \\
+  & Time             & $1000.0$	& $1000.0$   & $1000.0$	 & $934.4$ & $615.5$  & $243.8$  & $18.5$  \\
+  & Interrupts    & $1.0$	    & $2.0$      & $3.0$	& $3.6$  & $2.7$  & $1.0$  & $0.1$       \\ [1.5mm]
+  
 
-    {$50\times20$}       & Makespan             & $3879.4$   & $3479.4$	      & $3290.5$  &  \boldmath{$3260.3$} &  $3355.5$ & $3414.8$ & $3793.1$ \\
-    & Time             & $1000.0$	    & $1000.0$	   & $1000.0$	  & $944.9$  & $583.4$  & $321.5$   & $33.3$     \\
-    & Interrupts    & $1.0$	    & $2.0$      & $3.0$	& $3.5$ & $2.5$  & $1.6$  & $0.1$      \\[1.5mm]
+  {$50\times20$}       & Makespan             & $3879.4$   & $3479.4$	      & $3290.5$  &  \boldmath{$3260.3$} &  $3355.5$ & $3414.8$ & $3793.1$ \\
+  & Time             & $1000.0$	    & $1000.0$	   & $1000.0$	  & $944.9$  & $583.4$  & $321.5$   & $33.3$     \\
+  & Interrupts    & $1.0$	    & $2.0$      & $3.0$	& $3.5$ & $2.5$  & $1.6$  & $0.1$      \\[1.5mm]
 
-    {$100\times20$}      & Makespan             & $46786.1$  &  $26210.4$  & $7201.5$ &  $6288.7$                & $6106.1$  &  \boldmath{$6031.9$}   & $6234.0$  \\
-    & Time & $1000.0$	    & $1000.0$	   & $1000.0$	   & $1000.0$	    & $1000.0$	& $1000.0$	& $861.8$            \\
-    & Interrupts    & $1.0$	    & $2.0$      & $3.0$	& $4.0$ & $5.0$  & $6.0$ & $7.9$      % \\%[1.5mm]
-                     
-    % \\[-2.75mm]
-    \botline%\hline
-    \end{tabular}
-   % }
+  {$100\times20$}      & Makespan             & $46786.1$  &  $26210.4$  & $7201.5$ &  $6288.7$                & $6106.1$  &  \boldmath{$6031.9$}   & $6234.0$  \\
+  & Time & $1000.0$	    & $1000.0$	   & $1000.0$	   & $1000.0$	    & $1000.0$	& $1000.0$	& $861.8$            \\
+  & Interrupts    & $1.0$	    & $2.0$      & $3.0$	& $4.0$ & $5.0$  & $6.0$ & $7.9$      % \\%[1.5mm]
+                   
+  % \\[-2.75mm]
+  \botline%\hline
+  \end{tabular}
+ % }
 %    \end{minipage}
 % }
 %    \hfill\hfill\mbox{~}
 \end{table}
-%
-Our first series of experiments shown in Table~\ref{tab:Table01} concerns the number
-of time windows into which the $750$, $1000$, or $2000$ operations, respectively,
-of the instances with $50\times15$, $50\times20$, and $100\times20$ jobs and machines
-are split.
-We use the static Machine-based EST decomposition strategy, which augments the encoding
-given in Listing~\ref{prg:decomposition} with bottleneck machines for inserting 
-their operations into time windows, as baseline because it leads to more robust
-solution quality than Job-based problem decomposition.
-For each of the three problem sizes,
-we report the average makespan over ten instances,
-where smaller values indicate better schedules,
-the average runtime of \clingodl, and the
-average number of interrupted optimization runs on subproblems.
-We gradually increase the number of time windows from~$1$ to~$6$ and additionally
-include results for~$10$ time windows to outline the trend of degrading
-solution quality when the partition into time windows becomes too fragmented
-for merging (optimized) partial schedules into proficient global solutions.
-In fact, the shortest makespans, highlighted in boldface,
-are obtained with problem decomposition into
-$3$, $4$, or $6$ time windows, respectively, for the instances of size 
-$50\times15$, $50\times20$, and $100\times20$.
-Compared to the results for $1$ time window,
-which represent global optimization on the full problem up to the
-runtime limit of $1000$ seconds,
-we observe substantial makespan improvements, amounting to almost one order
-of magnitude for the largest instances with $100\times20$ jobs and machines.
-These advantages do not come as a surprise considering that the JSP instances
-are highly combinatorial \citep{shysha18a} and each global optimization run
-times out with a more or less optimized solution, 
-where a good-quality schedule is the more difficult to find the greater the
-number of operations gets.
-Except for about 12\% completed optimization runs in multi-shot solving with
-$4$ time windows on the $50\times20$ instances,
-the best schedules are obtained with optimization runs timing out on subproblems,
-yet with good-quality partial schedules that can be merged into better global
-solutions than achievable with more time windows, which
-become smaller and easier to solve but also cut off good-quality
-schedules.
 
 % Table \ref{tab:Table01} shows the results of solving the mentioned different sizes before with a machine-based EST decomposition method.
 % The columns represent how many windows split the original problem where TW $1$ refers that the problem is not decomposed. The results of $7, 8$ and $9$ TWs have not been presented because they have not changed the tendency of the results. Every three rows show the average makespan, running time and the number of interrupted calls of a particular size of the instances. We run the model with a fixed amount of time $1000$ seconds divided by TWs for each window. It is observed that increasing the timeout does not provide better results, and when we decrease it, the results become worse. The best-obtained average makespan for the $50\times15$ instances is $3083.8$ with $3$ TWs where the number of operations assigned to each window is $250$. In addition, increasing the TWs supported the optimizer to reach an optimal of a sub-problem, as the number of operations assigned to a TW decreased. Therefore, The average running time for 10 TWs is $18.5$ seconds. However, the average makespan is getting worse.
 % 
 % The number of windows with the best obtained average makespan $3260.3$ for scheduling $50\times20$ is $4$ with an average timeout of $944.9$. We observe that assigning $250$ operations to each window leads to getting the best average makespan for the first two sets. For the $100\times20$ set, we got an average makespan of $6031.9$ with $6$ TWs and $1000$ seconds timeout, where the optimizer could not reach a sub-optimal for any TW. 
 
-\begin{table}[t]
+\begin{table}[b]
     \caption{Experiments comparing Job- and Machine-based problem decomposition strategies\label{tab:Table02}}%
 %    \mbox{~}\hfill
 %    \resizebox{0.8\textwidth}{!}{%
@@ -961,12 +940,12 @@ Strategy & Makespan & Time & Ints & Makespan & Time & Ints & Makespan & Time & I
 %    \hfill\hfill\mbox{~}
 \end{table}
 %
-In Table~\ref{tab:Table02}, we compare other problem decomposition strategies
-to the static Machine-based EST approach, providing the baseline abbreviated by M-EST.
-Further decomposition strategies are denoted by M-MTWR for the static Machine-based MTWR
-variant, corresponding dynamic versions M-EST$^\text{\,d}$ and M-MTWR$^\text{\,d}$ that
-determine EST and MTWR values w.r.t.\ partial schedules from previous time windows, as well as
-static Job-based counterparts J-EST and J-MTWR in the first two rows.
+In Table~\ref{tab:Table02}, we provide a comparison of the Job- and Machine-based EST and MTWR approaches with %, providing the baseline abbreviated by M-EST.
+%Further decomposition strategies are denoted by M-MTWR for the static Machine-based MTWR variant, 
+dynamic versions of M-EST$^\text{\,d}$ and M-MTWR$^\text{\,d}$ that
+determine M-EST and M-MTWR values w.r.t.\ partial schedules from previous time windows.
+\ksverify{We excluded the dynamic variants of Job-based strategies, since they performed worse than their static originals.}
+%, as well as static Job-based counterparts J-EST and J-MTWR in the first two rows.
 For each decomposition strategy and JSP instance size, we present results for the number
 of time windows,
 which amounts to the next greater integer of the average number of interrupted optimization
