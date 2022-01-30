@@ -525,7 +525,7 @@ important and is associated with the index~\lstinline{0}. The other
 operations follow the total order taken for partitioning into time windows.
 As J-MTWR values are decreasing along the sequence of operations in a job, the obtained time windows also respect the precedence of operations.
 
-In addition to assessing decompositions in a purely Job-based fashion,
+Beyond partitioning operations in a purely Job-based fashion,
 we have encoded \emph{Machine-based} decompositions \emph{M-EST} and \emph{M-MTRW} in which an operation from a bottleneck machine with the greatest sum of processing times for yet unordered operations is considered next.
 For our example instance, the sum of processing times for operations 
 is~\lstinline{12}, \lstinline{15}, or again \lstinline{12}, respectively,
@@ -944,7 +944,7 @@ In Table~\ref{tab:Table02}, we provide a comparison of the Job- and Machine-base
 %Further decomposition strategies are denoted by M-MTWR for the static Machine-based MTWR variant, 
 dynamic versions of M-EST$^\text{\,d}$ and M-MTWR$^\text{\,d}$ that
 determine M-EST and M-MTWR values w.r.t.\ partial schedules from previous time windows.
-\ksverify{We excluded the dynamic variants of Job-based strategies, since they performed worse than their static originals.}
+% \ksverify{We excluded the dynamic variants of Job-based strategies, since they performed worse than their static originals.}
 %, as well as static Job-based counterparts J-EST and J-MTWR in the first two rows.
 For each decomposition strategy and JSP instance size, we present results for the number
 of time windows,
@@ -956,7 +956,8 @@ those investigating bottleneck machines in the first place, and then picking the
 based on the smallest EST or greatest MTWR value as a secondary criterion.
 While Machine-based decomposition turns out to be advantageous,
 there is no clear gap between the static M-EST and M-MTWR variants as well as their dynamic
-versions M-EST$^\text{\,d}$ and M-MTWR$^\text{\,d}$.
+versions M-EST$^\text{\,d}$ and M-MTWR$^\text{\,d}$\ksverify{,
+and the same indifference applies to Job-based decomposition strategies whose dynamic counterparts are thus omitted}.
 That is, the heuristic to schedule operations from highly loaded machines
 as soon as possible works well for decomposing the considered JSP instances,
 yet further solution quality differences due to minor deviations in the
