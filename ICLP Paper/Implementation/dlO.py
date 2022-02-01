@@ -39,7 +39,7 @@ class Application:
         to_join = []
         for name, value in assignment:
             if str(name) != "makespan":
-                facts_format = "startTime({}, {}, {}). ".format(name, value, i)
+                facts_format = "start({}, {}, {}). ".format(name, value, i)
                 to_join.append(facts_format)
             else:
                 makespan = int(value)
@@ -51,7 +51,7 @@ class Application:
     def step_to_ground(self, prg, step, total_facts):
         parts = []
         if step > 0:
-            parts.append(("subproblem", [step]))
+            parts.append(("step", [step]))
             if step > 1:
                 parts.append(("solutionTimeWindow", []))
                 prg.add("solutionTimeWindow", [], total_facts)
@@ -63,8 +63,8 @@ class Application:
     # add a new constraint to get lower value of makespan (Optimization Part)
     def add_new_constraint(self, prg, makespan):
         prg.cleanup()
-        prg.ground([("opt", [makespan-1])])
-        prg.assign_external(Function("makespan", [makespan-1]), True)
+        prg.ground([("optimize", [makespan-1])])
+        prg.assign_external(Function("horizon", [makespan-1]), True)
     # ********************************************************************
 
     def main(self, prg, files):
@@ -91,7 +91,7 @@ class Application:
             #adjust = self.__theory.lookup_symbol(clingo.Number(0))
             makespan = 0
             while True:
-                prg.assign_external(Function("makespan", [lastmakespan-1]), False)
+                prg.assign_external(Function("horizon", [lastmakespan-1]), False)
                 lastmakespan = makespan
                 tic = time.time()
                 if time_used >= timeout_for_window:
@@ -105,7 +105,7 @@ class Application:
                     for model in handle:
                         a = self.__theory.assignment(model.thread_id)
                         total_facts, makespan = self.get_total_facts(a, i)
-                        
+                        #print(a)
                         break
                     else:
                         non_interrupted_calls += 1
@@ -119,7 +119,7 @@ class Application:
             if i != 0:
                 makespan_time_window.append(lastmakespan)
             i = i + 1      # Go to the next Time Window
-            print("Makespan {} : Assignment {}".format(lastmakespan, total_facts))
+            print("Makespan {} : Operation assignment is --> {}".format(lastmakespan, total_facts))
             print("**************************************************************")
         for x in range(NUM_OF_TIME_WINDOWS):
             print("Completion Time for Window {} : {} ".format(x+1, makespan_time_window[x]))

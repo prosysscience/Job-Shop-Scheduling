@@ -25,8 +25,9 @@ order((J,S1),(J,S2),P,w) :- operation(J,S1,M,P), window(J,S2,w),
 
 &diff{(J,S) - makespan} <= -P :- operation(J,S,M,P), window(J,S,w), 
                                  not window(J,S + 1,w). 
-
+#show.
 #program optimize(m). 
 #external horizon(m).                                           
 
-&diff{makespan - 0} <= m :- horizon(m).                     
+&diff{makespan - 0} <= m :- horizon(m).   
+

@@ -8,3 +8,4 @@ index(J,S,N) :- est(J,S,P,T),
          N = #count{J',S' : est(J',S',P',T'), (T',P',J') < (T,P,J)}.   
 
 window(J,S,(N + W) / W) :- index(J,S,N), width(W). 
+
