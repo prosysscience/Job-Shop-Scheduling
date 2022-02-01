@@ -25,6 +25,6 @@ The directory consists of following files:
 * [Clingo-Dl](https://potassco.org/labs/clingodl/)
 
 ## Usage
-* clingo decomposition.lp instances/50 X 15/TA51.lp (for assigning to time windows) \
+* clingo decomposition.lp instances/50 X 15/TA51.lp (for assigning to time windows) 
 
 * python dlO.py encoding.lp instances/50 X 15/TA51.lp (for optimizing an instance of 50 jobs and 15 machines)
