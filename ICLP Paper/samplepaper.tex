@@ -1063,9 +1063,14 @@ Applying a similar approach can be advantageous in our future work as it may
 potentially improve computational efficiency as well as solution quality further
 and is even a necessity to switch from the makespan as optimization objective to tardiness
 w.r.t.\ deadlines, which are crucial in many application areas.
+While Machine-based decomposition turned out to be helpful
+for finding better schedules, the strategies presented in Section~\ref{subsec:decomposition}
+can be regarded as naive heuristics based on straightforward instance properties,
+and incorporating machine-learning approaches \citep{elscge22a,tagesc21a}
+for more adept partitioning is another promising direction for future work.
 Moreover, we aim to generalize our methods further, e.g.,
 by considering flexible machine allocations and varying processing times,
-and scale them up to large-scale instances with an order of magnitude more
+and scale them up to large real-world scheduling problems with an order of magnitude more
 operations than in synthetic benchmarks.
 %
 % In this work, different decomposition strategies have been proposed for solving the Job-shop Scheduling Problem (JSP) using a multi-shot Answer Set Programming with Difference Logic constraints to handle the decomposition approach and the problem constraints. The proposed model split the problem into sub-problems using different decomposition strategies and then optimized each separately while minimizing the Makespan. The proposed model has been developed to improve the performance by applying the overlap between TWs to fix the decomposition mistakes. In addition, the compression of each window is to fulfill the gaps that occurred during the optimization process. We tested our model on a set of benchmark instances and the experiments have shown that i) considering the bottleneck machines during the decomposition process is effective, ii) The overlap between TWs improves the solution quality, and iii) the compression of TWs is super practical, as it aided the proposed model to obtain better solutions in less computational time. Our work can be extended by linking the optimization model with a simulator that considers more realistic factors such as machine breakdowns, new job arrivals and order cancellations.
