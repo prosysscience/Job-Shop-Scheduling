@@ -663,7 +663,7 @@ such that the value for the \lstinline{makespan} variable is minimized.
 In single-shot ASP modulo DL solving with \clingodl, this can be accomplished
 via the command-line option \lstinline{--minimize-variable=makespan}.
 For the successive optimization by time windows, where the scheduling
-horizon gradually increases, we require a dedicated treatment of DL constraints
+horizon gradually increases, we instead require a dedicated treatment of DL constraints
 limiting the value for \lstinline{makespan}.
 To this end, the \lstinline{optimize(m)} subprogram below line~\ref{prg:diff_log:oper_min}
 declares an external atom \lstinline{horizon(m)} for controlling whether a DL
