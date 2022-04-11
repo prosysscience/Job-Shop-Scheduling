@@ -618,7 +618,7 @@ belongs to a previous time window~$w'$,
 the rule in line~\ref{prg:base:ordered} % applies and 
 derives the atom
 \lstinline{order((}$j_1$\lstinline{,}$s_1$\lstinline{),(}$j_2$\lstinline{,}$s_2$\lstinline{),}$p_1$\lstinline{,}$w$\lstinline{)}
-to signal that \lstinline{(}$j_1$\lstinline{,}$s_1$\lstinline{)} needs to be completed
+to express that \lstinline{(}$j_1$\lstinline{,}$s_1$\lstinline{)} needs to be completed
 before performing \lstinline{(}$j_2$\lstinline{,}$s_2$\lstinline{)}, i.e.,
 the execution order must comply with the decomposition into time windows.
 The rule in lines \ref{prg:base:same_job:begin}-\ref{prg:base:same_job:end} yields
@@ -633,8 +633,17 @@ allows for performing two operations sharing a machine in the lexicographic orde
 of their jobs if the operations belong to the same time window.
 In case the atom representing execution in lexicographic order is not chosen,
 the rule in lines \ref{prg:base:order:begin}-\ref{prg:base:order:end}
-derives an atom signaling the inverse, given that the operations must not intersect and some sequence has to be determined.%
-%
+derives an atom expressing the inverse, given that the operations must not intersect and some sequence has to be determined.
+\hl{Note that applications of the rules in lines} \ref{prg:base:order}-\ref{prg:base:order:end}
+\hl{for choosing an execution order require that the
+operations}
+\lstinline{(}$j_1$\lstinline{,}$s_1$\lstinline{)} \hl{and}
+\lstinline{(}$j_2$\lstinline{,}$s_2$\lstinline{)}
+\hl{are part of the same time window~$w$ and belong to distinct jobs, so that}
+\lstinline{(}$j_1$\lstinline{,}$s_1$\lstinline{)} \hl{and}
+\lstinline{(}$j_2$\lstinline{,}$s_2$\lstinline{)}
+\hl{are out of scope of the rules
+imposing a fixed order in lines} \ref{prg:base:ordered}-\ref{prg:base:same_job:end}.%
 \lstinputlisting[float=t,label=prg:encoding,caption={Multi-shot ASP modulo DL encoding}]{listing/encoding.lp}
 
 While the rules up to line~\ref{prg:base:order:end} yield atoms of the form
