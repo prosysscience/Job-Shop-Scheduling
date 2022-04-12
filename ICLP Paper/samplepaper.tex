@@ -673,6 +673,37 @@ completion time of any operation of the time window~$w$.
 That is, the least feasible \lstinline{makespan} value provides the
 scheduling horizon of a partial schedule for operations of time windows up to~$w$.
 
+\begin{figure}[tb]
+  \begin{tcolorbox}[breakable,arc=0mm,outer arc=0mm,colbacktitle=lightgray!50!white,coltitle=black,colframe=gray,fonttitle=\bfseries,colback=white,subtitle style={colback=white}]
+  %  \vspace{0.1\baselineskip}
+  Starting with $H:=\emptyset$, for $w:= 1$ to number $n$ of time windows:
+  \begin{enumerate}[label=\textbf{\arabic*.}]
+    \item For each $h\in H$, set \lstinline{horizon(}$h$\lstinline{)} to false
+    \item % \begin{tabbing}
+          If $w= 1$, % \= 
+          then $P:=\{\text{\lstinline{base}}\}$;
+          % \\
+          % \> 
+  
+          % \hfill
+          else $P := \{\text{\lstinline{start((}$j$\lstinline{,}$s$\lstinline{),}$t$\lstinline{,}$w-1$\lstinline{).}}
+                      \mid
+                      \{\text{\lstinline{window(}$j$\lstinline{,}$s$\lstinline{,}$w-1$\lstinline{)}},
+                      \text{\lstinline{(}$j$\lstinline{,}$s$\lstinline{)}}=t\}\subseteq X\}$
+          % \end{tabbing}
+    \item Ground $P\cup\{\text{\lstinline{step(}$w$\lstinline{)}}\}$
+    \item While there is some answer set $X$ and the time limit per time window is not reached:
+      \begin{enumerate}[label=\textbf{\alph*.}]
+      \item $h:=t-1$, where $($\lstinline{makespan}${}=t)\in X$
+      \item If $h\notin H$, then $H := H\cup\{h\}$ and ground $\{$\lstinline{optimize(}$h$\lstinline{)}$\}$
+      \item Set \lstinline{horizon(}$h$\lstinline{)} to true
+      \end{enumerate}
+    \end{enumerate}
+  \end{tcolorbox}
+  \caption{Control loop for successive schedule optimization by multi-shot ASP modulo DL solving\label{fig:enum}}
+  \end{figure}
+  % \captionof{figure}{Control loop for successive schedule optimization by multi-shot ASP modulo DL solving\label{fig:enum}}
+%
 The task of optimizing the horizon of a (partial) schedule means choosing
 the execution order of operations of the latest time window sharing a machine
 such that the value for the \lstinline{makespan} variable is minimized.
@@ -708,45 +739,6 @@ a global solution is implemented by means of the Python interface of \clingodl,
 where a time limit can be configured to restrict the optimization efforts per time window
 and thus make sure that the iterative scheduling progresses.
 \hl{Figure~{\ref{fig:enum}} summarizes the main steps of the Multi-shot solving controlled by a python script.}
-
-\begin{figure}[tb]
-\begin{tcolorbox}[breakable,arc=0mm,outer arc=0mm,colbacktitle=lightgray!50!white,coltitle=black,colframe=gray,fonttitle=\bfseries,colback=white,subtitle style={colback=white}]
-%  \vspace{0.1\baselineskip}
-Starting with $H:=\emptyset$, for $w:= 1$ to number $n$ of time windows, do:
-\begin{enumerate}[label=\textbf{\arabic*.}]
-  \item % \begin{tabbing}
-        If $w= 1$, % \= 
-        then $P:=\{\text{\lstinline{base}}\}$;
-        % \\
-        % \> 
-
-        % \hfill
-        else $P := \{\text{\lstinline{start((}$j$\lstinline{,}$s$\lstinline{),}$t$\lstinline{,}$w-1$\lstinline{).}}
-                    \mid
-                    \{\text{\lstinline{window(}$j$\lstinline{,}$s$\lstinline{,}$w-1$\lstinline{)}},
-                    \text{\lstinline{(}$j$\lstinline{,}$s$\lstinline{)}}=t\}\subseteq X\}$.
-        % \end{tabbing}
-  \item Ground $P\cup\{\text{\lstinline{step(}$w$\lstinline{)}}\}$
-  \item While the time limit per time window is not reached, do:
-  \begin{enumerate}[label=\textbf{\alph*.}]
-  \item Find some answer set $X$
-  \end{enumerate}
-  \item Apply the compression of a window (postprocessing phase).
-  \item Keep the operations assignment to be passed to the next window.
-  \item Go to \textbf{2} until all windows are optimized.
-\end{enumerate}
-  \begin{enumerate}[label=\textbf{\arabic*.}]
-    \item Ground the base program.
-    \item Ground the next shot.
-    \item Optimize the current window till reaching the optima or the timeout.
-    \item Apply the compression of a window (postprocessing phase).
-    \item Keep the operations assignment to be passed to the next window.
-    \item Go to \textbf{2} until all windows are optimized.
-  \end{enumerate}
-\end{tcolorbox}
-\caption{Control loop for successive schedule optimization by multi-shot ASP modulo DL solving\label{fig:enum}}
-\end{figure}
-% \captionof{figure}{Control loop for successive schedule optimization by multi-shot ASP modulo DL solving\label{fig:enum}}
 
 % This section will show how to solve the problem dynamically, where the output of each iteration is an input to the next and merging them to obtain the solution of the whole problem. In the first step, we consider the output of the decomposition phase, which is the assignment of the operations to TW as facts. For the multi-shot solving, the encoding is split into two parts; the base, which is run and grounded one time at the beginning of the optimization process presented in Listing \ref{prg:base}. The first rule is to determine the logical sequence between operations of same job in lines \ref{prg:base:same_job:begin}-\ref{prg:base:same_job:end} which is represented in predicate \lstinline{seqL/3}. On the other hand, Lines \ref{prg:base:sharing_machine:begin}-\ref{prg:base:sharing_machine:end} identify the sequence of the operations assigned to the same machine with predicate \lstinline{sameMach/4}.
 
