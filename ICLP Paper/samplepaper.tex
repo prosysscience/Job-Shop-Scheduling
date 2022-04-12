@@ -55,7 +55,7 @@ xleftmargin=\listingnumberwidth,xrightmargin=3pt,captionpos=b,breaklines=false,f
 
 \newcommand{\clingo}{\emph{clingo}\xspace}
 \newcommand{\clingodl}{\emph{clingo}[DL]\xspace}
-\newcommand{\figspace}{\vspace{-1ex}}
+\newcommand{\figspace}{}%{\vspace{-1ex}}
 \newcommand{\ksverify}[1]{#1}%{\textcolor{red}{#1}}
 \makeatletter
 \def\fcapsize@figure{\normalfont\normalsize\rmfamily}
@@ -359,8 +359,8 @@ JSP solving by means of multi-shot ASP with \clingodl.
 We start with specifying the fact format for JSP instances,
 then detail problem decomposition based on earliest starting times of operations,
 present our ASP encoding with DL constraints for optimizing the makespan of partial schedules, and
-finally outline the incorporation of time window overlapping and compression
-into the iterative scheduling process.   
+finally outline the iterative scheduling process 
+along with the incorporation of time window overlapping and compression techniques.   
 % The Job-shop Scheduling Problem (JSP) has been a complex and combinatorial optimization problem since the 1950s, and it was shown to be NP-hard. In the JSP, there are a set of jobs to be processed on a set of machines. The number of jobs is $n$, and the number of machines is $m$. Each job $J_i$ contains a chain $ O_{i,1}, O_{i,2},...,O_{i,m} $ of operations must be executed on an known order. The routings of the operations are deterministic and known a priori, as are the processing times of each operation on each machine. We consider here the problem of minimizing the total completion time (makespan). The task of the scheduling is to determine the starting time for each operation while optimizing the makespan. The basic assumptions are as follows:
 %
 % \begin{enumerate}
@@ -381,6 +381,10 @@ Each job in a JSP instance is a sequence of operations with associated
 machines and processing times.
 Corresponding facts for an example instance with three jobs and three
 machines are displayed in Listing~\ref{prg:facts}.
+%
+% In order to encode the problem using ASP, we should define a set of predicates that represents the problem instances. For instance, the operations are encoded with the predicate \lstinline{operation/2} where the first variable denotes the job number and the second is the operation number, see lines \ref{prg:facts:ops:begin}-\ref{prg:facts:ops:end} in Listing \ref{prg:facts}. The time needed to finish an operation is represented by the predicate \lstinline{pro/3} in which the operation is determined by the first two terms and the third represents the processing time in lines \ref{prg:facts:pro:begin}-\ref{prg:facts:pro:end}. For the machine assignment, the predicate \lstinline{assign/3} shows that a particular operation is executed by a machine in lines \ref{prg:facts:mach:begin}-\ref{prg:facts:mach:end}. For instance, \emph{operation(1,1)} is processed by machine 2. 
+\lstinputlisting[float=b,label=prg:facts,caption={Example JSP instance},linerange={1-3},numbers=none,xleftmargin=3pt]{listing/facts.lp}
+%
 An atom of the form
 \lstinline{operation(}$j$\lstinline{,}$s$\lstinline{,}$m$\lstinline{,}$p$\lstinline{)}
 denotes that the step~$s$ of job~$j$ needs to be processed by machine~$m$ for $p$ time units.
@@ -396,9 +400,6 @@ which need to be processed by machine~\lstinline{1} as well.
 That is, a schedule for the example instance must determine a sequence in which
 to process the three mentioned operations on machine~\lstinline{1},
 and likewise for operations sharing machine~\lstinline{2} or~\lstinline{3}, respectively.
-%
-% In order to encode the problem using ASP, we should define a set of predicates that represents the problem instances. For instance, the operations are encoded with the predicate \lstinline{operation/2} where the first variable denotes the job number and the second is the operation number, see lines \ref{prg:facts:ops:begin}-\ref{prg:facts:ops:end} in Listing \ref{prg:facts}. The time needed to finish an operation is represented by the predicate \lstinline{pro/3} in which the operation is determined by the first two terms and the third represents the processing time in lines \ref{prg:facts:pro:begin}-\ref{prg:facts:pro:end}. For the machine assignment, the predicate \lstinline{assign/3} shows that a particular operation is executed by a machine in lines \ref{prg:facts:mach:begin}-\ref{prg:facts:mach:end}. For instance, \emph{operation(1,1)} is processed by machine 2. 
-\lstinputlisting[float=b,label=prg:facts,caption={Example JSP instance},linerange={1-3},numbers=none,xleftmargin=3pt]{listing/facts.lp}
 
 Figure~\ref{fig:schedule} depicts a schedule with the optimal makespan, i.e., the latest completion time of any job/operation, for the JSP instance from Listing~\ref{prg:facts}.
 The \textbf{J}-\textbf{S} pairs in horizontal bars indicated for the
@@ -449,9 +450,12 @@ which in turn means that the schedule shown in Figure~\ref{fig:schedule} is opti
 Since JSP instances are highly combinatorial and the ground representation size
 can also become problematic for large real-world scheduling problems, achieving
 scalability of complete optimization methods necessitates problem decomposition.
-To this end, we consider strategies for partitioning the operations of JSP instances
-into balanced time windows \hl{(the number of operations assigned to each time window is equal)}, which respect the operation precedence within jobs and
-enable a successive extension of good-quality partial schedules to a global solution.
+% To this end, 
+In order to enable a successive extension of good-quality partial schedules to a global solution,
+we consider strategies for partitioning the operations of JSP instances
+into balanced time windows, \hl{each comprising an equal number of operations such that their precedence
+within jobs is respected}. % , which respect the operation precedence within jobs and
+% in order to enable a successive extension of good-quality partial schedules to a global solution.
 In the following, we first detail problem decomposition based on the earliest starting times of operations, and then outline further strategies that can be encoded by stratified ASP programs as well.
 
 \lstinputlisting[float=b,label=prg:decomposition,caption={J-EST decomposition encoding}]{listing/decomposition.lp}
@@ -517,7 +521,7 @@ the third argument of atoms over \lstinline{window/3}, so that the second operat
 of job~\lstinline{3} and the third operation of each job form the time window~\lstinline{2},
 while time window~\lstinline{1} consists of the five other operations.
 %
-\lstinputlisting[float=t,label=prg:tw,caption={Example time windows},numbers=none,xleftmargin=3pt]{listing/TW.lp}
+\lstinputlisting[float=b,label=prg:tw,caption={Example time windows},numbers=none,xleftmargin=3pt]{listing/TW.lp}
 
 In addition to J-EST decomposition, we have devised a similar ASP program for
 \emph{Job-based Most Total Work Remaining (J-MTWR)} decomposition,
@@ -654,7 +658,8 @@ the remaining rules assert corresponding DL constraints. % on the starting time 
 To begin with,
 the starting times of operations~$o$ from the previous time window $w-1$ (if any)
 are in the lines~\ref{prg:diff_log:freez1:begin} and~\ref{prg:diff_log:freez2:begin}
-fixed to the value~$t$ in an (optimized) partial schedule for time window $w-1$, 
+fixed \hl{by restricting them from above or below, respectively,}
+to the value~$t$ in an (optimized) partial schedule for time window $w-1$, 
 as supplied by reified facts \lstinline{start(}$o$\lstinline{,}$t$\lstinline{,}$w-1$\lstinline{).}
 In line~\ref{prg:diff_log:non_nega:begin},
 the lower bound~$0$ is asserted for the starting time of the first operation of some job,
@@ -673,6 +678,35 @@ completion time of any operation of the time window~$w$.
 That is, the least feasible \lstinline{makespan} value provides the
 scheduling horizon of a partial schedule for operations of time windows up to~$w$.
 
+The task of optimizing the horizon of a (partial) schedule means choosing
+the execution order of operations of the latest time window sharing a machine
+such that the value for the \lstinline{makespan} variable is minimized.
+In single-shot ASP modulo DL solving with \clingodl, this can be accomplished
+via the command-line option \lstinline{--minimize-variable=makespan}.
+\hl{This option, however, is implemented by means of a fixed control loop that
+cannot be combined with (other) multi-shot solving methods.}
+For the successive optimization by time windows, where the scheduling
+horizon gradually increases, we thus require a dedicated treatment of DL constraints
+limiting the value for \lstinline{makespan}.
+To this end, the \lstinline{optimize(m)} subprogram below line~\ref{prg:diff_log:oper_min}
+declares an external atom \lstinline{horizon(m)} for controlling whether a DL
+constraint asserted in line~\ref{prg:diff_log:oper_min:end} is active and limits
+the \lstinline{makespan} value to an integer supplied for the parameter~\lstinline{m}.
+
+\subsection{\hl{Iterative Scheduling}}\label{subsec:scheduling}
+
+\hl{The main steps of our control loop for successive schedule optimization
+by multi-shot ASP modulo DL solving, implemented by means of the Python interface of \clingodl,
+are displayed in Figure~{\ref{fig:enum}} and further detailed in the following.}
+When launching the optimization process for a new time window, any instance of the
+\lstinline{horizon(m)} atom introduced before is set to false in step~1 for making sure that
+some (partial) schedule is feasible.
+\hl{No such atoms have been introduced yet for the first time window $w=1$,
+where the static (default) subprogram called} \lstinline{base}\hl{,
+supplying a JSP instance along with its decomposition in terms of facts over} \lstinline{window/3}\hl{,
+and the} \lstinline{step(}$1$\lstinline{)} \hl{subprogram for operations of the first time window
+are instantiated in steps~2 and~3.}
+%
 \begin{figure}[tb]
   \begin{tcolorbox}[breakable,arc=0mm,outer arc=0mm,colbacktitle=lightgray!50!white,coltitle=black,colframe=gray,fonttitle=\bfseries,colback=white,subtitle style={colback=white}]
   %  \vspace{0.1\baselineskip}
@@ -701,44 +735,33 @@ scheduling horizon of a partial schedule for operations of time windows up to~$w
     \end{enumerate}
   \end{tcolorbox}
   \caption{Control loop for successive schedule optimization by multi-shot ASP modulo DL solving\label{fig:enum}}
-  \end{figure}
+  \end{figure}%
   % \captionof{figure}{Control loop for successive schedule optimization by multi-shot ASP modulo DL solving\label{fig:enum}}
 %
-The task of optimizing the horizon of a (partial) schedule means choosing
-the execution order of operations of the latest time window sharing a machine
-such that the value for the \lstinline{makespan} variable is minimized.
-In single-shot ASP modulo DL solving with \clingodl, this can be accomplished
-via the command-line option \lstinline{--minimize-variable=makespan}.
-\hl{This option, however, is implemented by means of a fixed control loop that
-cannot be combined with (other) multi-shot solving methods.}
-For the successive optimization by time windows, where the scheduling
-horizon gradually increases, we thus require a dedicated treatment of DL constraints
-limiting the value for \lstinline{makespan}.
-To this end, the \lstinline{optimize(m)} subprogram below line~\ref{prg:diff_log:oper_min}
-declares an external atom \lstinline{horizon(m)} for controlling whether a DL
-constraint asserted in line~\ref{prg:diff_log:oper_min:end} is active and limits
-the \lstinline{makespan} value to an integer supplied for the parameter~\lstinline{m}.
-When launching the optimization process for a new time window, any instance of the
-\lstinline{horizon(m)} atom introduced before is set to false for making sure that
-some (partial) schedule is feasible.
-Once some schedule with a horizon $h+1$ is found,
-the subprogram \lstinline{optimize(}$h$\lstinline{)} is instantiated on demand, i.e.,
+Once some schedule with a horizon $h+1$ is found in step~4a,
+the step~4b consists of instantiating
+the subprogram \lstinline{optimize(}$h$\lstinline{)} % is instantiated
+on demand, i.e.,
 in case $h$ has not been passed as a value for~\lstinline{m} before, and
-the corresponding \lstinline{horizon(}$h$\lstinline{)} atom is set to true for activating the DL
+the corresponding \lstinline{horizon(}$h$\lstinline{)} atom is set to true in step~4c for activating the DL
 constraint reducing the admitted scheduling horizon to~$h$.
-The process of successively reducing the horizon~$h$ in order to find better partial schedules
-is repeated until the imposed \lstinline{makespan} value turns out to be infeasible,
+The step 4 of successively reducing the horizon~$h$ in order to find better partial schedules
+% is repeated until 
+stops when the imposed \lstinline{makespan} value turns out to be infeasible,
 meaning that an optimal partial schedule has been found.
 As already mentioned above, the introduced instances of the external \lstinline{horizon(m)} atom
-are then set to false and the successive optimization proceeds by instantiating the
-\lstinline{step(}$w+1$\lstinline{)} subprogram for the next time window $w+1$ (if any), and
+are then set to false in step~1, and the successive optimization proceeds by in steps~2 and~3 instantiating the
+\lstinline{step(}$w+\nolinebreak1$\lstinline{)} subprogram for the next time window $w+1$ (if any) and
 also supplying the determined starting times of operations from time window~$w$
 by reified facts.
 The described control loop for successively extending good-quality partial schedules to
-a global solution is implemented by means of the Python interface of \clingodl,
-where a time limit can be configured to restrict the optimization efforts per time window
+a global solution 
+% is implemented by means of the Python interface of \clingodl,
+% where a time limit 
+can be configured with a time limit,
+included as secondary stopping condition in step~4,
+to restrict the optimization efforts per time window
 and thus make sure that the iterative scheduling progresses.
-\hl{Figure~{\ref{fig:enum}} summarizes the main steps of the Multi-shot solving controlled by a python script.}
 
 % This section will show how to solve the problem dynamically, where the output of each iteration is an input to the next and merging them to obtain the solution of the whole problem. In the first step, we consider the output of the decomposition phase, which is the assignment of the operations to TW as facts. For the multi-shot solving, the encoding is split into two parts; the base, which is run and grounded one time at the beginning of the optimization process presented in Listing \ref{prg:base}. The first rule is to determine the logical sequence between operations of same job in lines \ref{prg:base:same_job:begin}-\ref{prg:base:same_job:end} which is represented in predicate \lstinline{seqL/3}. On the other hand, Lines \ref{prg:base:sharing_machine:begin}-\ref{prg:base:sharing_machine:end} identify the sequence of the operations assigned to the same machine with predicate \lstinline{sameMach/4}.
 
@@ -846,7 +869,7 @@ $15$ operations in case of the $50\times15$ instances,
 where the sequence in which the operations of a job are allocated to machines varies.
 In our experiments, we assess decomposition strategies presented in Section~\ref{subsec:decomposition}
 with different number and size of time windows as well as the impact of
-time window overlapping and compression techniques described in Section~\ref{subsec:encoding}.
+time window overlapping and compression techniques described in Section~\ref{subsec:scheduling}.
 For the comparability of results between runs with a different number of time windows
 and respective optimization subproblems addressed by multi-shot solving,
 we divide the total runtime limit of $1000$ seconds for \clingodl (version 1.3.0) by the number
