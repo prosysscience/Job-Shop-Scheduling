@@ -655,7 +655,7 @@ To begin with,
 the starting times of operations~$o$ from the previous time window $w-1$ (if any)
 are in the lines~\ref{prg:diff_log:freez1:begin} and~\ref{prg:diff_log:freez2:begin}
 fixed to the value~$t$ in an (optimized) partial schedule for time window $w-1$, 
-as supplied by reified facts \lstinline{start(}$o${,}$t$\lstinline{,}$w-1$\lstinline{).}
+as supplied by reified facts \lstinline{start(}$o$\lstinline{,}$t$\lstinline{,}$w-1$\lstinline{).}
 In line~\ref{prg:diff_log:non_nega:begin},
 the lower bound~$0$ is asserted for the starting time of the first operation of some job,
 included in the time window~$w$ for which a partial schedule is to be determined next.
@@ -678,8 +678,10 @@ the execution order of operations of the latest time window sharing a machine
 such that the value for the \lstinline{makespan} variable is minimized.
 In single-shot ASP modulo DL solving with \clingodl, this can be accomplished
 via the command-line option \lstinline{--minimize-variable=makespan}.
+\hl{This option, however, is implemented by means of a fixed control loop that
+cannot be combined with (other) multi-shot solving methods.}
 For the successive optimization by time windows, where the scheduling
-horizon gradually increases, we require a dedicated treatment of DL constraints
+horizon gradually increases, we thus require a dedicated treatment of DL constraints
 limiting the value for \lstinline{makespan}.
 To this end, the \lstinline{optimize(m)} subprogram below line~\ref{prg:diff_log:oper_min}
 declares an external atom \lstinline{horizon(m)} for controlling whether a DL
@@ -705,6 +707,46 @@ The described control loop for successively extending good-quality partial sched
 a global solution is implemented by means of the Python interface of \clingodl,
 where a time limit can be configured to restrict the optimization efforts per time window
 and thus make sure that the iterative scheduling progresses.
+\hl{Figure~{\ref{fig:enum}} summarizes the main steps of the Multi-shot solving controlled by a python script.}
+
+\begin{figure}[tb]
+\begin{tcolorbox}[breakable,arc=0mm,outer arc=0mm,colbacktitle=lightgray!50!white,coltitle=black,colframe=gray,fonttitle=\bfseries,colback=white,subtitle style={colback=white}]
+%  \vspace{0.1\baselineskip}
+Starting with $H:=\emptyset$, for $w:= 1$ to number $n$ of time windows, do:
+\begin{enumerate}[label=\textbf{\arabic*.}]
+  \item % \begin{tabbing}
+        If $w= 1$, % \= 
+        then $P:=\{\text{\lstinline{base}}\}$;
+        % \\
+        % \> 
+
+        % \hfill
+        else $P := \{\text{\lstinline{start((}$j$\lstinline{,}$s$\lstinline{),}$t$\lstinline{,}$w-1$\lstinline{).}}
+                    \mid
+                    \{\text{\lstinline{window(}$j$\lstinline{,}$s$\lstinline{,}$w-1$\lstinline{)}},
+                    \text{\lstinline{(}$j$\lstinline{,}$s$\lstinline{)}}=t\}\subseteq X\}$.
+        % \end{tabbing}
+  \item Ground $P\cup\{\text{\lstinline{step(}$w$\lstinline{)}}\}$
+  \item While the time limit per time window is not reached, do:
+  \begin{enumerate}[label=\textbf{\alph*.}]
+  \item Find some answer set $X$
+  \end{enumerate}
+  \item Apply the compression of a window (postprocessing phase).
+  \item Keep the operations assignment to be passed to the next window.
+  \item Go to \textbf{2} until all windows are optimized.
+\end{enumerate}
+  \begin{enumerate}[label=\textbf{\arabic*.}]
+    \item Ground the base program.
+    \item Ground the next shot.
+    \item Optimize the current window till reaching the optima or the timeout.
+    \item Apply the compression of a window (postprocessing phase).
+    \item Keep the operations assignment to be passed to the next window.
+    \item Go to \textbf{2} until all windows are optimized.
+  \end{enumerate}
+\end{tcolorbox}
+\caption{Control loop for successive schedule optimization by multi-shot ASP modulo DL solving\label{fig:enum}}
+\end{figure}
+% \captionof{figure}{Control loop for successive schedule optimization by multi-shot ASP modulo DL solving\label{fig:enum}}
 
 % This section will show how to solve the problem dynamically, where the output of each iteration is an input to the next and merging them to obtain the solution of the whole problem. In the first step, we consider the output of the decomposition phase, which is the assignment of the operations to TW as facts. For the multi-shot solving, the encoding is split into two parts; the base, which is run and grounded one time at the beginning of the optimization process presented in Listing \ref{prg:base}. The first rule is to determine the logical sequence between operations of same job in lines \ref{prg:base:same_job:begin}-\ref{prg:base:same_job:end} which is represented in predicate \lstinline{seqL/3}. On the other hand, Lines \ref{prg:base:sharing_machine:begin}-\ref{prg:base:sharing_machine:end} identify the sequence of the operations assigned to the same machine with predicate \lstinline{sameMach/4}.
 
@@ -798,21 +840,7 @@ The starting times obtained by the \emph{compression} are then taken instead
 of those calculated in the actual schedule optimization, and, e.g.,
 the starting time~\lstinline{12} of the third operation of job~\lstinline{1}
 would be turned into~\lstinline{9} to fill the idle slot available on
-machine~\lstinline{3} when compressing the decomposed schedule displayed in Figure~\ref{fig:decomposed}. 
-\hl{Figure~{\ref{fig:enum}} summarizes the main steps of the Multi-shot solving controlled by a python script.}
-
-\begin{tcolorbox}[title={The main steps of the Multi-shot solving},breakable,arc=0mm,outer arc=0mm,colbacktitle=lightgray!50!white,coltitle=black,colframe=gray,fonttitle=\bfseries,colback=white,subtitle style={colback=white}]
-  \vspace{0.1\baselineskip}
-  \begin{enumerate}
-    \item[\textbf{1-}] Ground the base program.
-    \item[\textbf{2-}] Ground the next shot.
-    \item[\textbf{3-}] Optimize the current window till reaching the optima or the timeout.
-    \item[\textbf{4-}] Apply the compression of a window (postprocessing phase).
-    \item[\textbf{5-}] Keep the operations assignment to be passed to the next window.
-    \item[\textbf{6-}] Go to \textbf{2} until all windows are optimized.
-  \end{enumerate}
-\end{tcolorbox}
-\captionof{figure}{Main Steps of \textit{Multi-shot}\label{fig:enum}}
+machine~\lstinline{3} when compressing the decomposed schedule displayed in Figure~\ref{fig:decomposed}.
 
 \section{Experiments}\label{sec:experiments}
 % This section will show the computational experiments that we conducted to test the performance of our proposed model.
