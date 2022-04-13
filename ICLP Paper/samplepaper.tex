@@ -38,10 +38,10 @@ xleftmargin=\listingnumberwidth,xrightmargin=3pt,captionpos=b,breaklines=false,f
 \usepackage{url}
 \urldef\myurl\url{https://github.com/prosysscience/Job-Shop-Scheduling/tree/master/ICLP%20Paper/Implementation}
 
-\usepackage{comment}
-\usepackage{algorithm} 
-\usepackage{algpseudocode}
-\usepackage{color,soul}
+%\usepackage{comment}
+%\usepackage{algorithm} 
+%\usepackage{algpseudocode}
+\usepackage{soul}%{color,soul}
 
 % Used for displaying a sample figure. If possible, figure files should
 % be included in EPS format.
@@ -181,8 +181,8 @@ genetic algorithms \citep{pezzella2008genetic}.
 On the other hand, problem decomposition strategies based on a
 rolling horizon \citep{singer2001decomposition,liu2008prediction} or
 bottleneck operations \citep{zhang2010hybrid,zhai2014decomposition} 
-have been proposed to partition large-scale instances into better manageable subproblems, \hl{while minimizing the total tardiness}
-where no single strategy strictly dominates \citep{ovacik2012decomposition}. \hl{Most of the previous work has applied metaheuristic techniques or local search algorithms for solving the problem without sharing their implementation.}
+have been proposed to partition large-scale instances into better manageable subproblems,
+where no single strategy strictly dominates \hl{in minimizing the tardiness} \citep{ovacik2012decomposition}. % \hl{Most of the previous work has applied metaheuristic techniques or local search algorithms for solving the problem without sharing their implementation.}
 
 % In reality, the number of operations is reaching thousands of operations. Therefore, the exact methods Answer Set Programming (ASP), Constraint Programming and Branch and Bound cannot find the optimal solutions in a reasonable time\cite{daneshamooz2021mathematical,shi2021solving,francescutto2021solving}. Since the performance of the exact methods will be hardly satisfactory, several studies have presented one of the most effective methods for solving the JSP, which is decomposition \cite{zhang2010hybrid}. The decomposition aims to split the problem into a series of subproblems based on a particular decomposition policy and then solve each part separately and obtain the final solution by integrating all of these solutions. Several strategies have been proposed to decompose the JSP, and each varies according to the problem features. More specifically, there is no evidence that one of the introduced strategies is the best for solving all JSP(s) \cite{ovacik2012decomposition}. 
 
@@ -1220,13 +1220,28 @@ for finding better schedules, the strategies presented in Section~\ref{subsec:de
 can be regarded as naive heuristics based on straightforward instance properties,
 and incorporating machine-learning approaches \citep{elscge22a,tagesc21a}
 for more adept partitioning is another promising direction for future work.
-\hl{Furthermore, it would be beneficial to apply the same approach to Flow-shop and open-shop scheduling problems. However, the proposed model must be changed to solve open-shop since the precedence constraint is not applied}
+\hl{Provided the adjustment of problem decomposition strategies, 
+our multi-shot solving methods can also be applied to the 
+Flow-shop and Open-shop Scheduling Problems} \citep{taillard1993benchmarks}.
+% \hl{Furthermore, it would be beneficial to apply the same approach to Flow-shop and open-shop scheduling problems. However, the proposed model must be changed to solve open-shop since the precedence constraint is not applied}
 Moreover, we aim to generalize our methods further, e.g.,
 by considering flexible machine allocations and varying processing times,
 and scale them up to large real-world scheduling problems with an order of magnitude more
 operations than in synthetic benchmarks.
 %
 % In this work, different decomposition strategies have been proposed for solving the Job-shop Scheduling Problem (JSP) using a multi-shot Answer Set Programming with Difference Logic constraints to handle the decomposition approach and the problem constraints. The proposed model split the problem into sub-problems using different decomposition strategies and then optimized each separately while minimizing the Makespan. The proposed model has been developed to improve the performance by applying the overlap between TWs to fix the decomposition mistakes. In addition, the compression of each window is to fulfill the gaps that occurred during the optimization process. We tested our model on a set of benchmark instances and the experiments have shown that i) considering the bottleneck machines during the decomposition process is effective, ii) The overlap between TWs improves the solution quality, and iii) the compression of TWs is super practical, as it aided the proposed model to obtain better solutions in less computational time. Our work can be extended by linking the optimization model with a simulator that considers more realistic factors such as machine breakdowns, new job arrivals and order cancellations.
+
+\paragraph{Acknowledgments.}{This work was partially funded by
+KWF project 28472,
+cms electronics GmbH,
+FunderMax GmbH,
+Hirsch Armbänder GmbH,
+incubed IT GmbH,
+Infineon Technologies Austria AG,
+Isovolta AG,
+Kostwein Holding GmbH, and
+Privatstiftung Kärntner Sparkasse.
+We thank the anonymous reviewers for their valuable suggestions and comments.}
 
 %
 % ---- Bibliography ----
