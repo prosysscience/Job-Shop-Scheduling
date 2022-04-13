@@ -114,25 +114,20 @@ xleftmargin=\listingnumberwidth,xrightmargin=3pt,captionpos=b,breaklines=false,f
 \maketitle              % typeset the header of the contribution
 %
 \begin{abstract}
-Scheduling methods are important for effective production and logistics management, where tasks need to be allocated and performed by limited resources.
-In particular, the Job-shop Scheduling Problem (JSP) is a well-known and challenging
-combinatorial optimization problem in which tasks sharing a machine are to be arranged
-in sequence such that encompassing jobs can be completed as early as possible.
-Given that already moderately sized JSP instances can turn out as highly combinatorial,
-so that neither optimal schedules nor the runtime to termination of complete optimization methods
-is known, efficient approaches to approximate good-quality schedules are of interest.
-In this paper, we propose problem decomposition into time windows whose operations
-can be successively scheduled and optimized by means of multi-shot ASP solving.
-From a computational perspective, decomposition aims to split highly complex scheduling tasks into better manageable subproblems with a balanced number of 
-operations, so that good-quality or even optimal partial solutions can be
+Scheduling methods are important for effective production and logistics management, where tasks need to be allocated and performed with limited resources.
+In particular, the Job-shop Scheduling Problem (JSP) is a well-known and challenging combinatorial optimization problem in which tasks sharing a machine are to be arranged in a sequence such that encompassing jobs can be completed as early as possible.
+% remove double 'so that'
+Given that already moderately sized JSP instances can be highly combinatorial, and neither optimal schedules nor the runtime to termination of complete optimization methods is known, efficient approaches to approximate good-quality schedules are of interest.
+In this paper, we propose problem decomposition into time windows whose operations can be successively scheduled and optimized by means of multi-shot ASP solving.
+From a computational perspective, decomposition aims to split highly complex scheduling tasks into better manageable subproblems with a balanced number of  operations so that good-quality or even optimal partial solutions can be
 reliably found in a small fraction of runtime.
 Regarding the feasibility and quality of solutions, problem decomposition must
-respect the precedence of operations within their jobs, and partial schedules
+respect the precedence of operations within their jobs and partial schedules
 optimized by time windows should yield better global solutions than obtainable
-in similar runtime on the full problem.
+in similar runtime on the entire instance.
 We devise and investigate a variety of decomposition strategies in terms of the number and size of time windows as well as heuristics for choosing their operations.
 Moreover, we incorporate time window overlapping and compression techniques
-into the iterative scheduling process in order to counteract limitations of window-wise optimization restricted to partial schedules.
+into the iterative scheduling process to counteract window-wise optimization limitations restricted to partial schedules.
 Our experiments on JSP benchmark sets of several sizes show that
 successive optimization by multi-shot ASP solving leads to substantially better schedules within the runtime limit than global optimization on the full problem,
 where the gap increases with the number of operations to schedule.
@@ -148,23 +143,14 @@ Job-shop Scheduling Problem, Answer Set Programming, Problem Decomposition
 %
 \section{Introduction}
 % In today's competitive markets, manufacturers have to respond quickly to orders and meet shipping dates committed to the customers. This requires the ability to schedule production activities to use the available scarce resources efficiently. Effective scheduling techniques are essential in complex manufacturing systems such as semiconductor manufacturing. In general, scheduling operations is one of the most critical issues in the planning and managing of the manufacturing processes\cite{uzsoy2000performance}.
-Effective scheduling methods are essential for complex manufacturing and logistics systems,
-where allocating and performing diverse tasks within resource capacity limits 
-is one of the most critical challenges for production management \citep{uzsoy2000performance}.
+Effective scheduling methods are essential for complex manufacturing and transportation systems, where allocating and performing diverse tasks within resource capacity limits is one of the most critical challenges for production management \citep{uzsoy2000performance}.
 The Job-shop Scheduling Problem (JSP) \citep{baker1974introduction,taillard1993benchmarks}
 constitutes a well-known mathematical abstraction of industrial production scheduling in
-which sequences of operations need to be processed by machines such that a given objective
-like the makespan for completing all jobs or their tardiness w.r.t.\ deadlines is minimized.
-Finding optimal JSP solutions, determined by a sequence of operations for each machine,
-is an NP-hard combinatorial problem
-\citep{garey1976complexity,lenstra1977complexity,liu2008prediction},
-and optimal schedules as well as termination guarantees can be extremely challenging
-or beyond reach 
-of complete optimization methods already for moderately sized instances.
-For example, it took about $20$ years to develop a search procedure able to find a
-(provably) optimal solution for an instance called FT10 with $10$ jobs
-\citep{adams1988shifting,zhang2010hybrid},
-each consisting of a sequence of $10$ operations to be processed by $10$ machines. 
+which sequences of operations need to be processed by machines such that a given objective,
+like the makespan for completing all jobs or their tardiness w.r.t.\ deadlines, is minimized.
+Finding optimal JSP solutions, determined by a sequence of operations for each machine, is an NP-hard combinatorial problem \citep{garey1976complexity,lenstra1977complexity,liu2008prediction}. Therefore, optimal schedules and termination guarantees can be extremely challenging or even unreachable for complete optimization methods already for moderately sized instances.
+For example, it took about $20$ years to develop a search procedure able to find a (provably) optimal solution for an instance called FT10 with $10$ jobs
+\citep{adams1988shifting,zhang2010hybrid}, each consisting of a sequence of $10$ operations to be processed by $10$ machines. 
 
 % One of the most challenging scheduling problems is the Jop-shop Scheduling Problem (JSP). A set of jobs needs to be processed on a set of machines while optimizing a performance indicator, minimizing makespan, the time needed to complete all the jobs, or tardiness, i.e., the summation of the delays in executing all jobs according to their deadlines. Each job has a set of consecutive operations; each operation requires exactly one machine; machines are continuously available and can process only one operation at a time. The main purpose is to determine the sequence of the operations on each machine to optimize a performance indicator. The JSP is an NP-complete combinatorial optimization problem where obtaining the optimal solution is challenging regardless of the problem scale\cite{garey1976complexity,lenstra1977complexity,liu2008prediction}. For instance, benchmark (FT10) consists of $10$ jobs and $10$ machines took researchers roughly $20$ years to find the optimal solution\cite{adams1988shifting,zhang2010hybrid}.
 
