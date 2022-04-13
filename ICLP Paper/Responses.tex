@@ -1,0 +1,91 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath, amssymb, amsthm, graphicx, epsfig, fancyhdr}
+\usepackage[a4paper, total={7.5in, 10in}]{geometry}
+\usepackage{enumitem}
+\usepackage{url}
+\setlength{\headheight}{10pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{M. El-Kholany, M. Gebser, K. Schekotihin}
+%\fancyfoot[C]{\thepage}
+
+
+\begin{document}
+We thank the reviewers for their valuable feedback helping us to improve the paper. In the following, we reply to the comments/questions. % Some of the questions are grouped when corresponding answers are similar or related.
+
+\subsection*{Review 1}
+\begin{enumerate}[wide, labelwidth=!, labelindent=0pt]
+\item \textbf{The effectiveness of the proposed approach is still not clear to me.
+      For this, in my opinion, the authors need to show some comparison
+	  results with previous best known bounds obtained by other different
+	  approaches.}
+\item[] We did so by adding a comparison to known optima and OR-tools at the end of Section 4.
+        It turns out that OR-tools with dedicated interval variables and global constraints
+		finds better schedules than our decomposition and multi-shot solving
+		approach, yet the gap isn't too large and substantially reduced in comparison to
+		single-shot ASP modulo DL solving.
+		As implementations of greedy and local search methods applied to obtain the known
+		optima for the instances we tested are, to our knowledge, not publically available,
+		we couldn't run them but still report their results as optimal values.
+\item \textbf{Could you explain the reason why the authors selected a subset of
+       Taillard benchmark instances in [1,2] and didn't use the other
+       instances in OR-library [1]?}
+\item[] We used the largest families of instances included in common JSP benchmark sets,
+        and now explain our choice in the first paragraph of Section 4.
+\item \textbf{Can the proposed approach be effective to other shop scheduling
+problems like flow-shop and open-shop?}
+\item[] Yes, our problem encoding can be readily applied to these problem variants,
+        yet the decomposition should be adjusted to them.
+		We now mention this in Section 5.
+\end{enumerate}
+
+\subsection*{Review 2}
+\begin{enumerate}[wide, labelwidth=!, labelindent=0pt]
+\item \textbf{%
+	Some more intuitive description of the main encoding part dealing with the difference logic constraints can be beneficial to the reader. For instance, what is the reason to include two rules (instead of one of these) in lines 20 and 21 of Listing 4 to constrain starting times of initial operations in a schedule? Regarding optimization based on DL variables, is the --minimize-variable option still used in the whole algorithm or is it not applicable due to the dynamically added optimize(m) program parts?}
+\item[] We use the two rules in lines 20 and 21 of Listing 4 to restrict starting times from
+        above and below. Maybe this is somewhat overshooting, but it makes sure that the starting
+		times of operations from earlier time windows are fixed.
+		Moreover, the \texttt{--minimize-variable} option is internally implemented by multi-shot solving in \textit{clingo}[DL].
+		When control is handed over to a user-defined script, the option cannot be used anymore,
+		and we take care of the optimization ourselves.
+		The two issues are now addressed by additions to the last two paragraphs of Section 3.3.
+\item \textbf{%
+    The pseudo-code of the main control loop that implements the overall algorithm can be given so the reader can better comprehend the overall solution technique, especially with some of the additional features like window overlapping and compression.}
+\item[] We now provide the pseudocode in Figure 2 and extended corresponding descriptions
+        in the first paragraph of (the newly introduced) Section 3.4. 
+\item \textbf{%		
+    There might be a problem with the main encoding in Listing 4. The paper mentions when the X argument of share predicate is 1 (denoting the respective J1 operation is coming from the previous window) the ordering of respective operations is fixed via Line 12. However, line 4 will also generate use(M,W,w) instance and there will also be another copy of the share predicate instance only different in the X argument, this time 0. So, Line 16 will also try to choose an ordering for the same respective operations. Does this cause a problem in general or in the overlapping variant specifically where new ordering needs to be chosen for some of the already scheduled operations?}
+\item[] When the operation order can be chosen by the rules in lines 16-18, the cases for a fixed
+        ordering by the rules in lines 12-14 cannot apply. 
+		This is now commented at the end of the second paragraph of Section 3.3.
+\end{enumerate}
+
+\subsection*{Review 3}
+\begin{enumerate}[wide, labelwidth=!, labelindent=0pt]
+\item \textbf{%
+      On the negative side, the novelty of the presented approach and the significance of the results are not clear to me. The authors cite in the introduction some past problem decomposition strategies based on a rolling horizon (Singer 2001; Liu et al. 2008) or bottleneck operations (Zhang and Wu 2010; Zhai et al. 2014), but there is no discussion on how they differ from those presented in the paper and why there is a need for new strategies. Indeed, the paper lacks a related work section. The experimental study does not include results from some standard methods to solve JSP nor compares the presented approach to related work. It is therefore not clear how the presented work advances state-of-the art.}
+\item[] The problem here is that implementations of these previous methods are, to our knowledge,
+        not publicly available. This seems to be generally the case for greedy and local search
+		methods, so that we opted for OR-tools for a comparison with the state of the art added at the end of Section 4.
+		It turns out that OR-tools with interval variables and global constraints in the encoding
+		is ahead, but the gap isn't too large and much smaller for decomposition and multi-shot
+		solving than with single-shot ASP modulo DL solving.
+\item \textbf{%
+      You do not define what you mean by partitioning the operations into balanced time windows. It would also be nice to give the main idea first before presenting the decomposition strategies. For instance, before start explaining Listing 2, you could explain what the J-EST is aiming to do. Similarly for the others.}
+\item[] We tried to explain better what ``balanced'' is supposed to say in the first paragraph of Section 3.2.
+        Otherwise, the decomposition strategies merely use different metrics to generate a total order of operations.
+		In Section 5, we now comment on this and write that machine-learning approaches may be
+		used for better problem decomposition.
+\item \textbf{The last sentence of the third paragraph in page 2 ("Successful application areas beyond JSP include...") does not follow the previous sentence, you may want to reformulate it.}
+\item[] We incorporated a (small) reformulation that hopefully helps here.
+\item \textbf{The example for idle slots (Figure 2) is indeed negligible, could you present a better example to make your point? }
+\item[] That's difficult. We wanted to have a small example such that the decomposition matches
+        the J-EST approach. We would need to make the example substantially larger for having idle slots that propagate on to the makespan.
+\item \textbf{You could structure Section 4 using subsections to improve readability.}
+\item[] Here we usually take one paragraph per table with results, so that introducing subsections
+        may be overshooting. 
+\end{enumerate}
+We highlighted the reformulations and additions relevant to the above comments/replies in yellow in our revised version, which is provided together with this reply.
+\end{document}
+
