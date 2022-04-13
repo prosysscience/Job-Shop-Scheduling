@@ -667,8 +667,7 @@ scheduling horizon of a partial schedule for operations of time windows up to~$w
 The task of optimizing the horizon of a (partial) schedule means choosing
 the execution order of operations of the latest time window sharing a machine
 such that the value for the \lstinline{makespan} variable is minimized.
-In single-shot ASP modulo DL solving with \clingodl, this can be accomplished
-via the command-line option \lstinline{--minimize-variable=makespan}.
+In single-shot ASP modulo DL solving with \clingodl, the minimization can be accomplished via the command-line option \lstinline{--minimize-variable=makespan}.
 \hl{This option, however, is implemented by means of a fixed control loop that
 cannot be combined with (other) multi-shot solving methods.}
 For the successive optimization by time windows, where the scheduling
@@ -686,7 +685,7 @@ by multi-shot ASP modulo DL solving, implemented by means of the Python interfac
 are displayed in Figure~{\ref{fig:enum}} and further detailed in the following.}
 When launching the optimization process for a new time window, any instance of the
 \lstinline{horizon(m)} atom introduced before is set to false in step~1 for making sure that
-some (partial) schedule is feasible.
+some (partial) schedule $X$ is feasible.
 \hl{No such atoms have been introduced yet for the first time window $w=1$,
 where the static (default) subprogram called} \lstinline{base}\hl{,
 supplying a JSP instance along with its decomposition in terms of facts over} \lstinline{window/3}\hl{,
@@ -724,7 +723,7 @@ are instantiated in steps~2 and~3.}
   \end{figure}%
   % \captionof{figure}{Control loop for successive schedule optimization by multi-shot ASP modulo DL solving\label{fig:enum}}
 %
-Once some schedule with a horizon $h+1$ is found in step~4a,
+Once some schedule $X$ with a horizon $h+1$ is found in step~4a,
 the step~4b consists of instantiating
 the subprogram \lstinline{optimize(}$h$\lstinline{)} % is instantiated
 on demand, i.e.,
