@@ -1,6 +1,6 @@
 @string{lnai = {Lecture Notes in Artificial Intelligence}}
-@string{lncs = {Lecture Notes in Computer Science}}
-@string{springer = {Springer-Verlag}}
+@string{lncs = {LNCS}}
+@string{springer = {Springer}}
 @string{tplp = {Theory and Practice of Logic Programming}}
 
 @misc{ortools,
@@ -47,7 +47,7 @@
   author    = {Marcello Balduccini},
   title     = {Industrial-Size Scheduling with {ASP+CP}},
   booktitle = {{LPNMR}},
-  series    = {Lecture Notes in Computer Science},
+  series    = lncs,
   volume    = {6645},
   pages     = {284--296},
   publisher = {Springer},
@@ -91,11 +91,11 @@ inproceedings{coltep19a,
 }
 
 @inproceedings{coltep19a,
-  author    = {Giacomo Da Col and
-               Erich Christian Teppan},
+  author    = {Giacomo {Da Col} and
+               Erich Teppan},
   title     = {Industrial Size Job Shop Scheduling Tackled by Present Day {CP} Solvers},
   booktitle = {{CP}},
-  series    = {LNCS},
+  series    = lncs,
   volume    = {11802},
   pages     = {144--160},
   publisher = {Springer},
@@ -114,7 +114,7 @@ inproceedings{cotmal06a,
                Oded Maler},
   title     = {Fast and Flexible Difference Constraint Propagation for {DPLL(T)}},
   booktitle = {{SAT}},
-  series    = {LNCS},
+  series    = lncs,
   volume    = {4121},
   pages     = {170--183},
   publisher = {Springer},
@@ -254,10 +254,10 @@ inproceedings{kotakoscge21a,
   publisher={INFORMS}
 }
 
-@incollection{lenstra1977complexity,
+@article{lenstra1977complexity,
   title={Complexity of machine scheduling problems},
-  author={Lenstra, Jan Karel and Kan, AHG Rinnooy and Brucker, Peter},
-  booktitle={Annals of discrete mathematics},
+  author={Lenstra, Jan and Kan, Rinnooy and Brucker, Peter},
+  journal={Annals of Discrete Mathematics},
   volume={1},
   pages={343--362},
   year={1977},
@@ -267,7 +267,7 @@ inproceedings{kotakoscge21a,
 @article{adams1988shifting,
   title={The shifting bottleneck procedure for job shop scheduling},
   author={Adams, Joseph and Balas, Egon and Zawack, Daniel},
-  journal={Management science},
+  journal={Management Science},
   volume={34},
   number={3},
   pages={391--401},
@@ -299,7 +299,7 @@ inproceedings{kotakoscge21a,
 
 @article{uzsoy2000performance,
   title={Performance of decomposition procedures for job shop scheduling problems with bottleneck machines},
-  author={Uzsoy, Reha and Wang, Cheng-Shuo},
+  author={Uzsoy, Reha and Wang, Cheng{-}Shuo},
   journal={International Journal of Production Research},
   volume={38},
   number={6},
@@ -321,7 +321,7 @@ inproceedings{kotakoscge21a,
 
 @article{liu2008prediction,
   title={A prediction based iterative decomposition algorithm for scheduling large-scale job shops},
-  author={Liu, Min and Hao, Jing-Hua and Wu, Cheng},
+  author={Liu, Min and Hao, Jing{-}Hua and Wu, Cheng},
   journal={Mathematical and Computer Modelling},
   volume={47},
   number={3-4},
@@ -354,15 +354,15 @@ inproceedings{kotakoscge21a,
 
 @book{ovacik2012decomposition,
   title={Decomposition methods for complex factory scheduling problems},
-  author={Ovacik, Irfan M and Uzsoy, Reha},
+  author={Ovacik, Irfan and Uzsoy, Reha},
   year={2012},
-  publisher={Springer Science \& Business Media}
+  publisher=springer
 }
 
 @article{zhai2014decomposition,
   title={A decomposition heuristics based on multi-bottleneck machines for large-scale job shop scheduling problems},
   author={Zhai, Yingni and Liu, Changjun and Chu, Wei and Guo, Ruifeng and Liu, Cunliang},
-  journal={Journal of Industrial Engineering and Management (JIEM)},
+  journal={Journal of Industrial Engineering and Management},
   volume={7},
   number={5},
   pages={1397--1414},
@@ -428,7 +428,7 @@ inproceedings{gebser2016theory,
                Philipp Wanko},
   title     = {Theory Solving Made Easy with Clingo 5},
   booktitle = {{ICLP} (Technical Communications)},
-  series    = {{OASICS}},
+  series    = {{OASIcs}},
   volume    = {52},
   pages     = {2:1--2:15},
   publisher = {Schloss Dagstuhl},
@@ -519,11 +519,11 @@ inproceedings{francescutto2021solving,
 @inproceedings{francescutto2021solving,
   author    = {Giulia Francescutto and
                Konstantin Schekotihin and
-               Mohammed M. S. El{-}Kholany},
+               Mohammed El{-}Kholany},
   title     = {Solving a Multi-resource Partial-Ordering Flexible Variant of the
                Job-Shop Scheduling Problem with Hybrid {ASP}},
   booktitle = {{JELIA}},
-  series    = {LNCS},
+  series    = lncs,
   volume    = {12678},
   pages     = {313--328},
   publisher = {Springer},
@@ -541,7 +541,7 @@ article{daneshamooz2021mathematical,
 @article{daneshamooz2021mathematical,
   author    = {Fatemeh Daneshamooz and
                Parviz Fattahi and
-               Seyed Mohammad Hassan Hosseini},
+               Seyed Hosseini},
   title     = {Mathematical modeling and two efficient branch and bound algorithms for job shop scheduling problem followed by an assembly stage},
   journal   = {Kybernetes},
   volume    = {50},
@@ -554,7 +554,8 @@ article{daneshamooz2021mathematical,
   title={Solving the integrated process planning and scheduling problem using an enhanced constraint programming-based approach},
   author={Shi, Ganquan and Yang, Zhouwang and Xu, Yang and Quan, Yuchen},
   journal={International Journal of Production Research},
-  pages={1--18},
+  volume={Latest Articles},
+  optpages={1--18},
   year={2021},
   publisher={Taylor \& Francis}
 }
@@ -741,8 +742,8 @@ article{daneshamooz2021mathematical,
 
 @proceedings{padl22,
   title = {Proceedings of the Twenty-fourth International Symposium on Practical Aspects of Declarative Languages (PADL'22)},
-  editor = {J. Cheney and S. Perri},
-  booktitle = {Proceedings of the Twenty-fourth International Symposium on Practical Aspects of Declarative Languages (PADL'22)},
+  opteditor = {J. Cheney and S. Perri},
+  booktitle = {PADL},
   publisher = springer,
   series = lncs,
   volume = {13165},
@@ -751,9 +752,10 @@ article{daneshamooz2021mathematical,
 
 @proceedings{prl21,
   title = {Proceedings of the ICAPS 2021 Workshop on Planning and Reinforcement Learning (PRL'21)},
-  editor = {H. Palacios},
-  booktitle = {Proceedings of the ICAPS 2021 Workshop on Planning and Reinforcement Learning (PRL'21)},
-  year = {2021}
+  opteditor = {H. Palacios},
+  booktitle = {PRL},
+  year = {2021},
+  publisher = {\url{https://prl-theworkshop.github.io/prl2021/}}
 }
 
 @proceedings{sat06,
@@ -768,9 +770,8 @@ article{daneshamooz2021mathematical,
 
 @proceedings{taasp20,
   title = {Proceedings of the Fourth Workshop on Trends and Applications of Answer Set Programming (TAASP'20)},
-  editor = {M. Gebser and F. Laferri{\`{e}}re and Z. Saribatur},
-  booktitle = {Proceedings of the Fourth Workshop on Trends and Applications of Answer Set Programming (TAASP'20)},
-  optpublisher = {Technische Universit{\"a}t Wien},
-  url = {http://www.kr.tuwien.ac.at/events/taasp20/accepted.html},
+  opteditor = {M. Gebser and F. Laferri{\`{e}}re and Z. Saribatur},
+  booktitle = {TAASP},
+  publisher = {\url{http://www.kr.tuwien.ac.at/events/taasp20/accepted.html}},
   year = {2020}
 }
