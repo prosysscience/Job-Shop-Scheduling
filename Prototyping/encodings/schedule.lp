@@ -60,17 +60,15 @@ patch((I2,J),S,window) :- order((I1,J),P,(I2,J),window-1),
                           start((I2,J),S,window-1), scheduled((I2,J),window),
                           start((I1,J),S1,window-1), S1+P < S.
 
-limit(O,M,1,window) :- ups_sort(O,M,1), current(O,window).
+% limit(O,M,1,window) :- ups_sort(O,M,1), current(O,window), not windows(window).
 limit(O,M,N,window) :- ups_sort(O,M,N), current(O,window),
                        ups_sort(O1,M,N-1), unscheduled(O1,window+1).
-limit(O,M,N,window) :- ups_sort(O,M,N), current(O,window),
-                       ups_sort(O1,M,N-1), assign(O1,W), window < W.
 limit(M,S+P,window) :- limit(O,M,N,window), start(O,S,0), assignment(O,P).
 
 #external compressed(O,S,window) : ready(O,S,window), 0 < S,
                                    compress, not windows(window).
 #external overlap(O,window+1) : current(O,window), overlap_size(K),
-                                assignment(O,M,P), limit(O1,M,N,window), 1 < N.
+                                assignment(O,M,P), limit(O1,M,N,window). % , 1 < N.
 
 &diff{O - 0} <= S :- scheduled(O,window), start(O,S,window-1).
 
@@ -91,8 +89,6 @@ limit(M,S+P,window) :- limit(O,M,N,window), start(O,S,0), assignment(O,P).
 &diff{O - bound} <= -P     :- assignment(O,P), assign(O,window), last(O).
 &diff{(I,J) - bound} <= -P :- assignment((I,J),P), assign((I,J),window),
                               unscheduled((I+1,J),window+1).
-&diff{(I,J) - bound} <= -P :- assignment((I,J),P), assign((I,J),window),
-                              assign((I+1,J),W), window < W.
 
 % output predicates
 
