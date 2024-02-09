@@ -6,9 +6,12 @@ function to execute it.
 
 import os
 import sys
+import math
+import time
+import bisect
 
 import clingo
-from clingo import ast, Number
+from clingo import ast, Number, Function
 from clingo.application import Flag
 from clingodl import ClingoDLTheory
 
@@ -30,11 +33,13 @@ class Application(clingo.Application):
     _maxima: list
     _assignment: str
     _bound: int
+    _bounds: list
 
     def __init__(self, name):
         self._dynamic = Flag()
         self._timeout = 0
         self._maxima = []
+        self._bounds = []
         self.__theory = ClingoDLTheory()
         self.program_name = name
         self.version = ".".join(str(x) for x in self.__theory.version())
@@ -97,6 +102,20 @@ class Application(clingo.Application):
 #        print(facts)
         return program
 
+    def del_bounds(self, control):
+        while True:
+            bound = self._bounds[0]
+            del self._bounds[0]
+            control.release_external(Function("achieve", [Number(bound)]))
+            if bound == self._bound: break
+
+    def get_assignment(self, model):
+        self._assignment = ""
+        for key, value in self.__theory.assignment(model.thread_id):
+            if key.name == "bound": self._bound = value
+            else: self._assignment += "start(({},{}),{},{}). ".format(*key.arguments, value, self._window)
+        self._bound -= 1
+
     def print_settings(self, control):
         print("% +++++++ SETTINGS/ +++++++")
         print("% Files:", self._files)
@@ -113,6 +132,19 @@ class Application(clingo.Application):
         print("% --const divisor:", control.get_const("divisor"), "  [denominator of overlapping ratio] (default: --const divisor=10)")
         print("% +++++++ /SETTINGS +++++++")
 
+    def print_header(self, window):
+        print("% +++++++ OPTIMIZE/ +++++++")
+        print("% Window:", window)
+
+    def print_footer(self, control, timeopt, interrupt):
+        print("% Bound:", self._bound + 1)
+        print("% Variables:", int(control.statistics["problem"]["generator"]["vars"]))
+        print("% Constraints:", int(control.statistics["problem"]["generator"]["constraints"]))
+        print("% Edges:", int(control.statistics["user_step"]["DifferenceLogic"]["Edges"]))
+        print("% Solve Time:", "{:.2f}".format(timeopt))
+        print("% Interrupts:", interrupt)
+        print("% +++++++ /OPTIMIZE +++++++")
+
     def print_model(self, model, printer):
         # print model
         symbols = model.symbols(shown=True)
@@ -121,18 +153,10 @@ class Application(clingo.Application):
 
         # print assignment
         sys.stdout.write("Assignment:\n")
-        symbols = model.symbols(theory=True)
-        self._assignment = ""
-        for symbol in sorted(symbols):
-            if symbol.arguments[0].name == "bound":
-                self._bound = symbol.arguments[1].number
-            else:
-                self._assignment += "start({},{},{}). ".format(*symbol.arguments, self._window)
         sys.stdout.write(self._assignment)
         sys.stdout.write("\n")
-        sys.stdout.write("Bound: {}".format(self._bound))
+        sys.stdout.write("Bound: {}".format(self._bound + 1))
         sys.stdout.write("\n")
-
         sys.stdout.flush()
 
     def main(self, control, files):
@@ -166,13 +190,22 @@ class Application(clingo.Application):
             control.add("upper", [], facts)
             programs = [("upper", [])]
         self._windows = next(control.symbolic_atoms.by_signature("windows", 1)).symbol.arguments[0].number
-        self._timeout = self._timeout / self._windows
+        self._timeout = math.ceil(self._timeout / self._windows)
         self.print_settings(control)
 
         if not self._dynamic.flag:
             programs.extend([(self.add_ordering(control, 0, "ordering", "preorder", "ops_sort"), []), ("ordering", [Number(0)]), ("static", [])])
 
+        interrupt = 0
         for i in range(self._windows):
+            if 0 < i:
+                control.cleanup()
+                programs = []
+                if 0 <= self._bound: ### compression goes here
+                    program = "start_{}".format(self._window)
+                    control.add(program, [], self._assignment)
+                    programs.append((program, []))
+
             self._window = i + 1
             programs.append(("previous", [Number(self._window)]))
 #            print("GROUND:", programs)
@@ -195,12 +228,44 @@ class Application(clingo.Application):
 #            print("GROUND:", programs)
             control.ground(programs)
             self.__theory.prepare(control)
+
+            for bound in self._bounds: control.assign_external(Function("achieve", [Number(bound)]), False)
             self._bound = -1
-            control.solve(on_model=self.__on_model, on_statistics=self.__on_statistics)
-            control.cleanup()
-            programs = []
+            timeopt = 0
+            self.print_header(self._window)
+            while True:
+                with control.solve(on_model=self.__on_model, on_statistics=self.__on_statistics, async_=True, yield_=True) as handle:
+                    timeold = time.time()
+                    if self._timeout <= 0: wait = handle.wait()
+                    else: wait = handle.wait(self._timeout - timeopt)
+                    timeopt += time.time() - timeold
+
+                    if not wait:
+                        interrupt += 1
+                        break
+
+                    result = handle.get()
+                    if result.exhausted:
+                        if result.unsatisfiable: self.del_bounds(control)
+                        break
+
+                if 0 < self._timeout and self._timeout <= timeopt:
+                    interrupt += 1
+                    break
+
+                if not self._bound in self._bounds:
+                    bisect.insort(self._bounds, self._bound)
+                    control.ground([("optimize", [Number(self._window), Number(self._bound)])])
+                control.assign_external(Function("achieve", [Number(self._bound)]), True)
+
+            self.print_footer(control, timeopt, interrupt)
+
+        print("Schedule:")
+        if 0 <= self._bound: print(self._assignment)
+        else: print("fail.")
 
     def __on_model(self, model):
+        self.get_assignment(model)
         self.__theory.on_model(model)
 
     def __on_statistics(self, step, accu):

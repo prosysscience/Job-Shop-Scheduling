@@ -90,6 +90,16 @@ limit(M,S+P,window) :- limit(O,M,N,window), start(O,S,0), assignment(O,P).
 &diff{(I,J) - bound} <= -P :- assignment((I,J),P), assign((I,J),window),
                               unscheduled((I+1,J),window+1).
 
+% constrain bound variable to minimize the makespan for time window(s)
+
+#program optimize(window,makespan).
+
+#external achieve(makespan) : not windows(window).
+
+achieve(makespan) :- windows(window).
+
+&diff{bound - 0} <= makespan :- achieve(makespan).
+
 % output predicates
 
 %*
@@ -104,4 +114,5 @@ limit(M,S+P,window) :- limit(O,M,N,window), start(O,S,0), assignment(O,P).
 #show patch/3.
 #show limit/4.
 #show limit/3.
+#show achieve/1.
 *%
