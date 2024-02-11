@@ -50,9 +50,15 @@ window_late(W,M+N) :- window(W), window_size(W+1,M), window_late(W+1,N).
 window_now(W,0..M)     :- window_size(W,M+1).
 window_out(W,M..M+N-1) :- window_size(W,M), window_late(W,N).
 
-overlap_now(W,0..N)   :- window_size(W,M+1), overlap_size(K+1),
-                         N = (M+K-|M-K|)/2.
-overlap_out(W,K..K+M) :- window_size(W,M+1), overlap_size(K).
+overlap_add(2,N) :- window(2), window_size(1,M), overlap_size(K),
+                    N = (M+K-|M-K|)/2.
+overlap_add(W,N) :- window(W), window_size(W-1,M), overlap_size(K),
+                    overlap_add(W-1,A), L = M+A, N = (L+K-|L-K|)/2.
+
+overlap_now(W,0..N)   :- overlap_add(W,N+1).
+overlap_out(2,N..M)   :- overlap_add(2,N), window_size(1,M+1).
+overlap_out(W,N..M+A) :- overlap_add(W,N), window_size(W-1,M+1),
+                         overlap_add(W-1,A).
 overlap_out(W,N)      :- window_now(W,N), overlap_none.
 
 % auxiliary predicates
@@ -102,8 +108,18 @@ unscheduled(O,W) :- unscheduled(O,W+1), 1 < W.
 #show windows/1.
 #show window/1.
 #show window_size/1.
+#show window_fill/1.
 #show overlap_size/1.
+#show overlap_none/0.
+#show window_last/2.
 #show window/3.
+#show window_size/2.
+#show window_late/2.
+#show window_now/2.
+#show window_out/2.
+#show overlap_add/2.
+#show overlap_now/2.
+#show overlap_out/2.
 #show mtwr/0.
 #show est/0.
 #show bottleneck/0.
