@@ -11,7 +11,7 @@ import time
 import bisect
 
 import clingo
-from clingo import ast, Number, Function
+from clingo import ast, Number, Function, Control
 from clingo.application import Flag
 from clingodl import ClingoDLTheory
 
@@ -20,6 +20,7 @@ lp_windows = directory + "/encodings/windows.lp"
 lp_overlap = directory + "/encodings/overlap.lp"
 lp_ordering = directory + "/encodings/ordering.lp"
 lp_schedule = directory + "/encodings/schedule.lp"
+lp_compress = directory + "/encodings/compress.lp"
 
 class Application(clingo.Application):
     '''
@@ -34,6 +35,8 @@ class Application(clingo.Application):
     _assignment: str
     _bound: int
     _bounds: list
+    _compress: bool
+    _current: str
 
     def __init__(self, name):
         self._dynamic = Flag()
@@ -110,10 +113,24 @@ class Application(clingo.Application):
             if bound == self._bound: break
 
     def get_assignment(self, model):
+        current = []
+        self._current = ""
         self._assignment = ""
         for key, value in self.__theory.assignment(model.thread_id):
             if key.name == "bound": self._bound = value
-            else: self._assignment += "start(({},{}),{},{}). ".format(*key.arguments, value, self._window)
+            else:
+                operation = Function("", [*key.arguments])
+                self._assignment += "start({},{},{}). ".format(operation, value, self._window)
+                if self._compress:
+                    atom = Function("current", [operation, Number(self._window)])
+                    if model.contains(atom): current.append((-value, (operation.arguments[0].number, operation.arguments[1].number)))
+                    else: self._current += "previous(({},{}),{}).\n".format(*operation.arguments, self._window)
+        if self._compress:
+            n = 1
+            for operation in sorted(current):
+                self._current += "current({},{},{}).\n".format(operation[1], n, self._window)
+                n += 1
+            self._current += "previous(0,{}).\ncurrent({},{}).\n".format(self._window, n, self._window)
         self._bound -= 1
 
     def print_settings(self, control):
@@ -137,6 +154,8 @@ class Application(clingo.Application):
         print("% Window:", window)
 
     def print_footer(self, control, timeopt, interrupt):
+        print("% Assignment:", end=" ")
+        if 0 <= self._bound: print(self._assignment)
         print("% Bound:", self._bound + 1)
         print("% Variables:", int(control.statistics["problem"]["generator"]["vars"]))
         print("% Constraints:", int(control.statistics["problem"]["generator"]["constraints"]))
@@ -147,8 +166,7 @@ class Application(clingo.Application):
 
     def print_model(self, model, printer):
         # print model
-        symbols = model.symbols(shown=True)
-        sys.stdout.write(" ".join(str(symbol) for symbol in sorted(symbols) if not self.__hidden(symbol)))
+        for atom in map(str, model.symbols(shown=True)): sys.stdout.write(f"{atom}. ")
         sys.stdout.write("\n")
 
         # print assignment
@@ -171,10 +189,21 @@ class Application(clingo.Application):
 #        print("GROUND:", programs)
         control.ground(programs)
 
+        self._compress = control.get_const("compress").number == 1
+        if self._compress:
+            compress = Control()
+            facts = "occupy(M,0,0,0,1,1,0) :- assignment(O,M,P).\n"
+            for atom in control.symbolic_atoms.by_signature("assignment", 3): facts += "{}.\n".format(atom.symbol)
+            compress.add("base", [], facts)
+            compress.load(lp_compress)
+            compression = [("base", [])]
+
         programs = []
         upper, given = False, {}
         for atom in control.symbolic_atoms.by_signature("upper", 0): upper = True
-        for m in range(next(control.symbolic_atoms.by_signature("machines", 1)).symbol.arguments[0].number):
+        try: machines = next(control.symbolic_atoms.by_signature("machines", 1)).symbol.arguments[0].number
+        except StopIteration: machines = 0
+        for m in range(machines):
             self._maxima.insert(m,0)
             if upper: given[m] = []
         for atom in control.symbolic_atoms.by_signature("upper", 3):
@@ -190,7 +219,8 @@ class Application(clingo.Application):
             control.add("upper", [], facts)
             programs = [("upper", [])]
         self._windows = next(control.symbolic_atoms.by_signature("windows", 1)).symbol.arguments[0].number
-        self._timeout = math.ceil(self._timeout / self._windows)
+        if self._windows: self._timeout = math.ceil(self._timeout / self._windows)
+        else: self._bound = -1
         self.print_settings(control)
 
         if not self._dynamic.flag:
@@ -201,7 +231,7 @@ class Application(clingo.Application):
             if 0 < i:
                 control.cleanup()
                 programs = []
-                if 0 <= self._bound: ### compression goes here
+                if 0 <= self._bound:
                     program = "start_{}".format(self._window)
                     control.add(program, [], self._assignment)
                     programs.append((program, []))
@@ -258,11 +288,25 @@ class Application(clingo.Application):
                     control.ground([("optimize", [Number(self._window), Number(self._bound)])])
                 control.assign_external(Function("achieve", [Number(self._bound)]), True)
 
+            if self._compress:
+                if 0 <= self._bound:
+                    program = "current_{}".format(self._window)
+                    compress.add(program, [], self._current)
+                    compression.extend([(program, []), ("compress", [Number(self._window)])])
+                    compress.ground(compression)
+                    self._assignment = ""
+                    for atom in compress.symbolic_atoms.by_signature("start", 3):
+                        if atom.symbol.arguments[2].number == self._window: self._assignment += "{}. ".format(atom.symbol)
+                    for atom in compress.symbolic_atoms.by_signature("bound", 3):
+                        if atom.symbol.arguments[2].number == self._window and atom.symbol.arguments[0].number == machines: self._bound = atom.symbol.arguments[1].number - 1
+                    compression = []
+                else: self._compress = False
             self.print_footer(control, timeopt, interrupt)
 
         print("Schedule:")
         if 0 <= self._bound: print(self._assignment)
         else: print("fail.")
+        print("Makespan:", self._bound + 1)
 
     def __on_model(self, model):
         self.get_assignment(model)
