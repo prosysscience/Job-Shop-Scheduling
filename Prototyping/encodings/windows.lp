@@ -82,11 +82,22 @@ last((I,J)) :- operation((I,J)), not operation((I+1,J)).
 
 latest(M,0,0) :- machine(M).
 
+loaded(M,L,0,0..1) :- machine(M), bottleneck,
+                      L = #sum+{P,O : assignment(O,M,P)}.
+
 #program static.
 
 % statically determine operations for time windows
 
+mps_next(M,O,N,K,0) :- select(M,L,O,P,NM,K-1,0),
+                       mps_sort(O,N-1,0),
+                       window(W,N).
+
+mps_sort(O,N,0) :- gather(M,L,O,P,NM,A,K,0),
+                   mps_next(N',K,0), N = N'+A.
+
 assign(O,W) :- ops_sort(O,N,0), window(W,N), not bottleneck.
+assign(O,W) :- mps_sort(O,N,0), window(W,N).
 
 unscheduled(O,W) :- assign(O,W), 1 < W.
 unscheduled(O,W) :- unscheduled(O,W+1), 1 < W.
@@ -129,4 +140,9 @@ unscheduled(O,W) :- unscheduled(O,W+1), 1 < W.
 #show ups_sort/3.
 #show last/1.
 #show latest/3.
+#show loaded/4.
+#show mps_next/5.
+#show mps_next/3.
+#show mps_sort/3.
+#show ops_sort/3.
 *%

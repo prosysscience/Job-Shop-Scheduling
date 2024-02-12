@@ -136,7 +136,7 @@ class Application(clingo.Application):
     def print_settings(self, control):
         print("% +++++++ SETTINGS/ +++++++")
         print("% Files:", self._files)
-        print("% Timeout:", "{:.2f}".format(self._timeout), "        [--timeout=LIMIT: time limit per time window in seconds; unlimited if LIMIT=0] (default: LIMIT=0)")
+        print("% Timeout:", f"{self._timeout:{' '}{'<'}{12}}", "[--timeout=LIMIT: time limit per time window in seconds; unlimited if LIMIT=0] (default: LIMIT=0)")
         if self._dynamic.flag:
             print("% Dynamic:", self._dynamic.flag, "        [--dynamic: dynamically partition operations into time windows] (default: False)")
         else:
@@ -307,6 +307,8 @@ class Application(clingo.Application):
         if 0 <= self._bound: print(self._assignment)
         else: print("fail.")
         print("Makespan:", self._bound + 1)
+        print("Windows:", self._windows)
+        print("Interrupted:", interrupt)
 
     def __on_model(self, model):
         self.get_assignment(model)

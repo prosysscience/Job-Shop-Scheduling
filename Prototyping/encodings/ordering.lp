@@ -41,6 +41,93 @@ assign(O,window) :- ops_sort(O,N,window), window_now(window,N),
 unscheduled(O,window+1) :- ops_sort(O,N,window), window_out(window,N),
                            not bottleneck.
 
+% refine the operation order by bottleneck machines
+
+assign(O) :- assign(O,window-1),
+             bottleneck.
+
+loaded(M,L,N,window)   :- loaded(M,L,0,window-1),
+                          window_size(window-1,N).
+loaded(M,L-P,N,window) :- loaded(M,L,N+1,window),
+                          mps_sort(O,N,window-1),
+                          assignment(O,M,P).
+loaded(M,L,N,window)   :- loaded(M,L,N+1,window),
+                          mps_sort(O,N,window-1),
+                          assignment(O,M',P), M != M'.
+
+refine(M,L,0,window)   :- loaded(M,L,0,window), 0 < L.
+refine(M,L,N+1,window) :- refine(M,L,N,window),
+                          ops_sort(O,N,window),
+                          assignment(O,M',P), M != M'.
+refine(M,L,N+1,window) :- refine(M,L,N,window),
+                          gather(M,L',O,P,N,K,window), L < L'.
+refine(M,L,N+1,window) :- refine(M,L',N,window),
+                          gather(M,L',O,P,N,K-1,window),
+                          mps_next(N',K,window),
+                          L = L'-P, 0 < L.
+refine(M,L-P,N,window) :- refine(M,L,N,window),
+                          gather(M,L,O,P,NM,K-1,window), N < NM,
+                          mps_next(N',K,window).
+
+differ(M,L,A,K,window) :- reduce(M,L,K-1,window),
+                          gather(M',L',O,P,N',A,K-1,window), M != M',
+                          mps_next(O,N,K,window).
+differ(M,L,A,K,window) :- differ(M,L,A+1,K,window),
+                          gather(M',L',O,P,N',A,K-1,window), M != M'.
+
+reduce(M,L,0,window) :- loaded(M,L,0,window).
+reduce(M,L,K,window) :- differ(M,L,0,K,window).
+reduce(M,L,K,window) :- gather(M,L',O,P,N,K-1,window), L = L'-P,
+                        mps_next(N,K,window).
+
+reduce(M,M,L,K,window)   :- reduce(M,L,K,window),
+                            machines(M).
+reduce(M,M,L,K,window)   :- reduce(M,L,K,window),
+                            reduce(M+1,M',L',K,window), L' < L.
+reduce(M,M',L',K,window) :- reduce(M,L,K,window),
+                            reduce(M+1,M',L',K,window), L <= L'.
+
+ops_sort(O,M,P,N,0,window)     :- assignment(O,M,P),
+                                  ops_sort(O,N,window),
+                                  bottleneck.
+ops_sort((I,J),M,P,N,K,window) :- ops_sort((I,J),M,P,N,K-1,window),
+                                  mps_next((I',J),N,K,window), I < I'.
+ops_sort((I,J),M,P,N,K,window) :- ops_sort((I,J),M,P,N,K-1,window),
+                                  mps_next((I',J'),N,K,window), J != J'.
+
+select(M,L,O,P,N,K,window) :- refine(M,L,N,window),
+                              ops_sort(O,M,P,N,K,window),
+                              reduce(1,M,L,K,window).
+
+gather(M,L,O,P,N,K,window)     :- select(M,L,O,P,N,K,window).
+gather(M,L,(I,J),P,N,K,window) :- reduce(M,L,K,window),
+                                  ops_sort((I,J),M,P,N,K,window),
+                                  gather(M',L',(I+1,J),P',N',K,window).
+
+gather(M,L,(1,J),P,N,0,K,window) :- gather(M,L,(1,J),P,N,K,window).
+gather(M,L,(I,J),P,N,0,K,window) :- gather(M,L,(I,J),P,N,K,window),
+                                    assign((I-1,J)).
+gather(M,L,O,P,N,0,K,window)     :- gather(M,L,O,P,N,K,window),
+                                    gather(O,K,window).
+gather(M,L,(I,J),P,N,A,K,window) :- gather(M,L,(I,J),P,N,K,window),
+                                    gather(M',L',(I-1,J),P',N',A-1,K,window).
+
+gather(O,K,window)     :- ops_sort(O,M,P,N,K,window),
+                          gather(O,K-1,window).
+gather((I,J),K,window) :- ops_sort((I,J),M,P,N,K,window),
+                          mps_next((I-1,J),N',K,window).
+
+mps_next(O,N,K,window) :- select(M,L,O,P,NM,K-1,window),
+                          mps_sort(O,N-1,window),
+                          window_now(window,N).
+
+mps_next(0,0,window) :- reduce(1,M,L,0,window).
+mps_next(N,K,window) :- mps_next(O,N,K,window).
+
+mps_sort(O,N,window) :- gather(M,L,O,P,NM,A,K,window),
+                        mps_next(N',K,window), N = N'+A,
+                        window_now(window,N).
+
 % output predicates
 
 %*
@@ -49,5 +136,14 @@ unscheduled(O,window+1) :- ops_sort(O,N,window), window_out(window,N),
 #show earliest/5.
 #show remaining/4.
 #show preorder/4.
-#show ops_sort/3.
+#show assign/1.
+#show refine/4.
+#show differ/5.
+#show reduce/4.
+#show reduce/5.
+#show ops_sort/6.
+#show select/7.
+#show gather/7.
+#show gather/8.
+#show gather/3.
 *%
