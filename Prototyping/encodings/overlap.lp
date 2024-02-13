@@ -17,6 +17,10 @@ overlap(O,window) :- pre_sort(O,N,window), overlap_now(window,N).
 
 % determine occupation of machines by scheduled (non-overlapping) operations
 
+compressed(O,S,window-1) :- ready(O,S,window-1), compress,
+                            start(O,S',window-1), S' < S.
+
+scheduled(O,S,window)     :- compressed(O,S,window-1).
 scheduled(O,S,window)     :- previous(O,S,window),
                              pre_sort(O,N,window), overlap_out(window,N).
 scheduled(O,S,window)     :- previous(O,S,window), overlap_none.

@@ -156,6 +156,7 @@ class Application(clingo.Application):
     def print_footer(self, control, timeopt, interrupt):
         print("% Assignment:", end=" ")
         if 0 <= self._bound: print(self._assignment)
+        else: print("")
         print("% Bound:", self._bound + 1)
         print("% Variables:", int(control.statistics["problem"]["generator"]["vars"]))
         print("% Constraints:", int(control.statistics["problem"]["generator"]["constraints"]))
