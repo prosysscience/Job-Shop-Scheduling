@@ -35,11 +35,22 @@ preorder(O,-U,P,window) :- remaining(O,P,U,window).
 
 % dynamically determine operations for time window
 
-assign(O,window) :- ops_sort(O,N,window), window_now(window,N),
+assign(O,window) :- ops_sort(O,N,window),
+                    window_now(window,N),
                     not bottleneck.
+assign(O,window) :- mps_sort(O,N,window),
+                    window(window).
 
-unscheduled(O,window+1) :- ops_sort(O,N,window), window_out(window,N),
-                           not bottleneck.
+unscheduled(O,window+1)     :- ops_sort(O,N,window),
+                               window_out(window,N),
+                               not bottleneck.
+unscheduled(O,window+1)     :- gather(M,L,O,P,NM,A,K,window),
+                               mps_next(N',K,window), N = N'+A,
+                               window_out(window,N).
+unscheduled((I,J),window+1) :- ops_sort((I,J),M,P,NM,K,window),
+                               gather(M',L,(I',J'),P',NM',A,K,window), J != J',
+                               mps_next(N',K,window), N = N'+A,
+                               window_size(window,N+1).
 
 % refine the operation order by bottleneck machines
 
@@ -114,8 +125,8 @@ gather(M,L,(I,J),P,N,A,K,window) :- gather(M,L,(I,J),P,N,K,window),
 
 gather(O,K,window)     :- ops_sort(O,M,P,N,K,window),
                           gather(O,K-1,window).
-gather((I,J),K,window) :- ops_sort((I,J),M,P,N,K,window),
-                          mps_next((I-1,J),N',K,window).
+gather((I,J),K,window) :- mps_next((I-1,J),N,K,window),
+                          operation((I,J)).
 
 mps_next(O,N,K,window) :- select(M,L,O,P,NM,K-1,window),
                           mps_sort(O,N-1,window),
