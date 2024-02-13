@@ -44,9 +44,10 @@ assign(O,window) :- mps_sort(O,N,window),
 unscheduled(O,window+1)     :- ops_sort(O,N,window),
                                window_out(window,N),
                                not bottleneck.
-unscheduled(O,window+1)     :- gather(M,L,O,P,NM,A,K,window),
+unscheduled((I,J),window+1) :- ops_sort((I,J),M,P,NM,K,window),
+                               gather(M',L,(I',J),P',NM',A,K,window), I' < I,
                                mps_next(N',K,window), N = N'+A,
-                               window_out(window,N).
+                               window_size(window,N+1).
 unscheduled((I,J),window+1) :- ops_sort((I,J),M,P,NM,K,window),
                                gather(M',L,(I',J'),P',NM',A,K,window), J != J',
                                mps_next(N',K,window), N = N'+A,
