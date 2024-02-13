@@ -77,7 +77,7 @@ differ(M,L,A,K,window) :- differ(M,L,A+1,K,window),
 
 reduce(M,L,0,window) :- loaded(M,L,0,window).
 reduce(M,L,K,window) :- differ(M,L,0,K,window).
-reduce(M,L,K,window) :- gather(M,L',O,P,N,K-1,window), L = L'-P,
+reduce(M,L,K,window) :- gather(M,L',O,P,N',K-1,window), L = L'-P,
                         mps_next(N,K,window).
 
 reduce(M,M,L,K,window)   :- reduce(M,L,K,window),
@@ -91,9 +91,9 @@ ops_sort(O,M,P,N,0,window)     :- assignment(O,M,P),
                                   ops_sort(O,N,window),
                                   bottleneck.
 ops_sort((I,J),M,P,N,K,window) :- ops_sort((I,J),M,P,N,K-1,window),
-                                  mps_next((I',J),N,K,window), I < I'.
+                                  mps_next((I',J),N',K,window), I' < I.
 ops_sort((I,J),M,P,N,K,window) :- ops_sort((I,J),M,P,N,K-1,window),
-                                  mps_next((I',J'),N,K,window), J != J'.
+                                  mps_next((I',J'),N',K,window), J != J'.
 
 select(M,L,O,P,N,K,window) :- refine(M,L,N,window),
                               ops_sort(O,M,P,N,K,window),
