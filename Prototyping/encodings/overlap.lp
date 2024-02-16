@@ -32,7 +32,7 @@ scheduled(O,M,P,S,window) :- scheduled(O,S,window), assignment(O,M,P).
 scheduled(O,M,P,S)        :- scheduled(O,M,P,S,window).
 scheduled(O,window)       :- scheduled(O,S,window).
 
-compressed(O,S,window-1) :- start(O,S,window-1), compress,
+compressed(O,T,window-1) :- start(O,S,window-1), compress,
                             ready(O,T,1,window-1), S < T.
 
 % output predicates
