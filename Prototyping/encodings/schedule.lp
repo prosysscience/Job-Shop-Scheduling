@@ -24,9 +24,9 @@ ready((I,J),P,T2,T1,T,F,window) :- current((I,J),window),
                                    T = (T1+T2+|D|)/2,
                                    F = (E+1-|E-1|)/2.
 
-ready(O,S,F,window) :- ready(O,P,T,S,S,F,window), T < S,
+ready(O,S,F,window) :- ready(O,P,T,T',S,F,window), T < S,
                        assign(O,window).
-ready(O,S,0,window) :- ready(O,P,T,S,S,F,window), T < S,
+ready(O,S,0,window) :- ready(O,P,T,T',S,F,window), T < S,
                        overlap(O,window).
 
 ready(O,S,window) :- ready(O,S,F,window-1),
