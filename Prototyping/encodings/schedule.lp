@@ -60,12 +60,12 @@ guess((I1,J1),P1,(I2,J2),P2,window) :- assignment((I1,J1),M,P1),
                             not order(O1,P1,O2,window).
 
 % fix order of overlapping operations
-
+%*
 :- scheduled(O1,window), overlap(O2,window),
    guess(O1,P1,O2,P2,W), not order(O1,P1,O2,W).
 :- scheduled(O1,window), overlap(O2,window),
    guess(O2,P2,O1,P1,W), not order(O1,P1,O2,W).
-
+*%
 % constrain the start times of operations
 
 limit(O,M,N,window) :- ups_sort(O,M,N), current(O,window),
@@ -77,7 +77,16 @@ limit(M,S+P,window) :- limit(O,M,N,window), start(O,S,0), assignment(O,P).
 #external overlap(O,window+1) : current(O,window), overlap_size(K),
                                 assignment(O,M,P), limit(O1,M,N,window).
 
-&diff{O - 0} <= S :- scheduled(O,window), start(O,S,window-1).
+&diff{O - 0} <= S :- scheduled(O,S,window).
+
+&diff{0 - O} <= -S :- scheduled(O,S,window),
+                      ready(O,S',F,window-1), S != S'.
+&diff{0 - O} <= -S :- scheduled(O,S,window),
+                      ready(O,P,T,T',T,F,window-1),
+                      assign(O,window-1).
+&diff{0 - O} <= -S :- scheduled(O,S,window),
+                      ready(O,P,T,T',T,F,window-1),
+                      ready(O,S',window-1), S != S'.
 
 &diff{0 - O} <= -S :- ready(O,S,F,window), assign(O,window),
                       not compressed(O,S,window).
