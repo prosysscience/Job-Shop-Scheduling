@@ -5,29 +5,41 @@
 current(O,window) :- assign(O,window).
 current(O,window) :- overlap(O,window).
 
-delay((1,J),0,-1,window)  :- current((1,J),window).
-delay((I,J),P,S+P,window) :- current((I,J),window),
-                             scheduled((I-1,J),M,P,S).
-delay((I,J),P,T,window)   :- current((I,J),window),
-                             ready((I-1,J),P,S,T,P1,T1,window).
+ready((1,J),P,-1,T,T,F,window)  :- current((1,J),window),
+                                   assignment((1,J),M,P),
+                                   latest(M,T,window),
+                                   F = (T+1-|T-1|)/2.
+ready((I,J),P,-1,T1,T,F,window) :- current((I,J),window),
+                                   assignment((I,J),M,P),
+                                   latest(M,T1,window),
+                                   scheduled((I-1,J),M',P',S), T2 = S+P',
+                                   D = T1-T2, E = D+|D|,
+                                   T = (T1+T2+|D|)/2,
+                                   F = (E+1-|E-1|)/2.
+ready((I,J),P,T2,T1,T,F,window) :- current((I,J),window),
+                                   assignment((I,J),M,P),
+                                   latest(M,T1,window),
+                                   ready((I-1,J),P',T',S',S,F',window), T2 = S+P',
+                                   D = T1-T2, E = D+|D|+F',
+                                   T = (T1+T2+|D|)/2,
+                                   F = (E+1-|E-1|)/2.
 
-ready(O,P,S,S+P,P1,T1,window) :- delay(O,P1,T1,window),
-                                 assignment(O,M,P),
-                                 latest(M,T,window),
-                                 S = (T+T1+|T-T1|)/2.
-ready(O,S,P1,T1,window)       :- ready(O,P,S,T,P1,T1,window),
-                                 assign(O,window).
-ready(O,S,window)             :- ready(O,S,P,T,window), T < S.
+ready(O,S,F,window) :- ready(O,P,T,S,S,F,window), T < S,
+                       assign(O,window).
+ready(O,S,0,window) :- ready(O,P,T,S,S,F,window), T < S,
+                       overlap(O,window).
+
+ready(O,S,window) :- ready(O,S,F,window-1),
+                     overlap(O,window).
+ready(O,0,window) :- ready(O,P,T,T',T,F,window-1),
+                     overlap(O,window),
+                     assign(O,window-1).
+ready(O,S,window) :- ready(O,P,T,T',T,F,window-1),
+                     overlap(O,window),
+                     ready(O,S,window-1).
 
 % order successive operations of a job
 
-other((1,J),S,window) :- ready((1,J),S,window),
-                         not windows(window).
-other((I,J),S,window) :- ready((I,J),S,window),
-                         scheduled((I-1,J),M,P,S1),
-                         not windows(window).
-
-order((I-1,J),P,(I,J),window) :- ready((I,J),S,P,S,window).
 order((I1,J),P,(I2,J),window) :- assignment((I1,J),P),
                                  current((I1,J),window),
                                  assign((I2,J),window), I2 = I1+1.
@@ -56,30 +68,20 @@ guess((I1,J1),P1,(I2,J2),P2,window) :- assignment((I1,J1),M,P1),
 
 % constrain the start times of operations
 
-patch((I2,J),S,window) :- order((I1,J),P,(I2,J),window-1),
-                          start((I2,J),S,window-1), scheduled((I2,J),window),
-                          start((I1,J),S1,window-1), S1+P < S.
-
-% limit(O,M,1,window) :- ups_sort(O,M,1), current(O,window), not windows(window).
 limit(O,M,N,window) :- ups_sort(O,M,N), current(O,window),
                        ups_sort(O1,M,N-1), unscheduled(O1,window+1).
 limit(M,S+P,window) :- limit(O,M,N,window), start(O,S,0), assignment(O,P).
 
-#external compressed(O,S,window) : ready(O,S,window), 0 < S,
-                                   compress, not windows(window).
+#external compressed(O,S,window) : ready(O,S,1,window),
+                                   compress, window(window+1).
 #external overlap(O,window+1) : current(O,window), overlap_size(K),
-                                assignment(O,M,P), limit(O1,M,N,window). % , 1 < N.
+                                assignment(O,M,P), limit(O1,M,N,window).
 
 &diff{O - 0} <= S :- scheduled(O,window), start(O,S,window-1).
 
-&diff{0 - O} <= -S :- start(O,S,window-1), scheduled(O,window),
-                      other(O,T,window-1), S != T.
-&diff{0 - O} <= -S :- patch(O,S,window),
-                      ready(O,T,window-1), S != T.
-&diff{0 - O} <= -S :- patch(O,S,window),
-                      ready(O,T,P,T,window-1).
-
-&diff{0 - O} <= -S :- ready(O,S,window), not compressed(O,S,window).
+&diff{0 - O} <= -S :- ready(O,S,F,window), assign(O,window),
+                      not compressed(O,S,window).
+&diff{0 - O} <= -S :- ready(O,S,0,window), ready(O,S',window), S' < S.
 
 &diff{O1 - O2} <= -P :- order(O1,P,O2,window).
 
@@ -104,14 +106,11 @@ achieve(makespan) :- windows(window).
 
 %*
 #show current/2.
-#show delay/4.
 #show ready/7.
-#show ready/5.
+#show ready/4.
 #show ready/3.
-#show other/3.
 #show guess/5.
 #show order/4.
-#show patch/3.
 #show limit/4.
 #show limit/3.
 #show achieve/1.
