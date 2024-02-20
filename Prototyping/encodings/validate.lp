@@ -2,6 +2,7 @@
 
 start(O,S) :- start(O,S,W).
 
+:- start(O,S), S < 0.
 :- assignment(J,I,M,P), #count{S : start((I,J),S)} != 1.
 :- start((I,J),S), #count{M,P : assignment(J,I,M,P)} != 1.
 
