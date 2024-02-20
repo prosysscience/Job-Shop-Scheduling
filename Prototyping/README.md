@@ -1,6 +1,6 @@
 # JSSP Solving by Time Window Decomposition
 
-This folder contains a prototype implementation for the Job-Shop Scheduling Problem (JSSP) with the goal to integrate diverse time window decomposition strategies. Beyond the built-in options of [clingo-dl](https://potassco.org/labs/clingoDL/), the [main.py](`./main.py`) script, which uses the [clingo-dl](https://potassco.org/labs/clingoDL/) encodings in the [encodings subfolder](./encodings/), can be configured by the following command-line options:
+This folder contains a prototype implementation for the Job-Shop Scheduling Problem (JSSP) with the goal to integrate diverse time window decomposition strategies. Beyond the built-in options of [clingo-dl](https://potassco.org/labs/clingoDL/), the [`main.py`](./main.py) script, which uses the [clingo-dl](https://potassco.org/labs/clingoDL/) encodings in the [encodings subfolder](./encodings/), can be configured by the following command-line options:
 
 * `--timeout=LIMIT` : Set the overall time limit for a run to `LIMIT` seconds. This time budget will be evenly divided between time windows. The default value `LIMIT=0` means that the time for solving each time window and the overall run is unlimited.
 
@@ -20,7 +20,7 @@ This folder contains a prototype implementation for the Job-Shop Scheduling Prob
 
 * `--const divisor=N` : Set the denominator for the ratio of operations to take as overlap from the previous into the current time window. For instance, combining the default value `N=10` with a `factor` of `1` means that 10% of `|operations|/|windows|` many operations to be scheduled will be taken as overlap per time window.
 
-__NOTE :__ The Answer Set Programming (ASP) encoding part for revising the operation ordering of a time window decomposition strategy by bottleneck machines is grounding-intensive, which creates memory stress for large JSSP instances with thousands of operations. Hence, the option `--const bottleneck=1` should be considered with care and can be prohibitive for large JSSP instances. Switching to a procedural instead of an ASP implementation of the revised operation ordering based on bottleneck machines would resolve this issue, but it has not yet been implemented in the [main.py](`./main.py`) script.
+__NOTE :__ The Answer Set Programming (ASP) encoding part for revising the operation ordering of a time window decomposition strategy by bottleneck machines is grounding-intensive, which creates memory stress for large JSSP instances with thousands of operations. Hence, the option `--const bottleneck=1` should be considered with care and can be prohibitive for large JSSP instances. Switching to a procedural instead of an ASP implementation of the revised operation ordering based on bottleneck machines would resolve this issue, but it has not yet been implemented in the [`main.py`](./main.py) script.
 
 ## Usage Examples
 
@@ -80,3 +80,13 @@ Example calls like the following allow for JSSP solving by [clingo-dl](https://p
   with `⌈2/5⌉` ratio of operations from the previous time window taken as overlap:
 
   > `python3 main.py scratch/instance.lp --warn=none --const windows=3 --const factor=2 --const divisor=5`
+
+## Schedule Validation
+
+The auxiliary ASP encoding [`validate.lp`](./encodings/validate.lp) can be used to check an initial or computed schedule with [clingo](https://potassco.org/clingo/) (where the outcome `UNSATISFIABLE` indicates that the schedule is infeasible) by means of calls like the following:
+
+  > `clingo encodings/validate.lp scratch/instance.lp scratch/initial1.lp`
+
+  > `clingo encodings/validate.lp scratch/instance.lp scratch/initial2.lp`
+
+  > `python3 main.py scratch/instance.lp --warn=none --const windows=3 | grep -A1 -e "^Schedule:$" | tail -n1 | clingo encodings/validate.lp scratch/instance.lp -`
