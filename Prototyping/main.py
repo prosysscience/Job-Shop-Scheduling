@@ -135,18 +135,18 @@ class Application(clingo.Application):
 
     def print_settings(self, control):
         print("% +++++++ SETTINGS/ +++++++")
-        print("% Files:", self._files)
-        print("% Timeout:", f"{self._timeout:{' '}{'<'}{12}}", "[--timeout=LIMIT: time limit per time window in seconds; unlimited if LIMIT=0] (default: LIMIT=0)")
+        print("% Files:                ", self._files)
+        print("% Timeout:", f"{self._timeout:{' '}{'<'}{13}}", "[--timeout=LIMIT: time limit per time window in seconds; unlimited if LIMIT=0] (default: LIMIT=0)")
         if self._dynamic.flag:
-            print("% Dynamic:", self._dynamic.flag, "        [--dynamic: dynamically partition operations into time windows] (default: False)")
+            print("% Dynamic:", self._dynamic.flag, "         [--dynamic: dynamically partition operations into time windows] (default: False)")
         else:
-            print("% Dynamic:", self._dynamic.flag, "       [--dynamic: dynamically partition operations into time windows] (default: False)")
-        print("% --const windows:", self._windows, "   [number of time windows] (default: --const windows=1)")
-        print("% --const ordering:", control.get_const("ordering"), "  [1: EST; 2: MTWR; other: start time of a schedule represented by facts 'start((OPERATION,JOB),START,0).';\n%                        other than 0, 1, and 2 & --const bottleneck != 1: assert machine-wise upper bounds according to schedule] (default: --const ordering=1)")
-        print("% --const bottleneck:", control.get_const("bottleneck"), "[1: (re)order operations by bottleneck machines; other: ignore machines] (default: --const bottleneck=0)")
-        print("% --const compress:", control.get_const("compress"), "  [1: activate compression; other: deactivate compression] (default: --const compress=1)")
-        print("% --const factor:", control.get_const("factor"), "    [numerator of overlapping ratio] (default: --const factor=0)")
-        print("% --const divisor:", control.get_const("divisor"), "  [denominator of overlapping ratio] (default: --const divisor=10)")
+            print("% Dynamic:", self._dynamic.flag, "        [--dynamic: dynamically partition operations into time windows] (default: False)")
+        print("% --const windows:", f"{self._windows:{' '}{'<'}{5}}", "[number of time windows] (default: --const windows=1)")
+        print("% --const ordering:", control.get_const("ordering"), "   [1: EST; 2: MTWR; other: start time of a schedule represented by facts 'start((OPERATION,JOB),START,0).';\n%                         other than 0, 1, and 2 & --const bottleneck != 1: assert machine-wise upper bounds according to schedule] (default: --const ordering=1)")
+        print("% --const bottleneck:", control.get_const("bottleneck"), " [1: (re)order operations by bottleneck machines; other: ignore machines] (default: --const bottleneck=0)")
+        print("% --const compress:", control.get_const("compress"), "   [1: activate compression; other: deactivate compression] (default: --const compress=1)")
+        print("% --const factor:", f"{control.get_const('factor').number:{' '}{'<'}{6}}", "[numerator of overlapping ratio] (default: --const factor=0)")
+        print("% --const divisor:", f"{control.get_const('divisor').number:{' '}{'<'}{5}}", "[denominator of overlapping ratio] (default: --const divisor=10)")
         print("% +++++++ /SETTINGS +++++++")
 
     def print_header(self, window):
@@ -159,7 +159,7 @@ class Application(clingo.Application):
         else: print("")
         print("% Bound:", self._bound + 1)
         print("% Variables:", int(control.statistics["problem"]["generator"]["vars"]))
-        print("% Constraints:", int(control.statistics["problem"]["generator"]["constraints"]))
+#        print("% Constraints:", int(control.statistics["problem"]["generator"]["constraints"]))
         print("% Edges:", int(control.statistics["user_step"]["DifferenceLogic"]["Edges"]))
         print("% Solve Time:", "{:.2f}".format(timeopt))
         print("% Interrupts:", interrupt)
@@ -310,6 +310,7 @@ class Application(clingo.Application):
         print("Makespan:", self._bound + 1)
         print("Windows:", self._windows)
         print("Interrupted:", interrupt)
+        self.print_settings(control)
 
     def __on_model(self, model):
         self.get_assignment(model)
